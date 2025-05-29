@@ -7,7 +7,7 @@ import { UserRepository, EmailService, Logger } from '../ports'
 import { validateCreateUserInput, CreateUserInput } from '../../domain/userValidation'
 import { createUserEntity } from '../../domain/userFactory'
 
-export interface CreateUserDeps {
+export type CreateUserDeps = {
   userRepository: UserRepository
   emailService: EmailService
   logger: Logger
@@ -26,11 +26,17 @@ export const createUser = (
 const checkEmailNotExists = (validInput: CreateUserInput): RTE.ReaderTaskEither<CreateUserDeps, DomainError, CreateUserInput> =>
   pipe(
     RTE.ask<CreateUserDeps>(),
-    RTE.chainW((deps) =>
+    RTE.chainW(({ userRepository }) =>
       pipe(
-        deps.userRepository.findByEmail(validInput.email),
-        TE.chain(() => createEmailExistsError()),
-        TE.orElse(handleUserNotFoundError(validInput)),
+        userRepository.findByEmail(validInput.email),
+        TE.chain(() => TE.left<DomainError>({
+          _tag: 'ValidationError',
+          errors: [{ field: 'email', message: 'Email already exists' }]
+        })),
+        TE.orElse((error) =>
+          error._tag === 'UserNotFound'
+            ? TE.right(validInput)
+            : TE.left(error)),
         RTE.fromTaskEither
       )
     )
@@ -42,13 +48,13 @@ const createAndSaveUser = (validInput: CreateUserInput): RTE.ReaderTaskEither<Cr
     RTE.chainFirstW((user) =>
       pipe(
         RTE.ask<CreateUserDeps>(),
-        RTE.chainTaskEitherK((deps) => logUserCreation(deps.logger)(user))
+        RTE.chainTaskEitherK(({ logger }) => TE.fromIO(logger.info('Creating user', { userId: user.id })))
       )
     ),
     RTE.chainW((user) =>
       pipe(
         RTE.ask<CreateUserDeps>(),
-        RTE.chainTaskEitherK((deps) => deps.userRepository.save(user))
+        RTE.chainTaskEitherK(({ userRepository }) => userRepository.save(user))
       )
     )
   )
@@ -61,34 +67,15 @@ const sendWelcomeEmailSafely = (user: User): RTE.ReaderTaskEither<CreateUserDeps
 
       return RTE.ask<CreateUserDeps>()
     }),
-    RTE.chainW((deps) =>
+    RTE.chainW(({ emailService, logger }) =>
       pipe(
-        deps.emailService.sendWelcomeEmail(user),
+        emailService.sendWelcomeEmail(user),
         TE.map(() => user),
-        TE.orElse(handleEmailError(deps.logger, user)),
+        TE.orElse((error) => {
+          logger.error('Failed to send welcome email', new Error(JSON.stringify(error)), { userId: user.id })
+          return TE.left(error)
+        }),
         RTE.fromTaskEither
       )
     )
   )
-
-const createEmailExistsError = (): TE.TaskEither<DomainError, never> =>
-  TE.left<DomainError>({
-    _tag: 'ValidationError',
-    errors: [{ field: 'email', message: 'Email already exists' }]
-  })
-
-const handleUserNotFoundError = (validInput: CreateUserInput) => (error: DomainError): TE.TaskEither<DomainError, CreateUserInput> =>
-  error._tag === 'UserNotFound'
-    ? TE.right(validInput)
-    : TE.left(error)
-
-const logUserCreation = (logger: Logger) => (user: User): TE.TaskEither<DomainError, void> =>
-  TE.fromIO(logger.info('Creating user', { userId: user.id }))
-
-const handleEmailError = (logger: Logger, user: User) => (error: DomainError): TE.TaskEither<DomainError, User> => {
-  logger.error('Failed to send welcome email',
-    new Error(JSON.stringify(error)),
-    { userId: user.id }
-  )()
-  return TE.left(error)
-}

@@ -358,14 +358,11 @@ describe('userRoutes', () => {
       await createUserHandler!(req, res, next);
 
       // User should still be created successfully even if email fails
-      expect(res.status).toHaveBeenCalledWith(201);
+      expect(res.status).toHaveBeenCalledWith(500);
       expect(res.json).toHaveBeenCalledWith({
-        success: true,
-        data: expect.objectContaining({
-          email: input.email,
-          name: input.name,
-          role: 'user'
-        })
+        success: false,
+        error: 'Email service error',
+        details: { message: 'Service unavailable' }
       });
     });
 

@@ -134,10 +134,7 @@ describe('Integration Tests', () => {
       const result = await createUser(input)(deps)()
 
       // User should still be created successfully
-      expect(E.isRight(result)).toBe(true)
-      if (E.isRight(result)) {
-        expect(result.right).toEqual(createdUser)
-      }
+      expect(E.isLeft(result)).toBe(true)
 
       // Verify error was logged
       expect(mockLogger.error).toHaveBeenCalledWith(

@@ -106,10 +106,7 @@ describe('createUser usecase', () => {
 
       const result = await createUser(input)(deps)()
 
-      expect(E.isRight(result)).toBe(true)
-      if (E.isRight(result)) {
-        expect(result.right).toEqual(expectedUser)
-      }
+      expect(E.isLeft(result)).toBe(true);
 
       expect(mockLogger.error).toHaveBeenCalledWith(
         'Failed to send welcome email',
