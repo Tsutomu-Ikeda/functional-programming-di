@@ -97,7 +97,7 @@ export class SQLiteConnection implements DatabaseConnection {
           message: error instanceof Error ? error.message : 'Failed to begin transaction'
         })
       ),
-      TE.chain(() => fn(this) as TE.TaskEither<{ _tag: "DatabaseError"; message: string; }, T>),
+      TE.chain(() => fn(this) as TE.TaskEither<{ _tag: 'DatabaseError'; message: string; }, T>),
       TE.chainFirst((_result) =>
         TE.tryCatch(
           async () => {

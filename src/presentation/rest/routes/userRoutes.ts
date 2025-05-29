@@ -194,21 +194,21 @@ const createInternalServerErrorResponse = (): IO.IO<HttpResponse> => () => ({
 // Error handler mapping using Record
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const errorHandlers: Record<string, (error: any) => IO.IO<HttpResponse>> = {
-  'ValidationError': (error: Extract<RouteError, { _tag: 'ValidationError' }>) =>
+  ValidationError: (error: Extract<RouteError, { _tag: 'ValidationError' }>) =>
     createValidationErrorResponse(error.errors),
-  'UserNotFound': (error: Extract<RouteError, { _tag: 'UserNotFound' }>) =>
+  UserNotFound: (error: Extract<RouteError, { _tag: 'UserNotFound' }>) =>
     createUserNotFoundResponse(error.userId),
-  'DatabaseError': (error: Extract<RouteError, { _tag: 'DatabaseError' }>) =>
+  DatabaseError: (error: Extract<RouteError, { _tag: 'DatabaseError' }>) =>
     createDatabaseErrorResponse(error.message),
-  'EmailServiceError': (error: Extract<RouteError, { _tag: 'EmailServiceError' }>) =>
+  EmailServiceError: (error: Extract<RouteError, { _tag: 'EmailServiceError' }>) =>
     createEmailServiceErrorResponse(error.message),
-  'DependencyResolutionError': (error: Extract<RouteError, { _tag: 'DependencyResolutionError' }>) =>
+  DependencyResolutionError: (error: Extract<RouteError, { _tag: 'DependencyResolutionError' }>) =>
     createDependencyResolutionErrorResponse(error.message),
-  'RouteProcessingError': (error: Extract<RouteError, { _tag: 'RouteProcessingError' }>) =>
+  RouteProcessingError: (error: Extract<RouteError, { _tag: 'RouteProcessingError' }>) =>
     createRouteProcessingErrorResponse(error.message),
-  'InvalidEmail': (error: Extract<RouteError, { _tag: 'InvalidEmail' }>) =>
+  InvalidEmail: (error: Extract<RouteError, { _tag: 'InvalidEmail' }>) =>
     createValidationErrorResponse([{ field: 'email', message: `Invalid email: ${error.email}` }]),
-  'Unauthorized': (error: Extract<RouteError, { _tag: 'Unauthorized' }>) =>
+  Unauthorized: (error: Extract<RouteError, { _tag: 'Unauthorized' }>) =>
     pipe(
       IO.of({
         statusCode: 401,

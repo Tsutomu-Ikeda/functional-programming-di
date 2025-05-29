@@ -51,12 +51,14 @@ export default [
       'no-trailing-spaces': 'error',
       'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 0, maxBOF: 0 }],
       'eol-last': ['error', 'always'],
-      "semi": ["error", "always"],
-      "semi-spacing": ["error", { "after": true, "before": false }],
-      "semi-style": ["error", "last"],
-      "no-extra-semi": "error",
-      "no-unexpected-multiline": "error",
-      "no-unreachable": "error"
+      'semi': ['error', 'always'],
+      'semi-spacing': ['error', { 'after': true, 'before': false }],
+      'semi-style': ['error', 'last'],
+      'no-extra-semi': 'error',
+      'no-unexpected-multiline': 'error',
+      'no-unreachable': 'error',
+      'quotes': ['error', 'single'],
+      'quote-props': ['error', 'as-needed']
     },
   },
   {
