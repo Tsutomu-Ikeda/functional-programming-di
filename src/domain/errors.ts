@@ -10,3 +10,4 @@ export type DomainError =
   | { _tag: 'ValidationError'; errors: readonly ValidationError[] }
   | { _tag: 'DatabaseError'; message: string }
   | { _tag: 'EmailServiceError'; message: string }
+  | { _tag: 'UnknownError'; message: string };

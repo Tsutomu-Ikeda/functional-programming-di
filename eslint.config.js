@@ -44,7 +44,6 @@ export default [
       ],
       'no-unused-vars': 'off',
       '@typescript-eslint/no-explicit-any': 'warn',
-      '@typescript-eslint/explicit-function-return-type': 'warn',
       '@typescript-eslint/no-inferrable-types': 'off',
       'prefer-const': 'error',
       'no-var': 'error',
