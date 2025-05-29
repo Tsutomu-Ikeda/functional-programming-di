@@ -1,7 +1,7 @@
 import * as E from 'fp-ts/Either'
 import { User } from './user'
 import { DomainError } from './errors'
-import { CreateUserInput } from '../shared/validation'
+import { CreateUserInput } from './userValidation'
 
 export function createUserEntity(input: CreateUserInput): E.Either<DomainError, User> {
   return E.right({

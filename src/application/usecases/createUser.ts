@@ -4,7 +4,7 @@ import { pipe } from 'fp-ts/function'
 import { User } from '../../domain/user'
 import { DomainError } from '../../domain/errors'
 import { UserRepository, EmailService, Logger } from '../ports'
-import { validateCreateUserInput, CreateUserInput } from '../../shared/validation'
+import { validateCreateUserInput, CreateUserInput } from '../../domain/userValidation'
 import { createUserEntity } from '../../domain/userFactory'
 
 export interface CreateUserDeps {
