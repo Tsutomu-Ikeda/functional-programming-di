@@ -42,7 +42,8 @@ describe('Integration Tests', () => {
 
     jest.clearAllMocks();
   });
-describe('End-to-End User Creation Flow', () => {
+
+  describe('End-to-End User Creation Flow', () => {
     it('should complete full user creation workflow successfully', async () => {
       const input: CreateUserInput = {
         email: 'integration@example.com',
@@ -103,7 +104,8 @@ describe('End-to-End User Creation Flow', () => {
       expect(saveCall).toBeLessThan(emailCall);
       expect(logCall).toBeLessThan(emailCall);
     });
-it('should handle partial failure gracefully (email service fails)', async () => {
+
+    it('should handle partial failure gracefully (email service fails)', async () => {
       const input: CreateUserInput = {
         email: 'partial-fail@example.com',
         name: 'Partial Fail User',
@@ -141,7 +143,8 @@ it('should handle partial failure gracefully (email service fails)', async () =>
       // Verify user was still saved despite email failure
       expect(mockUserRepository.save).toHaveBeenCalled();
     });
-it('should fail fast on validation errors without calling external services', async () => {
+
+    it('should fail fast on validation errors without calling external services', async () => {
       const invalidInput: CreateUserInput = {
         email: 'invalid-email-format',
         name: 'A', // Too short
@@ -170,7 +173,8 @@ it('should fail fast on validation errors without calling external services', as
       expect(mockLogger.info).not.toHaveBeenCalled();
       expect(mockLogger.error).not.toHaveBeenCalled();
     });
-it('should handle database errors appropriately', async () => {
+
+    it('should handle database errors appropriately', async () => {
       const input: CreateUserInput = {
         email: 'db-error@example.com',
         name: 'DB Error User',

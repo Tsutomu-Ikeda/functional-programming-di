@@ -20,7 +20,8 @@ describe('userFactory', () => {
         id: expect.any(String)
       }));
     });
-it('should generate unique ids for different users', () => {
+
+    it('should generate unique ids for different users', () => {
       const input1: CreateUserInput = {
         email: 'user1@example.com',
         name: 'User One',
@@ -43,7 +44,8 @@ it('should generate unique ids for different users', () => {
       const result2Id = E.isRight(result2) ? result2.right.id : null;
       expect(result1Id).not.toBe(result2Id);
     });
-it('should always assign user role by default', () => {
+
+    it('should always assign user role by default', () => {
       const input: CreateUserInput = {
         email: 'admin@example.com',
         name: 'Admin User',

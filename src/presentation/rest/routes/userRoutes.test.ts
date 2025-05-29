@@ -191,7 +191,7 @@ describe('userRoutes', () => {
     });
     await sqlitePool.initialize();
   });
-afterAll(async () => {
+  afterAll(async () => {
     // Cleanup
     await sqlitePool.close();
     if (fs.existsSync(TEST_DB_PATH)) {
@@ -218,7 +218,8 @@ afterAll(async () => {
 
     jest.clearAllMocks();
   });
-describe('createUserHandler', () => {
+
+  describe('createUserHandler', () => {
     it('should create a user successfully', async () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
@@ -251,7 +252,8 @@ describe('createUserHandler', () => {
       });
       expect(next).not.toHaveBeenCalled();
     });
-it('should handle validation errors', async () => {
+
+    it('should handle validation errors', async () => {
       const input: CreateUserInput = {
         email: 'invalid-email',
         name: 'T',
@@ -288,7 +290,8 @@ it('should handle validation errors', async () => {
         ])
       });
     });
-it('should handle duplicate email error', async () => {
+
+    it('should handle duplicate email error', async () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
@@ -330,7 +333,8 @@ it('should handle duplicate email error', async () => {
         ])
       });
     });
-it('should handle email service errors gracefully', async () => {
+
+    it('should handle email service errors gracefully', async () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
@@ -360,7 +364,8 @@ it('should handle email service errors gracefully', async () => {
         details: { message: 'Service unavailable' }
       });
     });
-it('should handle dependency resolution errors', async () => {
+
+    it('should handle dependency resolution errors', async () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
@@ -390,7 +395,8 @@ it('should handle dependency resolution errors', async () => {
         details: { message: 'Service not found' }
       });
     });
-it('should handle malformed request body', async () => {
+
+    it('should handle malformed request body', async () => {
       const input = 'invalid json'; // This will cause validation to fail
 
       const req = createMockRequest(input, {}, container, context);
@@ -453,7 +459,8 @@ it('should handle malformed request body', async () => {
       });
       expect(next).not.toHaveBeenCalled();
     });
-it('should handle user not found', async () => {
+
+    it('should handle user not found', async () => {
       const req = createMockRequest({}, { id: 'non-existent-id' }, container, context);
       const res = createMockResponse();
       const next = jest.fn();
@@ -471,7 +478,8 @@ it('should handle user not found', async () => {
         details: { userId: 'non-existent-id' }
       });
     });
-it('should handle dependency resolution errors', async () => {
+
+    it('should handle dependency resolution errors', async () => {
       const failingContainer: ScopedContainer = {
         resolve: jest.fn().mockRejectedValue(new Error('Service not found')),
         dispose: jest.fn()
@@ -599,7 +607,8 @@ it('should handle dependency resolution errors', async () => {
       }
     });
   });
-describe('SQLite integration', () => {
+
+  describe('SQLite integration', () => {
     it('should persist and retrieve users correctly', async () => {
       const user: User = {
         id: 'sqlite-test-id',
@@ -620,7 +629,8 @@ describe('SQLite integration', () => {
       const findByEmailResult = await userRepository.findByEmail(user.email)();
       expect(findByEmailResult).toEqual(E.right(expect.objectContaining(user)));
     });
-it('should handle database constraints', async () => {
+
+    it('should handle database constraints', async () => {
       const user1: User = {
         id: 'user1',
         email: 'duplicate@example.com',
@@ -688,7 +698,8 @@ it('should handle database constraints', async () => {
           name: input.name,
         })));
     });
-it('should allow dependency injection override', async () => {
+
+    it('should allow dependency injection override', async () => {
       const mockUserRepo: UserRepository = {
         findById: jest.fn().mockReturnValue(TE.left({ _tag: 'UserNotFound', userId: 'test' })),
         findByEmail: jest.fn().mockReturnValue(TE.left({ _tag: 'UserNotFound', userId: 'test' })),

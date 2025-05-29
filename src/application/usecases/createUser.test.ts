@@ -35,7 +35,8 @@ describe('createUser usecase', () => {
 
     jest.clearAllMocks();
   });
-describe('successful user creation', () => {
+
+  describe('successful user creation', () => {
     it('should create a user successfully when email does not exist', async () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
@@ -79,7 +80,8 @@ describe('successful user creation', () => {
         expect.objectContaining({ userId: expect.any(String) })
       );
     });
-it('should continue even if welcome email fails', async () => {
+
+    it('should continue even if welcome email fails', async () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
@@ -132,7 +134,8 @@ it('should continue even if welcome email fails', async () => {
       expect(mockUserRepository.save).not.toHaveBeenCalled();
       expect(mockEmailService.sendWelcomeEmail).not.toHaveBeenCalled();
     });
-it('should return validation error for short name', async () => {
+
+    it('should return validation error for short name', async () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'J',
@@ -146,7 +149,8 @@ it('should return validation error for short name', async () => {
         errors: [{ field: 'name', message: 'Name must be at least 2 characters' }]
       }));
     });
-it('should return validation error for short password', async () => {
+
+    it('should return validation error for short password', async () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
@@ -160,7 +164,8 @@ it('should return validation error for short password', async () => {
         errors: [{ field: 'password', message: 'Password must be at least 6 characters' }]
       }));
     });
-it('should accumulate multiple validation errors', async () => {
+
+    it('should accumulate multiple validation errors', async () => {
       const input: CreateUserInput = {
         email: 'invalid',
         name: 'J',
@@ -232,7 +237,8 @@ it('should accumulate multiple validation errors', async () => {
       expect(mockUserRepository.save).not.toHaveBeenCalled();
       expect(mockEmailService.sendWelcomeEmail).not.toHaveBeenCalled();
     });
-it('should propagate save errors', async () => {
+
+    it('should propagate save errors', async () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
@@ -285,7 +291,8 @@ it('should propagate save errors', async () => {
         expect.objectContaining({ userId: expect.any(String) })
       );
     });
-it('should log email sending errors', async () => {
+
+    it('should log email sending errors', async () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
