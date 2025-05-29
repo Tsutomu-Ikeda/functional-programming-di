@@ -1,11 +1,11 @@
 import * as E from 'fp-ts/Either'
 import { pipe } from 'fp-ts/function'
-import { 
-  validateCreateUserInput, 
-  combineValidations, 
-  required, 
+import {
+  validateCreateUserInput,
+  combineValidations,
+  required,
   minLength,
-  CreateUserInput 
+  CreateUserInput
 } from './validation'
 
 describe('validation', () => {
