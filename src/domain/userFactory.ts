@@ -1,4 +1,4 @@
-import * as E from 'fp-ts/Either'
+import * as E from 'fp-ts/lib/Either'
 import { User } from './user'
 import { DomainError } from './errors'
 import { CreateUserInput } from './userValidation'

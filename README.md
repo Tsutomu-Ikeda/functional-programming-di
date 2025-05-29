@@ -1,114 +1,290 @@
-# DI Project
+# Clean Architecture with Dependency Injection
 
-[![CI](https://github.com/username/di/actions/workflows/ci.yml/badge.svg)](https://github.com/username/di/actions/workflows/ci.yml)
-[![Code Coverage](https://github.com/username/di/actions/workflows/coverage.yml/badge.svg)](https://github.com/username/di/actions/workflows/coverage.yml)
-[![Security Audit](https://github.com/username/di/actions/workflows/security.yml/badge.svg)](https://github.com/username/di/actions/workflows/security.yml)
+このプロジェクトは、クリーンアーキテクチャの原則に従い、高度な依存性注入（DI）システムを実装したNode.js/TypeScriptアプリケーションです。
 
-TypeScriptプロジェクトでDependency Injectionパターンを実装したサンプルアプリケーションです。
+## 🏗️ アーキテクチャ概要
 
-## 🚀 機能
+### クリーンアーキテクチャ層
 
-- Clean Architecture
-- Domain-Driven Design
-- Functional Programming (fp-ts)
-- 包括的なテストカバレッジ
-- ESLintによる静的解析
-- GitHub Actionsによる自動CI/CD
+```
+src/
+├── domain/           # ドメイン層 - ビジネスエンティティとルール
+├── application/      # アプリケーション層 - ユースケースとポート
+├── infrastructure/   # インフラストラクチャ層 - 外部システムとの接続
+└── presentation/     # プレゼンテーション層 - API エンドポイント
+```
 
-## 📦 技術スタック
+### 依存性注入システム
 
-- **言語**: TypeScript
-- **テスト**: Jest
-- **関数型プログラミング**: fp-ts
-- **リンター**: ESLint
-- **パッケージマネージャー**: pnpm
+カスタムDIコンテナを実装し、以下の機能を提供：
 
-## 🛠️ セットアップ
+- **ライフサイクル管理**: `singleton`, `scoped`, `transient`
+- **リクエストスコープ**: リクエストごとの独立したコンテナ
+- **自動リソース管理**: スコープ終了時の自動クリーンアップ
+- **型安全性**: TypeScriptによる完全な型サポート
+
+## 🔧 DIシステムの特徴
+
+### 基本的なDI関数
+
+```typescript
+export type Injectable<T, U extends any[], V> = {
+  (...args: U): V;
+  inject: (deps: Partial<T> | ((d: T) => Partial<T>)) => Injectable<T, U, V>;
+};
+
+export const depend = <T extends Record<string, any>, U extends any[], V>(
+  dependencies: T,
+  cb: (deps: T, ...args: U) => V
+): Injectable<T, U, V> => {
+  const fn = (...args: U) => cb(dependencies, ...args);
+  fn.inject = (deps: Partial<T> | ((d: T) => Partial<T>)) =>
+    typeof deps === 'function'
+      ? depend({ ...dependencies, ...deps(dependencies) }, cb)
+      : depend({ ...dependencies, ...deps }, cb);
+  return fn;
+};
+```
+
+### ライフサイクル管理
+
+#### Singleton
+アプリケーション起動時に一度だけ作成され、全リクエストで共有されます。
+- データベース接続プール
+- 設定オブジェクト
+- アプリケーションレベルのロガー
+
+#### Scoped
+リクエストごとに新しいインスタンスが作成され、リクエスト終了時に破棄されます。
+- リクエストスコープのロガー（リクエストIDを含む）
+- ユーザーリポジトリ
+- リクエスト固有のサービス
+
+#### Transient
+呼び出しごとに新しいインスタンスが作成されます。
+- 一時的な計算オブジェクト
+- ステートレスなユーティリティ
+
+### リクエストライフサイクル
+
+```typescript
+// 1. リクエスト開始時
+const requestContext: RequestContext = {
+  requestId: uuidv4(),
+  startTime: new Date(),
+  metadata: { userAgent, ip, method, url }
+};
+
+// 2. スコープコンテナ作成
+const scopedContainer = globalContainer.createScope(requestContext);
+
+// 3. リクエスト処理
+const logger = new RequestScopedLogger(requestContext);
+const userRepository = await scopedContainer.resolve<UserRepository>('userRepository');
+
+// 4. リクエスト終了時の自動クリーンアップ
+await scopedContainer.dispose();
+```
+
+## 🚀 使用方法
+
+### 開発環境での起動
 
 ```bash
 # 依存関係のインストール
 pnpm install
 
+# 開発サーバーの起動
+pnpm dev
+```
+
+### プロダクション環境での起動
+
+```bash
+# ビルド
+pnpm build
+
+# 起動
+pnpm start
+```
+
+### テスト実行
+
+```bash
 # テスト実行
 pnpm test
-
-# テスト（ウォッチモード）
-pnpm test:watch
 
 # カバレッジ付きテスト
 pnpm test:coverage
 
-# ESLintチェック
-pnpm lint
-
-# ESLint自動修正
-pnpm lint:fix
-
-# チェックファイル数表示
-pnpm lint:count
+# ウォッチモード
+pnpm test:watch
 ```
 
-## 🔧 GitHub Actions
+## 📡 API エンドポイント
 
-このプロジェクトでは以下のワークフローが自動実行されます：
+### REST API
 
-### CI (`ci.yml`)
-- Node.js 18.x, 20.x でのマトリックステスト
-- ESLintチェック
-- Jestテスト実行
-- pnpmキャッシュ最適化
+#### ユーザー作成
+```bash
+POST /api/users
+Content-Type: application/json
 
-### ESLint PR Review (`lint-pr.yml`)
-- Pull Requestでのコード品質チェック
-- ESLint結果のアノテーション
-- 結果のアーティファクト保存
+{
+  "email": "user@example.com",
+  "name": "Test User",
+  "password": "password123"
+}
+```
 
-### Code Coverage (`coverage.yml`)
-- テストカバレッジ測定
-- Codecovへのレポート送信
-- PRへのカバレッジコメント
+#### ユーザー取得
+```bash
+GET /api/users/:id
+```
 
-### Security Audit (`security.yml`)
-- 依存関係の脆弱性チェック
-- 毎日自動実行（UTC 2:00）
-- Pull Requestでの依存関係レビュー
+#### ヘルスチェック
+```bash
+GET /health
+```
+
+#### API ドキュメント
+```bash
+GET /api
+```
+
+## 🔍 実装例
+
+### ユースケースの実装
+
+```typescript
+export const createUser = (
+  input: CreateUserInput
+): RTE.ReaderTaskEither<CreateUserDeps, DomainError, User> =>
+  pipe(
+    RTE.fromEither(validateCreateUserInput(input)),
+    RTE.chainW(checkEmailNotExists),
+    RTE.chainW(createAndSaveUser),
+    RTE.chainFirstW(sendWelcomeEmailSafely)
+  )
+```
+
+### DIコンテナの使用
+
+```typescript
+// サービス登録
+container.register<UserRepository>('userRepository', {
+  factory: async () => {
+    const pool = await container.resolve<DatabaseConnectionPool>('databasePool');
+    return new DatabaseUserRepository(pool.getConnection());
+  },
+  lifecycle: 'scoped'
+});
+
+// サービス解決
+const userRepository = await container.resolve<UserRepository>('userRepository');
+```
+
+### ログ機能
+
+```typescript
+// リクエストスコープのロガー
+const logger = new RequestScopedLogger(requestContext);
+logger.info('User creation started', { email: input.email })();
+
+// 出力例:
+// {"timestamp":"2024-01-01T00:00:00.000Z","level":"info","message":"User creation started","context":{"email":"user@example.com"},"requestId":"123e4567-e89b-12d3-a456-426614174000"}
+```
+
+## 🧪 テスト戦略
+
+### 単体テスト
+- ドメインロジックのテスト
+- ユースケースのテスト
+- DIコンテナのテスト
+
+### 統合テスト
+- API エンドポイントのテスト
+- データベース操作のテスト
+- サービス間の連携テスト
 
 ## 📁 プロジェクト構造
 
 ```
 src/
-├── application/          # アプリケーション層
-│   ├── ports.ts         # ポート（インターフェース）
-│   └── usecases/        # ユースケース
-├── domain/              # ドメイン層
-│   ├── user.ts          # ユーザーエンティティ
-│   ├── userFactory.ts   # ユーザーファクトリー
-│   └── errors.ts        # ドメインエラー
-└── shared/              # 共通ユーティリティ
-    └── validation.ts    # バリデーション
+├── domain/
+│   ├── user.ts              # ユーザーエンティティ
+│   ├── errors.ts            # ドメインエラー定義
+│   ├── userFactory.ts       # ユーザーファクトリ
+│   └── userValidation.ts    # バリデーションロジック
+├── application/
+│   ├── ports.ts             # ポート（インターフェース）定義
+│   └── usecases/
+│       └── createUser.ts    # ユーザー作成ユースケース
+├── infrastructure/
+│   ├── di/
+│   │   ├── types.ts         # DI型定義
+│   │   ├── container.ts     # DIコンテナ実装
+│   │   └── registry.ts      # サービス登録
+│   ├── database/
+│   │   └── connection.ts    # データベース接続
+│   ├── repositories/
+│   │   └── userRepository.ts # ユーザーリポジトリ実装
+│   ├── services/
+│   │   └── emailService.ts  # メールサービス実装
+│   └── logging/
+│       └── logger.ts        # ログ機能実装
+├── presentation/
+│   ├── rest/
+│   │   └── routes/
+│   │       └── userRoutes.ts # REST APIルート
+│   ├── trpc/
+│   │   └── router.ts        # tRPC ルーター
+│   ├── graphql/
+│   │   ├── schema.ts        # GraphQL スキーマ
+│   │   └── resolvers.ts     # GraphQL リゾルバー
+│   ├── middleware/
+│   │   └── diMiddleware.ts  # DI ミドルウェア
+│   └── server.ts            # サーバー設定
+└── main.ts                  # アプリケーションエントリーポイント
 ```
 
-## 🧪 テスト
+## 🌟 主な特徴
 
-- 単体テスト: Jest
-- カバレッジ: 自動測定・レポート
-- CI/CD: GitHub Actionsで自動実行
+1. **クリーンアーキテクチャ**: 依存関係の方向が内側に向かう設計
+2. **型安全性**: TypeScriptによる完全な型サポート
+3. **関数型プログラミング**: fp-tsを使用したエラーハンドリング
+4. **テスタビリティ**: DIによる高いテスタビリティ
+5. **スケーラビリティ**: モジュラーな設計による拡張性
+6. **監視可能性**: 構造化ログとリクエストトレーシング
 
-## 📋 コード品質
+## 🔧 環境変数
 
-- **ESLint**: TypeScript推奨ルール + カスタムルール
-- **末尾スペース**: 自動検出・修正
-- **改行**: ファイル末尾改行の強制
-- **未使用変数**: インターフェースパラメータは除外
+```bash
+# データベース設定
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=app_db
+DB_USER=user
+DB_PASSWORD=password
+DB_MAX_CONNECTIONS=10
 
-## 🤝 コントリビューション
+# メール設定
+SMTP_HOST=localhost
+SMTP_PORT=587
+SMTP_USER=user
+SMTP_PASSWORD=password
+FROM_EMAIL=noreply@example.com
 
-1. このリポジトリをフォーク
-2. フィーチャーブランチを作成 (`git checkout -b feature/amazing-feature`)
-3. 変更をコミット (`git commit -m 'Add some amazing feature'`)
-4. ブランチにプッシュ (`git push origin feature/amazing-feature`)
-5. Pull Requestを作成
+# ログ設定
+LOG_LEVEL=info
+LOG_FORMAT=json
 
-## 📄 ライセンス
+# サーバー設定
+PORT=3000
+```
 
-このプロジェクトはISCライセンスの下で公開されています。
+## 📚 参考資料
+
+- [Clean Architecture by Robert C. Martin](https://blog.cleancoder.com/uncle-bob/2012/08/13/the-clean-architecture.html)
+- [fp-ts Documentation](https://gcanti.github.io/fp-ts/)
+- [Dependency Injection Patterns](https://martinfowler.com/articles/injection.html)

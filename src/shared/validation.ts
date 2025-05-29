@@ -1,4 +1,4 @@
-import * as E from 'fp-ts/Either'
+import * as E from 'fp-ts/lib/Either'
 import { ValidationError } from '../domain/errors'
 
 export function combineValidations<T>(

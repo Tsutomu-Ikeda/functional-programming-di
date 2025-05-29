@@ -1,5 +1,5 @@
-import * as E from 'fp-ts/Either'
-import { pipe } from 'fp-ts/function'
+import * as E from 'fp-ts/lib/Either'
+import { pipe } from 'fp-ts/lib/function'
 import { ValidationError, DomainError } from './errors'
 import { combineValidations } from '../shared/validation'
 

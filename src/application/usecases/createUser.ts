@@ -1,6 +1,6 @@
-import * as TE from 'fp-ts/TaskEither'
-import * as RTE from 'fp-ts/ReaderTaskEither'
-import { pipe } from 'fp-ts/function'
+import * as TE from 'fp-ts/lib/TaskEither'
+import * as RTE from 'fp-ts/lib/ReaderTaskEither'
+import { pipe } from 'fp-ts/lib/function'
 import { User } from '../../domain/user'
 import { DomainError } from '../../domain/errors'
 import { UserRepository, EmailService, Logger } from '../ports'
@@ -56,34 +56,39 @@ const createAndSaveUser = (validInput: CreateUserInput): RTE.ReaderTaskEither<Cr
 const sendWelcomeEmailSafely = (user: User): RTE.ReaderTaskEither<CreateUserDeps, DomainError, User> =>
   pipe(
     RTE.ask<CreateUserDeps>(),
+    RTE.chainFirstW(() => {
+      console.log('sending mail to user:', user.email);
+
+      return RTE.ask<CreateUserDeps>()
+    }),
     RTE.chainW((deps) =>
       pipe(
         deps.emailService.sendWelcomeEmail(user),
-        TE.orElse(handleEmailError(deps.logger, user)),
         TE.map(() => user),
+        TE.orElse(handleEmailError(deps.logger, user)),
         RTE.fromTaskEither
       )
     )
   )
 
-const createEmailExistsError = () =>
+const createEmailExistsError = (): TE.TaskEither<DomainError, never> =>
   TE.left<DomainError>({
     _tag: 'ValidationError',
     errors: [{ field: 'email', message: 'Email already exists' }]
   })
 
-const handleUserNotFoundError = (validInput: CreateUserInput) => (error: DomainError) =>
+const handleUserNotFoundError = (validInput: CreateUserInput) => (error: DomainError): TE.TaskEither<DomainError, CreateUserInput> =>
   error._tag === 'UserNotFound'
     ? TE.right(validInput)
     : TE.left(error)
 
-const logUserCreation = (logger: Logger) => (user: User) =>
+const logUserCreation = (logger: Logger) => (user: User): TE.TaskEither<DomainError, void> =>
   TE.fromIO(logger.info('Creating user', { userId: user.id }))
 
-const handleEmailError = (logger: Logger, user: User) => (error: DomainError) => {
+const handleEmailError = (logger: Logger, user: User) => (error: DomainError): TE.TaskEither<DomainError, User> => {
   logger.error('Failed to send welcome email',
     new Error(JSON.stringify(error)),
     { userId: user.id }
   )()
-  return TE.right(undefined as void)
+  return TE.left(error)
 }

@@ -1,5 +1,5 @@
-import * as TE from 'fp-ts/TaskEither'
-import * as IO from 'fp-ts/IO'
+import * as TE from 'fp-ts/lib/TaskEither'
+import * as IO from 'fp-ts/lib/IO'
 import { User } from '../domain/user'
 import { DomainError } from '../domain/errors'
 

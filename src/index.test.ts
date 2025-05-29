@@ -1,11 +1,11 @@
 import * as TE from 'fp-ts/TaskEither'
 import * as E from 'fp-ts/Either'
 import * as IO from 'fp-ts/IO'
-import { 
-  createUser, 
-  UserRepository, 
-  EmailService, 
-  Logger, 
+import {
+  createUser,
+  UserRepository,
+  EmailService,
+  Logger,
   User,
   DomainError,
   CreateUserInput,
