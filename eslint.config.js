@@ -18,6 +18,7 @@ export default [
         console: 'readonly',
         process: 'readonly',
         Buffer: 'readonly',
+        NodeJS: 'readonly',
         __dirname: 'readonly',
         __filename: 'readonly',
         global: 'readonly',
@@ -28,6 +29,7 @@ export default [
         clearTimeout: 'readonly',
         setInterval: 'readonly',
         clearInterval: 'readonly',
+        fail: 'readonly',
       },
     },
     plugins: {

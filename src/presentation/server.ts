@@ -253,8 +253,11 @@ export const createAndStartServer = (port: number = 3000): TE.TaskEither<ServerE
   pipe(
     TE.of(createServer()()),
     TE.chainFirst(server =>
-      TE.fromTask(() => server.start(port).then(result =>
-        E.isLeft(result) ? Promise.reject(result.left) : Promise.resolve(undefined)
-      ))
+      TE.tryCatch(
+        () => server.start(port).then(result =>
+          E.isLeft(result) ? Promise.reject(result.left) : Promise.resolve(undefined)
+        ),
+        (error) => error as ServerError
+      )
     )
   );

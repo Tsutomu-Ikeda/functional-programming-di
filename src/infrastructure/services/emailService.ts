@@ -18,7 +18,7 @@ export class MockEmailService implements EmailService {
     TE.tryCatch(
       async () => {
         // Simulate email sending delay
-        await new Promise(resolve => setTimeout(resolve, 100));
+        await new Promise(resolve => setTimeout(resolve, 120));
 
         // Mock email sending logic
         console.log(`Sending welcome email to ${user.email} for user ${user.name}`);

@@ -2,9 +2,20 @@ import * as E from 'fp-ts/lib/Either';
 import { pipe } from 'fp-ts/lib/function';
 import { createServer } from './presentation/server';
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let globalServer: any = null;
+
+// Export for testing
+export const setGlobalServer = (server: any) => {
+  globalServer = server;
+};
+
+export const getGlobalServer = () => globalServer;
+
 async function main(): Promise<void> {
   try {
     const server = createServer()();
+    setGlobalServer(server); // Store reference for shutdown immediately
     const port = parseInt(process.env.PORT || '3000');
 
     console.log('🔧 Initializing Clean Architecture Application...');
@@ -51,37 +62,39 @@ async function main(): Promise<void> {
       )
     );
 
-    // Graceful shutdown
-    const setupGracefulShutdown = (): void => {
-      const shutdown = async (): Promise<void> => {
-        console.log('\n🛑 Shutting down gracefully...');
-        const stopResult = await server.stop();
-        pipe(
-          stopResult,
-          E.fold(
-            (error) => {
-              console.error('❌ Error during shutdown:', error);
-              process.exit(1);
-            },
-            () => {
-              console.log('✅ Server stopped successfully');
-              process.exit(0);
-            }
-          )
-        );
-      };
-
-      process.on('SIGINT', shutdown);
-      process.on('SIGTERM', shutdown);
-    };
-
-    setupGracefulShutdown();
-
   } catch (error) {
     console.error('❌ Failed to start application:', error);
     process.exit(1);
   }
 }
+
+// Graceful shutdown handler
+const shutdown = async (): Promise<void> => {
+  console.log('\n🛑 Shutting down gracefully...');
+  if (globalServer && globalServer.stop) {
+    const stopResult = await globalServer.stop();
+    pipe(
+      stopResult,
+      E.fold(
+        (error) => {
+          console.error('❌ Error during shutdown:', error);
+          process.exit(1);
+        },
+        () => {
+          console.log('✅ Server stopped successfully');
+          process.exit(0);
+        }
+      )
+    );
+  } else {
+    console.log('✅ No server to stop');
+    process.exit(0);
+  }
+};
+
+// Setup graceful shutdown handlers
+process.on('SIGINT', shutdown);
+process.on('SIGTERM', shutdown);
 
 // Handle unhandled promise rejections
 process.on('unhandledRejection', (reason, promise) => {
@@ -94,4 +107,5 @@ process.on('uncaughtException', (error) => {
   console.error('Uncaught Exception:', error);
   process.exit(1);
 });
+
 main();

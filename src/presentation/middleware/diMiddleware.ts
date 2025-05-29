@@ -144,15 +144,27 @@ const handleMiddlewareError = (error: MiddlewareError, next: NextFunction): IO.I
 // Main middleware factory function
 export const createDIMiddleware = (globalContainer: DIContainer) => {
   return async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const result = await processRequest(globalContainer, req, res)();
+    try {
+      const result = await processRequest(globalContainer, req, res)();
 
-    pipe(
-      result,
-      E.fold(
-        (error) => handleMiddlewareError(error, next)(),
-        () => next()
-      )
-    );
+      pipe(
+        result,
+        E.fold(
+          (error) => handleMiddlewareError(error, next)(),
+          () => {
+            // The request object has been modified in-place by attachToRequest
+            next();
+          }
+        )
+      );
+    } catch (error) {
+      // Handle any unexpected errors
+      const middlewareError = {
+        _tag: 'ContainerScopeError' as const,
+        message: error instanceof Error ? error.message : 'Unknown middleware error'
+      };
+      handleMiddlewareError(middlewareError, next)();
+    }
   };
 };
 
@@ -163,7 +175,10 @@ export const createDIMiddlewareFP = (globalContainer: DIContainer) =>
       processRequest(globalContainer, req, res),
       TE.fold(
         (error) => T.fromIO(handleMiddlewareError(error, next)),
-        () => T.fromIO(() => next())
+        () => T.fromIO(() => {
+          // The request object has been modified in-place by attachToRequest
+          next();
+        })
       )
     );
 

@@ -72,29 +72,32 @@ const resolveUserRepository = (container: ScopedContainer): TE.TaskEither<TRPCEr
 // Pure function to map domain errors to TRPC errors
 const mapDomainErrorToTRPCError = (error: DomainError): TRPCError => {
   switch (error._tag) {
-    case 'ValidationError':
+    case 'ValidationError': {
       return new TRPCError({
         code: 'BAD_REQUEST',
         message: 'Validation failed',
-        cause: error.errors
+        cause: error.errors.map(e => (`${e.field}: ${e.message}`)).join(",")
       });
-    case 'UserNotFound':
+    }
+    case 'UserNotFound': {
       return new TRPCError({
         code: 'NOT_FOUND',
         message: 'User not found',
-        cause: { userId: error.userId }
+        cause: JSON.stringify({ userId: error.userId })
       });
-    case 'DatabaseError':
+    }
+    case 'DatabaseError': {
       return new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Database error',
-        cause: { message: error.message }
+        cause: JSON.stringify({ message: error.message })
       });
+    }
     case 'EmailServiceError':
       return new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Email service error',
-        cause: { message: error.message }
+        cause: new Error(error.message)
       });
     default:
       return new TRPCError({
@@ -127,10 +130,7 @@ const executeCreateUser = (
   input: z.infer<typeof createUserInputSchema>,
   deps: { userRepository: UserRepository; emailService: EmailService; logger: RequestScopedLogger }
 ): TE.TaskEither<DomainError, User> =>
-  pipe(
-    createUser(input),
-    (useCase) => useCase(deps)
-  );
+  createUser(input)(deps);
 
 // Pure function to execute get user by ID
 const executeGetUserById = (
