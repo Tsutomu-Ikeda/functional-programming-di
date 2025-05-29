@@ -191,8 +191,7 @@ describe('userRoutes', () => {
     });
     await sqlitePool.initialize();
   });
-
-  afterAll(async () => {
+afterAll(async () => {
     // Cleanup
     await sqlitePool.close();
     if (fs.existsSync(TEST_DB_PATH)) {
@@ -219,8 +218,7 @@ describe('userRoutes', () => {
 
     jest.clearAllMocks();
   });
-
-  describe('createUserHandler', () => {
+describe('createUserHandler', () => {
     it('should create a user successfully', async () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
@@ -253,8 +251,7 @@ describe('userRoutes', () => {
       });
       expect(next).not.toHaveBeenCalled();
     });
-
-    it('should handle validation errors', async () => {
+it('should handle validation errors', async () => {
       const input: CreateUserInput = {
         email: 'invalid-email',
         name: 'T',
@@ -291,8 +288,7 @@ describe('userRoutes', () => {
         ])
       });
     });
-
-    it('should handle duplicate email error', async () => {
+it('should handle duplicate email error', async () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
@@ -334,8 +330,7 @@ describe('userRoutes', () => {
         ])
       });
     });
-
-    it('should handle email service errors gracefully', async () => {
+it('should handle email service errors gracefully', async () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
@@ -365,8 +360,7 @@ describe('userRoutes', () => {
         details: { message: 'Service unavailable' }
       });
     });
-
-    it('should handle dependency resolution errors', async () => {
+it('should handle dependency resolution errors', async () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
@@ -396,8 +390,7 @@ describe('userRoutes', () => {
         details: { message: 'Service not found' }
       });
     });
-
-    it('should handle malformed request body', async () => {
+it('should handle malformed request body', async () => {
       const input = 'invalid json'; // This will cause validation to fail
 
       const req = createMockRequest(input, {}, container, context);
@@ -460,8 +453,7 @@ describe('userRoutes', () => {
       });
       expect(next).not.toHaveBeenCalled();
     });
-
-    it('should handle user not found', async () => {
+it('should handle user not found', async () => {
       const req = createMockRequest({}, { id: 'non-existent-id' }, container, context);
       const res = createMockResponse();
       const next = jest.fn();
@@ -479,8 +471,7 @@ describe('userRoutes', () => {
         details: { userId: 'non-existent-id' }
       });
     });
-
-    it('should handle dependency resolution errors', async () => {
+it('should handle dependency resolution errors', async () => {
       const failingContainer: ScopedContainer = {
         resolve: jest.fn().mockRejectedValue(new Error('Service not found')),
         dispose: jest.fn()
@@ -608,8 +599,7 @@ describe('userRoutes', () => {
       }
     });
   });
-
-  describe('SQLite integration', () => {
+describe('SQLite integration', () => {
     it('should persist and retrieve users correctly', async () => {
       const user: User = {
         id: 'sqlite-test-id',
@@ -624,20 +614,13 @@ describe('userRoutes', () => {
 
       // Retrieve by ID
       const findByIdResult = await userRepository.findById(user.id)();
-      expect(E.isRight(findByIdResult)).toBe(true);
-      if (E.isRight(findByIdResult)) {
-        expect(findByIdResult.right).toEqual(expect.objectContaining(user));
-      }
+      expect(findByIdResult).toEqual(E.right(expect.objectContaining(user)));
 
       // Retrieve by email
       const findByEmailResult = await userRepository.findByEmail(user.email)();
-      expect(E.isRight(findByEmailResult)).toBe(true);
-      if (E.isRight(findByEmailResult)) {
-        expect(findByEmailResult.right).toEqual(expect.objectContaining(user));
-      }
+      expect(findByEmailResult).toEqual(E.right(expect.objectContaining(user)));
     });
-
-    it('should handle database constraints', async () => {
+it('should handle database constraints', async () => {
       const user1: User = {
         id: 'user1',
         email: 'duplicate@example.com',
@@ -659,9 +642,9 @@ describe('userRoutes', () => {
       // Try to save second user with same email
       const saveResult2 = await userRepository.save(user2)();
       expect(E.isLeft(saveResult2)).toBe(true);
-      if (E.isLeft(saveResult2)) {
-        expect((saveResult2.left as DomainError)._tag).toBe('DatabaseError');
-      }
+      expect(saveResult2).toEqual(
+        E.left(expect.objectContaining({ _tag: 'DatabaseError' }))
+      );
     });
   });
 
@@ -699,14 +682,13 @@ describe('userRoutes', () => {
       };
 
       const result = await createUserWithDI(input);
-      expect(E.isRight(result)).toBe(true);
-      if (E.isRight(result)) {
-        expect((result.right as User).email).toBe(input.email);
-        expect((result.right as User).name).toBe(input.name);
-      }
+      expect(result).toEqual(
+        E.right(expect.objectContaining({
+          email: input.email,
+          name: input.name,
+        })));
     });
-
-    it('should allow dependency injection override', async () => {
+it('should allow dependency injection override', async () => {
       const mockUserRepo: UserRepository = {
         findById: jest.fn().mockReturnValue(TE.left({ _tag: 'UserNotFound', userId: 'test' })),
         findByEmail: jest.fn().mockReturnValue(TE.left({ _tag: 'UserNotFound', userId: 'test' })),
@@ -741,11 +723,11 @@ describe('userRoutes', () => {
       };
 
       const result = await createUserWithMock(input);
-      expect(E.isRight(result)).toBe(true);
-      if (E.isRight(result)) {
-        expect((result.right as User).id).toBe('mocked');
-        expect(mockUserRepo.save).toHaveBeenCalled();
-      }
+      expect(result).toEqual(
+        E.right(expect.objectContaining({
+          id: 'mocked',
+        })));
+      expect(mockUserRepo.save).toHaveBeenCalled();
     });
   });
 });

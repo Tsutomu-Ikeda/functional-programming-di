@@ -37,7 +37,7 @@ export class DatabaseUserRepository implements UserRepository {
       TE.chain((users) => {
         return users.length > 0
           ? TE.right(users[0])
-          : TE.left({ _tag: 'DatabaseError' as const, message: 'Failed to save user' })
+          : TE.left({ _tag: 'DatabaseError' as const, message: 'Failed to save user' });
       }
       )
     );
