@@ -239,3 +239,38 @@ describe('createContainer', () => {
     expect(typeof container.createScope).toBe('function');
   });
 });
+
+describe('Container.dispose', () => {
+  it('should dispose singleton instances', async () => {
+    const container = new Container();
+    const disposeMock = jest.fn();
+    const definition: ServiceDefinition = {
+      factory: async () => ({ dispose: disposeMock }),
+      lifecycle: 'singleton'
+    };
+
+    container.register('service', definition);
+    await container.resolve('service');
+
+    await container.dispose();
+
+    expect(disposeMock).toHaveBeenCalled();
+  });
+
+  it('should be idempotent', async () => {
+    const container = new Container();
+    const disposeMock = jest.fn();
+    const definition: ServiceDefinition = {
+      factory: async () => ({ dispose: disposeMock }),
+      lifecycle: 'singleton'
+    };
+
+    container.register('service', definition);
+    await container.resolve('service');
+
+    await container.dispose();
+    await container.dispose();
+
+    expect(disposeMock).toHaveBeenCalledTimes(1);
+  });
+});

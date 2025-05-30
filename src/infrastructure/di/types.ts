@@ -33,6 +33,7 @@ export interface DIContainer {
   register<T>(key: string, definition: ServiceDefinition<T>): void;
   resolve<T>(key: string, context?: RequestContext): Promise<T>;
   createScope(context: RequestContext): ScopedContainer;
+  dispose(): Promise<void>;
 }
 
 export interface ScopedContainer {
