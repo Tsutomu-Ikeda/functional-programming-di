@@ -38,6 +38,16 @@ export class Container implements DIContainer {
   createScope(context: RequestContext): ScopedContainer {
     return new ScopedContainerImpl(this, context);
   }
+
+  async dispose(): Promise<void> {
+    for (const [_key, instance] of this.singletons) {
+      if (instance && typeof instance.dispose === 'function') {
+        await instance.dispose();
+      }
+    }
+
+    this.singletons.clear();
+  }
 }
 
 class ScopedContainerImpl implements ScopedContainer {

@@ -1,4 +1,5 @@
 import express from 'express';
+import type { Server as HttpServer } from 'http';
 import * as TE from 'fp-ts/lib/TaskEither';
 import * as IO from 'fp-ts/lib/IO';
 import * as E from 'fp-ts/lib/Either';
@@ -18,6 +19,7 @@ interface ServerState {
   readonly app: express.Application;
   readonly container: DIContainer;
   readonly config: ServerConfig;
+  readonly server: HttpServer;
 }
 
 // Error types
@@ -161,7 +163,9 @@ const initializeServerState = (config: ServerConfig): TE.TaskEither<ServerError,
         TE.map(app => ({
           app,
           container,
-          config
+          config,
+          // placeholder, will be set in startServer
+          server: undefined as unknown as HttpServer
         }))
       )
     )
@@ -173,7 +177,7 @@ const startServer = (state: ServerState): TE.TaskEither<ServerError, ServerState
     TE.tryCatch(
       () => new Promise<ServerState>((resolve, reject) => {
         try {
-          state.app.listen(state.config.port, () => {
+          const server = state.app.listen(state.config.port, () => {
 
             console.log(`🚀 Server running on port ${state.config.port}`);
 
@@ -182,7 +186,7 @@ const startServer = (state: ServerState): TE.TaskEither<ServerError, ServerState
             console.log(`❤️ Health: http://localhost:${state.config.port}/health`);
 
             console.log(`📚 API Docs: http://localhost:${state.config.port}/api`);
-            resolve(state);
+            resolve({ ...state, server });
           });
         } catch (error) {
           reject(error);
@@ -201,8 +205,10 @@ const stopServer = (state: ServerState): TE.TaskEither<ServerError, void> =>
   pipe(
     TE.tryCatch(
       async () => {
-        // Close database connections and other cleanup
-        // await state.container.dispose();
+        await new Promise<void>((resolve, reject) => {
+          state.server.close(err => (err ? reject(err) : resolve()));
+        });
+        await state.container.dispose();
       },
       (error) => ({
         _tag: 'ServerStartError' as const,
