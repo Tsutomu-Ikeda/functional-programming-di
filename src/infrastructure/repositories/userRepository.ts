@@ -41,4 +41,34 @@ export class DatabaseUserRepository implements UserRepository {
       }
       )
     );
+
+  saveBulk = (users: User[]): TE.TaskEither<DomainError, User[]> => {
+    if (users.length === 0) {
+      return TE.right([]);
+    }
+
+    return this.db.transaction<User[]>((conn) => {
+      const insertPromises = users.map(user => 
+        conn.query<User>(
+          'INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?) RETURNING *',
+          [user.id, user.email, user.name, user.role]
+        )
+      );
+
+      return pipe(
+        TE.sequenceArray(insertPromises),
+        TE.map(results => results.flatMap(r => r)),
+        TE.chain(savedUsers => {
+          if (savedUsers.length === users.length) {
+            return TE.right(savedUsers);
+          } else {
+            return TE.left({ 
+              _tag: 'DatabaseError' as const, 
+              message: 'Failed to save all users in bulk operation' 
+            });
+          }
+        })
+      );
+    });
+  };
 }

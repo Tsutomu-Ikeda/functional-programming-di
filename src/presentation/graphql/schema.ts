@@ -20,6 +20,27 @@ export const typeDefs = `
     password: String!
   }
 
+  type ValidationError {
+    field: String!
+    message: String!
+  }
+
+  type FailedUserInput {
+    input: CreateUserInput!
+    errors: [ValidationError!]!
+  }
+
+  type BulkCreateUserResult {
+    success: Boolean!
+    data: BulkUserOperationResult
+    error: String
+  }
+
+  type BulkUserOperationResult {
+    successful: [User!]!
+    failed: [FailedUserInput!]!
+  }
+
   type CreateUserResult {
     success: Boolean!
     data: User
@@ -38,6 +59,7 @@ export const typeDefs = `
 
   type Mutation {
     createUser(input: CreateUserInput!): CreateUserResult!
+    bulkCreateUsers(csvContent: String!): BulkCreateUserResult!
   }
 `;
 

@@ -2,13 +2,17 @@ import { initTRPC, TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import * as TE from 'fp-ts/lib/TaskEither';
 import * as IO from 'fp-ts/lib/IO';
+import * as E from 'fp-ts/lib/Either';
 import { pipe } from 'fp-ts/lib/function';
 import { createUser } from '../../application/usecases/createUser';
+import { bulkCreateUsers } from '../../application/usecases/bulkCreateUsers';
 import { ScopedContainer, RequestContext } from '../../infrastructure/di/types';
 import { UserRepository, EmailService } from '../../application/ports';
 import { RequestScopedLogger } from '../../infrastructure/logging/logger';
 import { DomainError } from '../../domain/errors';
 import { User } from '../../domain/user';
+import { BulkCreateUserResult } from '../../domain/userValidation';
+import { parseUsersFromCSV } from '../../infrastructure/csv/csvParser';
 
 export interface TRPCContext {
   container: ScopedContainer;
@@ -24,6 +28,10 @@ const createUserInputSchema = z.object({
   email: z.string().email(),
   name: z.string().min(2),
   password: z.string().min(6)
+});
+
+const bulkCreateUsersInputSchema = z.object({
+  csvContent: z.string().min(1)
 });
 
 // Types for better type safety
@@ -79,6 +87,25 @@ const mapDomainErrorToTRPCError = (error: DomainError): TRPCError => {
         cause: error.errors.map(e => (`${e.field}: ${e.message}`)).join(',')
       });
     }
+    case 'BulkValidationError': {
+      return new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'Bulk validation failed',
+        cause: JSON.stringify({ 
+          failedInputs: error.failedInputs.map(f => ({
+            input: f.input,
+            errors: f.errors.map(e => `${e.field}: ${e.message}`)
+          }))
+        })
+      });
+    }
+    case 'CSVParsingError': {
+      return new TRPCError({
+        code: 'BAD_REQUEST',
+        message: 'CSV parsing failed',
+        cause: JSON.stringify({ message: error.message })
+      });
+    }
     case 'UserNotFound': {
       return new TRPCError({
         code: 'NOT_FOUND',
@@ -132,6 +159,21 @@ const executeCreateUser = (
 ): TE.TaskEither<DomainError, User> =>
   createUser(input)(deps);
 
+// Pure function to execute bulk create users use case
+const executeBulkCreateUsers = (
+  csvContent: string,
+  deps: { userRepository: UserRepository; emailService: EmailService; logger: RequestScopedLogger }
+): TE.TaskEither<DomainError, BulkCreateUserResult> => {
+  const parseResult = parseUsersFromCSV(csvContent);
+  
+  if (E.isLeft(parseResult)) {
+    return TE.left(parseResult.left);
+  }
+  
+  const userInputs = parseResult.right;
+  return bulkCreateUsers(userInputs)(deps);
+};
+
 // Pure function to execute get user by ID
 const executeGetUserById = (
   userRepository: UserRepository,
@@ -165,6 +207,26 @@ export const appRouter = router({
           TE.flatMap(deps =>
             pipe(
               executeCreateUser(input, deps),
+              handleTaskEitherResult
+            )
+          )
+        );
+
+        return withTaskEither(program);
+      }),
+
+    bulkCreate: publicProcedure
+      .input(bulkCreateUsersInputSchema)
+      .mutation(async ({ input, ctx }) => {
+        const program = pipe(
+          resolveDependencies(ctx.container),
+          TE.map(deps => ({
+            ...deps,
+            logger: createRequestLogger(ctx.requestContext)()
+          })),
+          TE.flatMap(deps =>
+            pipe(
+              executeBulkCreateUsers(input.csvContent, deps),
               handleTaskEitherResult
             )
           )

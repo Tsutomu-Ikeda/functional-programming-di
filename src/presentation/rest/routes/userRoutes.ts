@@ -6,12 +6,15 @@ import * as O from 'fp-ts/lib/Option';
 import * as R from 'fp-ts/lib/Record';
 import { pipe } from 'fp-ts/lib/function';
 import { createUser } from '../../../application/usecases/createUser';
+import { bulkCreateUsers } from '../../../application/usecases/bulkCreateUsers';
 import { ScopedContainer, RequestContext } from '../../../infrastructure/di/types';
 import { UserRepository, EmailService } from '../../../application/ports';
 import { RequestScopedLogger } from '../../../infrastructure/logging/logger';
-import { CreateUserInput } from '../../../domain/userValidation';
+import { CreateUserInput, BulkCreateUserResult } from '../../../domain/userValidation';
 import { DomainError } from '../../../domain/errors';
 import { User } from '../../../domain/user';
+import { csvUpload, handleUploadErrors, readFileContent, deleteFile } from '../../middleware/uploadMiddleware';
+import { parseUsersFromCSV } from '../../../infrastructure/csv/csvParser';
 
 export interface AuthenticatedRequest extends Request {
   container: ScopedContainer;
@@ -27,6 +30,11 @@ interface RouteContext {
 
 interface CreateUserRouteInput {
   readonly input: CreateUserInput;
+  readonly context: RouteContext;
+}
+
+interface BulkCreateUserRouteInput {
+  readonly inputs: CreateUserInput[];
   readonly context: RouteContext;
 }
 
@@ -196,6 +204,8 @@ const createInternalServerErrorResponse = (): IO.IO<HttpResponse> => () => ({
 const errorHandlers: Record<string, (error: any) => IO.IO<HttpResponse>> = {
   ValidationError: (error: Extract<RouteError, { _tag: 'ValidationError' }>) =>
     createValidationErrorResponse(error.errors),
+  BulkValidationError: (error: Extract<RouteError, { _tag: 'BulkValidationError' }>) =>
+    createValidationErrorResponse(error.failedInputs),
   UserNotFound: (error: Extract<RouteError, { _tag: 'UserNotFound' }>) =>
     createUserNotFoundResponse(error.userId),
   DatabaseError: (error: Extract<RouteError, { _tag: 'DatabaseError' }>) =>
@@ -208,6 +218,8 @@ const errorHandlers: Record<string, (error: any) => IO.IO<HttpResponse>> = {
     createRouteProcessingErrorResponse(error.message),
   InvalidEmail: (error: Extract<RouteError, { _tag: 'InvalidEmail' }>) =>
     createValidationErrorResponse([{ field: 'email', message: `Invalid email: ${error.email}` }]),
+  CSVParsingError: (error: Extract<RouteError, { _tag: 'CSVParsingError' }>) =>
+    createValidationErrorResponse([{ field: 'file', message: error.message }]),
   Unauthorized: (error: Extract<RouteError, { _tag: 'Unauthorized' }>) =>
     pipe(
       IO.of({
@@ -230,7 +242,7 @@ const createErrorResponse = (error: RouteError): IO.IO<HttpResponse> =>
   );
 
 // Send response using fp-ts
-const sendResponse = (res: Response, result: E.Either<RouteError, User>, successStatusCode: number = 200): IO.IO<void> => () => {
+const sendResponse = <T>(res: Response, result: E.Either<RouteError, T>, successStatusCode: number = 200): IO.IO<void> => () => {
   pipe(
     result,
     E.match(
@@ -251,6 +263,28 @@ const processCreateUserRoute = (routeInput: CreateUserRouteInput): TE.TaskEither
   pipe(
     resolveDependencies(routeInput.context),
     TE.flatMap(deps => executeCreateUser(routeInput.input, deps))
+  );
+
+// Process bulk create users route
+const processBulkCreateUserRoute = (routeInput: BulkCreateUserRouteInput): TE.TaskEither<RouteError, BulkCreateUserResult> =>
+  pipe(
+    resolveDependencies(routeInput.context),
+    TE.flatMap(deps => 
+      pipe(
+        TE.tryCatch(
+          bulkCreateUsers(routeInput.inputs)(deps),
+          (error) => ({
+            _tag: 'RouteProcessingError' as const,
+            message: error instanceof Error ? error.message : 'Unknown processing error'
+          } as RouteError)
+        ),
+        TE.flatMap(result =>
+          E.isLeft(result)
+            ? TE.left(result.left as RouteError)
+            : TE.right(result.right)
+        )
+      )
+    )
   );
 
 // Process get user route
@@ -283,6 +317,45 @@ const createUserHandler = async (req: Request, res: Response, next: NextFunction
   }
 };
 
+const bulkCreateUsersFromCsvHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+  try {
+    const authReq = req as AuthenticatedRequest;
+    const context = createRouteContext(authReq)();
+    const file = req.file;
+
+    if (!file) {
+      return sendResponse(res, E.left({
+        _tag: 'ValidationError' as const,
+        errors: [{ field: 'file', message: 'CSV file is required' }]
+      }), 400)();
+    }
+
+    const fileContentResult = await readFileContent(file.path)();
+    
+    deleteFile(file.path)(); // Don't await, run in background
+
+    if (E.isLeft(fileContentResult)) {
+      return sendResponse(res, E.left(fileContentResult.left), 400)();
+    }
+
+    const csvContent = fileContentResult.right;
+    const parseResult = parseUsersFromCSV(csvContent);
+
+    if (E.isLeft(parseResult)) {
+      return sendResponse(res, E.left(parseResult.left), 400)();
+    }
+
+    const userInputs = parseResult.right;
+    const routeInput: BulkCreateUserRouteInput = { inputs: userInputs, context };
+
+    const result = await processBulkCreateUserRoute(routeInput)();
+    
+    sendResponse(res, result, 201)();
+  } catch (error) {
+    next(error);
+  }
+};
+
 // Get user route handler
 const getUserHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -306,6 +379,15 @@ export const createUserRoutes = (): Router => {
 
   router.post('/users', createUserHandler);
   router.get('/users/:id', getUserHandler);
+  router.post('/users/bulk', (req, res, next) => {
+    csvUpload.single('file')(req, res, (err) => {
+      if (err) {
+        handleUploadErrors(err, req, res, next);
+      } else {
+        bulkCreateUsersFromCsvHandler(req, res, next);
+      }
+    });
+  });
 
   return router;
 };
@@ -316,6 +398,15 @@ export const createUserRoutesFP = (): IO.IO<Router> => () => {
 
   router.post('/users', createUserHandler);
   router.get('/users/:id', getUserHandler);
+  router.post('/users/bulk', (req, res, next) => {
+    csvUpload.single('file')(req, res, (err) => {
+      if (err) {
+        handleUploadErrors(err, req, res, next);
+      } else {
+        bulkCreateUsersFromCsvHandler(req, res, next);
+      }
+    });
+  });
 
   return router;
 };
@@ -328,7 +419,8 @@ export const createRouteConfig = (): {
 } => ({
   routes: [
     { method: 'POST', path: '/users', handler: createUserHandler },
-    { method: 'GET', path: '/users/:id', handler: getUserHandler }
+    { method: 'GET', path: '/users/:id', handler: getUserHandler },
+    { method: 'POST', path: '/users/bulk', handler: bulkCreateUsersFromCsvHandler }
   ],
   router: createUserRoutes(),
   routerFP: createUserRoutesFP
