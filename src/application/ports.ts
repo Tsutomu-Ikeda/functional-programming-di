@@ -7,6 +7,7 @@ export interface UserRepository {
   findById: (id: string) => TE.TaskEither<DomainError, User>
   findByEmail: (email: string) => TE.TaskEither<DomainError, User>
   save: (user: User) => TE.TaskEither<DomainError, User>
+  saveBulk: (users: User[]) => TE.TaskEither<DomainError, User[]>
 }
 
 export interface EmailService {

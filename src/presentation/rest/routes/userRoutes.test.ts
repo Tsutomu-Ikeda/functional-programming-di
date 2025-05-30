@@ -519,7 +519,7 @@ describe('userRoutes', () => {
     it('should create route configuration', () => {
       const config = createRouteConfig();
 
-      expect(config.routes).toHaveLength(2);
+      expect(config.routes).toHaveLength(3);
       expect(config.routes[0]).toEqual({
         method: 'POST',
         path: '/users',
@@ -703,7 +703,8 @@ describe('userRoutes', () => {
       const mockUserRepo: UserRepository = {
         findById: jest.fn().mockReturnValue(TE.left({ _tag: 'UserNotFound', userId: 'test' })),
         findByEmail: jest.fn().mockReturnValue(TE.left({ _tag: 'UserNotFound', userId: 'test' })),
-        save: jest.fn().mockReturnValue(TE.right({ id: 'mocked', email: 'mock@test.com', name: 'Mock', role: 'user' }))
+        save: jest.fn().mockReturnValue(TE.right({ id: 'mocked', email: 'mock@test.com', name: 'Mock', role: 'user' })),
+        saveBulk: jest.fn().mockReturnValue(TE.right([{ id: 'mocked', email: 'mock@test.com', name: 'Mock', role: 'user' }]))
       };
 
       const createUserWithDI = depend(

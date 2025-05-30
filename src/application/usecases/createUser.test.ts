@@ -15,7 +15,8 @@ describe('createUser usecase', () => {
     mockUserRepository = {
       findById: jest.fn(),
       findByEmail: jest.fn(),
-      save: jest.fn()
+      save: jest.fn(),
+      saveBulk: jest.fn()
     };
 
     mockEmailService = {
