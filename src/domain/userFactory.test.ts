@@ -8,7 +8,7 @@ describe('userFactory', () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
-        password: 'password123'
+        password: 'password123',
       };
 
       const result = createUserEntity(input);
@@ -17,7 +17,7 @@ describe('userFactory', () => {
         email: input.email,
         name: input.name,
         role: 'user',
-        id: expect.any(String)
+        id: expect.any(String),
       }));
     });
 
@@ -25,13 +25,13 @@ describe('userFactory', () => {
       const input1: CreateUserInput = {
         email: 'user1@example.com',
         name: 'User One',
-        password: 'password123'
+        password: 'password123',
       };
 
       const input2: CreateUserInput = {
         email: 'user2@example.com',
         name: 'User Two',
-        password: 'password456'
+        password: 'password456',
       };
 
       const result1 = createUserEntity(input1);
@@ -49,7 +49,7 @@ describe('userFactory', () => {
       const input: CreateUserInput = {
         email: 'admin@example.com',
         name: 'Admin User',
-        password: 'password123'
+        password: 'password123',
       };
 
       const result = createUserEntity(input);
@@ -58,7 +58,7 @@ describe('userFactory', () => {
         email: expect.any(String),
         name: expect.any(String),
         role: 'user',
-        id: expect.any(String)
+        id: expect.any(String),
       }));
     });
   });

@@ -29,7 +29,7 @@ export class SQLiteConnection implements DatabaseConnection {
             this.isConnected = true;
             resolve();
           }
-        }
+        },
       );
     });
   }
@@ -72,8 +72,8 @@ export class SQLiteConnection implements DatabaseConnection {
       },
       (error) => ({
         _tag: 'DatabaseError' as const,
-        message: error instanceof Error ? error.message : 'Unknown database error'
-      })
+        message: error instanceof Error ? error.message : 'Unknown database error',
+      }),
     );
   }
 
@@ -94,8 +94,8 @@ export class SQLiteConnection implements DatabaseConnection {
         },
         (error) => ({
           _tag: 'DatabaseError' as const,
-          message: error instanceof Error ? error.message : 'Failed to begin transaction'
-        })
+          message: error instanceof Error ? error.message : 'Failed to begin transaction',
+        }),
       ),
       TE.flatMap(() => fn(this) as TE.TaskEither<{ _tag: 'DatabaseError'; message: string; }, T>),
       TE.tap((_result) =>
@@ -110,9 +110,9 @@ export class SQLiteConnection implements DatabaseConnection {
           },
           (error) => ({
             _tag: 'DatabaseError' as const,
-            message: error instanceof Error ? error.message : 'Failed to commit transaction'
-          })
-        )
+            message: error instanceof Error ? error.message : 'Failed to commit transaction',
+          }),
+        ),
       ),
       TE.orElse((error) =>
         pipe(
@@ -127,12 +127,12 @@ export class SQLiteConnection implements DatabaseConnection {
             },
             () => ({
               _tag: 'DatabaseError' as const,
-              message: 'Failed to rollback transaction'
-            })
+              message: 'Failed to rollback transaction',
+            }),
           ),
-          TE.flatMap(() => TE.left(error))
-        )
-      )
+          TE.flatMap(() => TE.left(error)),
+        ),
+      ),
     );
   }
 

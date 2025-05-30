@@ -8,14 +8,14 @@ describe('EmailService', () => {
     smtpPort: 587,
     username: 'test@example.com',
     password: 'password',
-    fromEmail: 'noreply@example.com'
+    fromEmail: 'noreply@example.com',
   };
 
   const testUser: User = {
     id: '1',
     email: 'user@example.com',
     name: 'Test User',
-    role: 'user'
+    role: 'user',
   };
 
   describe('MockEmailService', () => {
@@ -46,7 +46,7 @@ describe('EmailService', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'EmailServiceError',
-        message: 'SMTP server unavailable'
+        message: 'SMTP server unavailable',
       }));
     });
 
@@ -60,7 +60,7 @@ describe('EmailService', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'EmailServiceError',
-        message: 'Unknown email service error'
+        message: 'Unknown email service error',
       }));
     });
 
@@ -94,7 +94,7 @@ describe('EmailService', () => {
         to: testUser.email,
         from: mockConfig.fromEmail,
         subject: 'Welcome to our platform!',
-        html: expect.stringContaining(`Welcome ${testUser.name}!`)
+        html: expect.stringContaining(`Welcome ${testUser.name}!`),
       }));
     });
 
@@ -119,7 +119,7 @@ describe('EmailService', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'EmailServiceError',
-        message: 'Email sending failed'
+        message: 'Email sending failed',
       }));
     });
 
@@ -132,7 +132,7 @@ describe('EmailService', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'EmailServiceError',
-        message: 'Unknown email service error'
+        message: 'Unknown email service error',
       }));
     });
   });
@@ -144,7 +144,7 @@ describe('EmailService', () => {
         smtpPort: 465,
         username: 'user@gmail.com',
         password: 'app-password',
-        fromEmail: 'noreply@company.com'
+        fromEmail: 'noreply@company.com',
       };
 
       expect(config.smtpHost).toBe('smtp.gmail.com');

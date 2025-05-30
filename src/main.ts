@@ -58,8 +58,8 @@ async function main(): Promise<void> {
           console.log(`  curl -X POST http://localhost:${port}/api/users \\`);
           console.log('    -H "Content-Type: application/json" \\');
           console.log('    -d \'{"email":"test@example.com","name":"Test User","password":"password123"}\'');
-        }
-      )
+        },
+      ),
     );
 
   } catch (error) {
@@ -83,8 +83,8 @@ const shutdown = async (): Promise<void> => {
         () => {
           console.log('✅ Server stopped successfully');
           process.exit(0);
-        }
-      )
+        },
+      ),
     );
   } else {
     console.log('✅ No server to stop');

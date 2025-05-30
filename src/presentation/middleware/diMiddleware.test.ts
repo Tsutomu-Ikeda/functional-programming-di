@@ -3,13 +3,13 @@ import {
   createDIMiddleware,
   createDIMiddlewareFP,
   createMiddlewareConfig,
-  AuthenticatedRequest
+  AuthenticatedRequest,
 } from './diMiddleware';
 import { DIContainer, ScopedContainer } from '../../infrastructure/di/types';
 
 // Mock uuid
 jest.mock('uuid', () => ({
-  v4: jest.fn(() => 'test-uuid-123')
+  v4: jest.fn(() => 'test-uuid-123'),
 }));
 
 // Mock logger
@@ -18,8 +18,8 @@ jest.mock('../../infrastructure/logging/logger', () => ({
     info: jest.fn(() => () => {}),
     error: jest.fn(() => () => {}),
     warn: jest.fn(() => () => {}),
-    debug: jest.fn(() => () => {})
-  }))
+    debug: jest.fn(() => () => {}),
+  })),
 }));
 
 describe('DI Middleware', () => {
@@ -33,25 +33,25 @@ describe('DI Middleware', () => {
   beforeEach(() => {
     mockScopedContainer = {
       resolve: jest.fn(),
-      dispose: jest.fn()
+      dispose: jest.fn(),
     };
 
     mockContainer = {
       register: jest.fn(),
       resolve: jest.fn(),
-      createScope: jest.fn().mockReturnValue(mockScopedContainer)
+      createScope: jest.fn().mockReturnValue(mockScopedContainer),
     };
 
     mockReq = {
       get: jest.fn().mockReturnValue('test-user-agent'),
       ip: '127.0.0.1',
       method: 'GET',
-      url: '/test'
+      url: '/test',
     };
 
     mockRes = {
       on: jest.fn(),
-      statusCode: 200
+      statusCode: 200,
     };
 
     mockNext = jest.fn();
@@ -76,9 +76,9 @@ describe('DI Middleware', () => {
             userAgent: 'test-user-agent',
             ip: '127.0.0.1',
             method: 'GET',
-            url: '/test'
-          })
-        })
+            url: '/test',
+          }),
+        }),
       );
       expect(mockNext).toHaveBeenCalledWith();
     });
@@ -93,8 +93,8 @@ describe('DI Middleware', () => {
       expect(authReq.context).toEqual(
         expect.objectContaining({
           requestId: 'test-uuid-123',
-          startTime: expect.any(Date)
-        })
+          startTime: expect.any(Date),
+        }),
       );
     });
 
@@ -117,7 +117,7 @@ describe('DI Middleware', () => {
 
       expect(consoleSpy).toHaveBeenCalledWith('DI Middleware error:', expect.objectContaining({
         _tag: 'ContainerScopeError',
-        message: 'Container creation failed'
+        message: 'Container creation failed',
       }));
       expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
@@ -133,7 +133,7 @@ describe('DI Middleware', () => {
 
       expect(consoleSpy).toHaveBeenCalledWith('DI Middleware error:', expect.objectContaining({
         _tag: 'ContainerScopeError',
-        message: 'Unknown container scope error'
+        message: 'Unknown container scope error',
       }));
     });
   });
@@ -146,7 +146,7 @@ describe('DI Middleware', () => {
 
       // Get the finish handler
       const finishHandler = (mockRes.on as jest.Mock).mock.calls.find(
-        call => call[0] === 'finish'
+        call => call[0] === 'finish',
       )?.[1];
 
       expect(finishHandler).toBeDefined();
@@ -166,7 +166,7 @@ describe('DI Middleware', () => {
 
       // Get and call the finish handler
       const finishHandler = (mockRes.on as jest.Mock).mock.calls.find(
-        call => call[0] === 'finish'
+        call => call[0] === 'finish',
       )?.[1];
 
       // Should not throw
@@ -236,7 +236,7 @@ describe('DI Middleware', () => {
         }) as any,
         ip: '192.168.1.1',
         method: 'POST',
-        url: '/api/users'
+        url: '/api/users',
       };
 
       const middleware = createDIMiddleware(mockContainer);
@@ -251,16 +251,16 @@ describe('DI Middleware', () => {
             userAgent: 'Mozilla/5.0',
             ip: '192.168.1.1',
             method: 'POST',
-            url: '/api/users'
-          }
-        })
+            url: '/api/users',
+          },
+        }),
       );
     });
 
     it('should handle missing user agent', async () => {
       mockReq = {
         ...mockReq,
-        get: jest.fn().mockReturnValue(undefined)
+        get: jest.fn().mockReturnValue(undefined),
       };
 
       const middleware = createDIMiddleware(mockContainer);
@@ -270,9 +270,9 @@ describe('DI Middleware', () => {
       expect(mockContainer.createScope).toHaveBeenCalledWith(
         expect.objectContaining({
           metadata: expect.objectContaining({
-            userAgent: undefined
-          })
-        })
+            userAgent: undefined,
+          }),
+        }),
       );
     });
   });
@@ -289,8 +289,8 @@ describe('DI Middleware', () => {
 
       expect(mockNext).toHaveBeenCalledWith(
         expect.objectContaining({
-          message: 'Failed to create request scope'
-        })
+          message: 'Failed to create request scope',
+        }),
       );
     });
   });
@@ -302,7 +302,7 @@ describe('DI Middleware', () => {
         get: jest.fn().mockReturnValue('test-user-agent'),
         ip: '127.0.0.1',
         method: 'GET',
-        url: '/test'
+        url: '/test',
       } as unknown as Request;
 
       const middleware = createDIMiddleware(mockContainer);

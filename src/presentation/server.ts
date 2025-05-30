@@ -62,9 +62,9 @@ const initializeContainer = (): TE.TaskEither<ServerError, DIContainer> =>
       },
       (error) => ({
         _tag: 'ContainerInitializationError' as const,
-        message: error instanceof Error ? error.message : 'Unknown container initialization error'
-      })
-    )
+        message: error instanceof Error ? error.message : 'Unknown container initialization error',
+      }),
+    ),
   );
 
 // Setup health check endpoint
@@ -77,9 +77,9 @@ const setupHealthEndpoint = (app: express.Application): IO.IO<void> => () => {
         rest: 'available at /api',
         endpoints: {
           'POST /api/users': 'Create a new user',
-          'GET /api/users/:id': 'Get user by ID'
-        }
-      }
+          'GET /api/users/:id': 'Get user by ID',
+        },
+      },
     });
   });
 };
@@ -97,16 +97,16 @@ const setupApiDocsEndpoint = (app: express.Application): IO.IO<void> => () => {
           body: {
             email: 'string (required)',
             name: 'string (required)',
-            password: 'string (required, min 6 chars)'
-          }
+            password: 'string (required, min 6 chars)',
+          },
         },
         'GET /api/users/:id': {
           description: 'Get user by ID',
           params: {
-            id: 'string (required)'
-          }
-        }
-      }
+            id: 'string (required)',
+          },
+        },
+      },
     });
   });
 };
@@ -119,7 +119,7 @@ const setupErrorHandling = (app: express.Application): IO.IO<void> => () => {
     res.status(500).json({
       success: false,
       error: 'Internal server error',
-      requestId: (req as express.Request & { context?: { requestId?: string } }).context?.requestId
+      requestId: (req as express.Request & { context?: { requestId?: string } }).context?.requestId,
     });
   });
 };
@@ -139,16 +139,16 @@ const setupMiddlewareAndRoutes = (app: express.Application, container: DIContain
         pipe(
           setupHealthEndpoint(app),
           IO.flatMap(() => setupApiDocsEndpoint(app)),
-          IO.flatMap(() => setupErrorHandling(app))
+          IO.flatMap(() => setupErrorHandling(app)),
         )();
 
         return app;
       },
       (error) => ({
         _tag: 'MiddlewareSetupError' as const,
-        message: error instanceof Error ? error.message : 'Unknown middleware setup error'
-      })
-    )
+        message: error instanceof Error ? error.message : 'Unknown middleware setup error',
+      }),
+    ),
   );
 
 // Initialize complete server state
@@ -161,10 +161,10 @@ const initializeServerState = (config: ServerConfig): TE.TaskEither<ServerError,
         TE.map(app => ({
           app,
           container,
-          config
-        }))
-      )
-    )
+          config,
+        })),
+      ),
+    ),
   );
 
 // Start the server
@@ -191,9 +191,9 @@ const startServer = (state: ServerState): TE.TaskEither<ServerError, ServerState
       (error) => ({
         _tag: 'ServerStartError' as const,
         message: error instanceof Error ? error.message : 'Unknown server start error',
-        port: state.config.port
-      })
-    )
+        port: state.config.port,
+      }),
+    ),
   );
 
 // Stop the server
@@ -207,9 +207,9 @@ const stopServer = (state: ServerState): TE.TaskEither<ServerError, void> =>
       (error) => ({
         _tag: 'ServerStartError' as const,
         message: error instanceof Error ? error.message : 'Unknown server stop error',
-        port: state.config.port
-      })
-    )
+        port: state.config.port,
+      }),
+    ),
   );
 
 export class ApplicationServer {
@@ -224,7 +224,7 @@ export class ApplicationServer {
       TE.flatMap(startServer),
       TE.map(state => {
         this.state = state;
-      })
+      }),
     )();
 
     return result;
@@ -255,9 +255,9 @@ export const createAndStartServer = (port: number = 3000): TE.TaskEither<ServerE
     TE.tap(server =>
       TE.tryCatch(
         () => server.start(port).then(result =>
-          E.isLeft(result) ? Promise.reject(result.left) : Promise.resolve(undefined)
+          E.isLeft(result) ? Promise.reject(result.left) : Promise.resolve(undefined),
         ),
-        (error) => error as ServerError
-      )
-    )
+        (error) => error as ServerError,
+      ),
+    ),
   );

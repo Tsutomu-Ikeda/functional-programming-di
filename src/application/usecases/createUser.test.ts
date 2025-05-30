@@ -15,22 +15,22 @@ describe('createUser usecase', () => {
     mockUserRepository = {
       findById: jest.fn(),
       findByEmail: jest.fn(),
-      save: jest.fn()
+      save: jest.fn(),
     };
 
     mockEmailService = {
-      sendWelcomeEmail: jest.fn()
+      sendWelcomeEmail: jest.fn(),
     };
 
     mockLogger = {
       info: jest.fn().mockReturnValue(IO.of(undefined)),
-      error: jest.fn().mockReturnValue(IO.of(undefined))
+      error: jest.fn().mockReturnValue(IO.of(undefined)),
     };
 
     deps = {
       userRepository: mockUserRepository,
       emailService: mockEmailService,
-      logger: mockLogger
+      logger: mockLogger,
     };
 
     jest.clearAllMocks();
@@ -41,18 +41,18 @@ describe('createUser usecase', () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
-        password: 'password123'
+        password: 'password123',
       };
 
       const expectedUser: User = {
         id: 'generated-id',
         email: input.email,
         name: input.name,
-        role: 'user'
+        role: 'user',
       };
 
       mockUserRepository.findByEmail.mockReturnValue(
-        TE.left({ _tag: 'UserNotFound', userId: input.email })
+        TE.left({ _tag: 'UserNotFound', userId: input.email }),
       );
       mockUserRepository.save.mockReturnValue(TE.right(expectedUser));
       mockEmailService.sendWelcomeEmail.mockReturnValue(TE.right(undefined));
@@ -63,7 +63,7 @@ describe('createUser usecase', () => {
         email: input.email,
         name: input.name,
         role: 'user',
-        id: expect.any(String)
+        id: expect.any(String),
       }));
 
       expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(input.email);
@@ -71,13 +71,13 @@ describe('createUser usecase', () => {
         expect.objectContaining({
           email: input.email,
           name: input.name,
-          role: 'user'
-        })
+          role: 'user',
+        }),
       );
       expect(mockEmailService.sendWelcomeEmail).toHaveBeenCalledWith(expectedUser);
       expect(mockLogger.info).toHaveBeenCalledWith(
         'Creating user',
-        expect.objectContaining({ userId: expect.any(String) })
+        expect.objectContaining({ userId: expect.any(String) }),
       );
     });
 
@@ -85,22 +85,22 @@ describe('createUser usecase', () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
-        password: 'password123'
+        password: 'password123',
       };
 
       const expectedUser: User = {
         id: 'generated-id',
         email: input.email,
         name: input.name,
-        role: 'user'
+        role: 'user',
       };
 
       mockUserRepository.findByEmail.mockReturnValue(
-        TE.left({ _tag: 'UserNotFound', userId: input.email })
+        TE.left({ _tag: 'UserNotFound', userId: input.email }),
       );
       mockUserRepository.save.mockReturnValue(TE.right(expectedUser));
       mockEmailService.sendWelcomeEmail.mockReturnValue(
-        TE.left({ _tag: 'Unauthorized', reason: 'Email service unavailable' })
+        TE.left({ _tag: 'Unauthorized', reason: 'Email service unavailable' }),
       );
 
       const result = await createUser(input)(deps)();
@@ -110,7 +110,7 @@ describe('createUser usecase', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         'Failed to send welcome email',
         expect.any(Error),
-        expect.objectContaining({ userId: expectedUser.id })
+        expect.objectContaining({ userId: expectedUser.id }),
       );
     });
   });
@@ -120,14 +120,14 @@ describe('createUser usecase', () => {
       const input: CreateUserInput = {
         email: 'invalid-email',
         name: 'Test User',
-        password: 'password123'
+        password: 'password123',
       };
 
       const result = await createUser(input)(deps)();
 
       expect(result).toEqual(E.left({
         _tag: 'ValidationError',
-        errors: [{ field: 'email', message: 'Invalid email format' }]
+        errors: [{ field: 'email', message: 'Invalid email format' }],
       }));
 
       expect(mockUserRepository.findByEmail).not.toHaveBeenCalled();
@@ -139,14 +139,14 @@ describe('createUser usecase', () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'J',
-        password: 'password123'
+        password: 'password123',
       };
 
       const result = await createUser(input)(deps)();
 
       expect(result).toEqual(E.left({
         _tag: 'ValidationError',
-        errors: [{ field: 'name', message: 'Name must be at least 2 characters' }]
+        errors: [{ field: 'name', message: 'Name must be at least 2 characters' }],
       }));
     });
 
@@ -154,14 +154,14 @@ describe('createUser usecase', () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
-        password: '123'
+        password: '123',
       };
 
       const result = await createUser(input)(deps)();
 
       expect(result).toEqual(E.left({
         _tag: 'ValidationError',
-        errors: [{ field: 'password', message: 'Password must be at least 6 characters' }]
+        errors: [{ field: 'password', message: 'Password must be at least 6 characters' }],
       }));
     });
 
@@ -169,7 +169,7 @@ describe('createUser usecase', () => {
       const input: CreateUserInput = {
         email: 'invalid',
         name: 'J',
-        password: '123'
+        password: '123',
       };
 
       const result = await createUser(input)(deps)();
@@ -179,8 +179,8 @@ describe('createUser usecase', () => {
         errors: [
           { field: 'email', message: 'Invalid email format' },
           { field: 'name', message: 'Name must be at least 2 characters' },
-          { field: 'password', message: 'Password must be at least 6 characters' }
-        ]
+          { field: 'password', message: 'Password must be at least 6 characters' },
+        ],
       }));
     });
   });
@@ -190,14 +190,14 @@ describe('createUser usecase', () => {
       const input: CreateUserInput = {
         email: 'existing@example.com',
         name: 'Test User',
-        password: 'password123'
+        password: 'password123',
       };
 
       const existingUser: User = {
         id: 'existing-id',
         email: input.email,
         name: 'Existing User',
-        role: 'user'
+        role: 'user',
       };
 
       mockUserRepository.findByEmail.mockReturnValue(TE.right(existingUser));
@@ -206,7 +206,7 @@ describe('createUser usecase', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'ValidationError',
-        errors: [{ field: 'email', message: 'Email already exists' }]
+        errors: [{ field: 'email', message: 'Email already exists' }],
       }));
 
       expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(input.email);
@@ -220,12 +220,12 @@ describe('createUser usecase', () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
-        password: 'password123'
+        password: 'password123',
       };
 
       const repositoryError: DomainError = {
         _tag: 'Unauthorized',
-        reason: 'Database connection failed'
+        reason: 'Database connection failed',
       };
 
       mockUserRepository.findByEmail.mockReturnValue(TE.left(repositoryError));
@@ -242,16 +242,16 @@ describe('createUser usecase', () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
-        password: 'password123'
+        password: 'password123',
       };
 
       const saveError: DomainError = {
         _tag: 'Unauthorized',
-        reason: 'Save operation failed'
+        reason: 'Save operation failed',
       };
 
       mockUserRepository.findByEmail.mockReturnValue(
-        TE.left({ _tag: 'UserNotFound', userId: input.email })
+        TE.left({ _tag: 'UserNotFound', userId: input.email }),
       );
       mockUserRepository.save.mockReturnValue(TE.left(saveError));
 
@@ -268,18 +268,18 @@ describe('createUser usecase', () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
-        password: 'password123'
+        password: 'password123',
       };
 
       const expectedUser: User = {
         id: 'generated-id',
         email: input.email,
         name: input.name,
-        role: 'user'
+        role: 'user',
       };
 
       mockUserRepository.findByEmail.mockReturnValue(
-        TE.left({ _tag: 'UserNotFound', userId: input.email })
+        TE.left({ _tag: 'UserNotFound', userId: input.email }),
       );
       mockUserRepository.save.mockReturnValue(TE.right(expectedUser));
       mockEmailService.sendWelcomeEmail.mockReturnValue(TE.right(undefined));
@@ -288,7 +288,7 @@ describe('createUser usecase', () => {
 
       expect(mockLogger.info).toHaveBeenCalledWith(
         'Creating user',
-        expect.objectContaining({ userId: expect.any(String) })
+        expect.objectContaining({ userId: expect.any(String) }),
       );
     });
 
@@ -296,23 +296,23 @@ describe('createUser usecase', () => {
       const input: CreateUserInput = {
         email: 'test@example.com',
         name: 'Test User',
-        password: 'password123'
+        password: 'password123',
       };
 
       const expectedUser: User = {
         id: 'generated-id',
         email: input.email,
         name: input.name,
-        role: 'user'
+        role: 'user',
       };
 
       const emailError: DomainError = {
         _tag: 'Unauthorized',
-        reason: 'Email service down'
+        reason: 'Email service down',
       };
 
       mockUserRepository.findByEmail.mockReturnValue(
-        TE.left({ _tag: 'UserNotFound', userId: input.email })
+        TE.left({ _tag: 'UserNotFound', userId: input.email }),
       );
       mockUserRepository.save.mockReturnValue(TE.right(expectedUser));
       mockEmailService.sendWelcomeEmail.mockReturnValue(TE.left(emailError));
@@ -322,7 +322,7 @@ describe('createUser usecase', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         'Failed to send welcome email',
         new Error(JSON.stringify(emailError)),
-        { userId: expectedUser.id }
+        { userId: expectedUser.id },
       );
     });
   });

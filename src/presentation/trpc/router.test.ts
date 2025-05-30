@@ -7,7 +7,7 @@ import { User } from '../../domain/user';
 // Mock the createUser use case
 const mockCreateUser = jest.fn();
 jest.mock('../../application/usecases/createUser', () => ({
-  createUser: mockCreateUser
+  createUser: mockCreateUser,
 }));
 
 // Mock the logger
@@ -16,8 +16,8 @@ jest.mock('../../infrastructure/logging/logger', () => ({
     info: jest.fn(),
     error: jest.fn(),
     warn: jest.fn(),
-    debug: jest.fn()
-  }))
+    debug: jest.fn(),
+  })),
 }));
 
 // Import after mocking
@@ -33,27 +33,27 @@ describe('TRPC Router', () => {
     mockUserRepository = {
       findById: jest.fn(),
       save: jest.fn(),
-      findByEmail: jest.fn()
+      findByEmail: jest.fn(),
     };
 
     mockEmailService = {
-      sendWelcomeEmail: jest.fn()
+      sendWelcomeEmail: jest.fn(),
     };
 
     mockContainer = {
       resolve: jest.fn(),
-      dispose: jest.fn()
+      dispose: jest.fn(),
     };
 
     const requestContext: RequestContext = {
       requestId: 'test-request-123',
       startTime: new Date(),
-      metadata: {}
+      metadata: {},
     };
 
     context = {
       container: mockContainer,
-      requestContext
+      requestContext,
     };
 
     // Setup default container resolve behavior
@@ -71,14 +71,14 @@ describe('TRPC Router', () => {
     const validInput = {
       email: 'test@example.com',
       name: 'Test User',
-      password: 'password123'
+      password: 'password123',
     };
 
     const createdUser: User = {
       id: 'user-123',
       email: 'test@example.com',
       name: 'Test User',
-      role: 'user'
+      role: 'user',
     };
 
     it('should create user successfully', async () => {
@@ -90,7 +90,7 @@ describe('TRPC Router', () => {
 
       expect(result).toEqual({
         success: true,
-        data: createdUser
+        data: createdUser,
       });
     });
 
@@ -101,21 +101,21 @@ describe('TRPC Router', () => {
       await expect(caller.user.create({
         email: 'invalid-email',
         name: 'Test User',
-        password: 'password123'
+        password: 'password123',
       })).rejects.toThrow();
 
       // Test short name
       await expect(caller.user.create({
         email: 'test@example.com',
         name: 'T',
-        password: 'password123'
+        password: 'password123',
       })).rejects.toThrow();
 
       // Test short password
       await expect(caller.user.create({
         email: 'test@example.com',
         name: 'Test User',
-        password: '123'
+        password: '123',
       })).rejects.toThrow();
     });
 
@@ -123,8 +123,8 @@ describe('TRPC Router', () => {
       mockCreateUser.mockReturnValue(() => () => Promise.resolve(E.left({
         _tag: 'ValidationError',
         errors: [
-          { field: 'email', message: 'Email already exists' }
-        ]
+          { field: 'email', message: 'Email already exists' },
+        ],
       })));
 
       const caller = appRouter.createCaller(context);
@@ -148,12 +148,12 @@ describe('TRPC Router', () => {
       id: 'user-123',
       email: 'test@example.com',
       name: 'Test User',
-      role: 'user'
+      role: 'user',
     };
 
     it('should get user by ID successfully', async () => {
       mockUserRepository.findById.mockReturnValue(
-        () => Promise.resolve(E.right(testUser))
+        () => Promise.resolve(E.right(testUser)),
       );
 
       const caller = appRouter.createCaller(context);
@@ -161,7 +161,7 @@ describe('TRPC Router', () => {
 
       expect(result).toEqual({
         success: true,
-        data: testUser
+        data: testUser,
       });
       expect(mockUserRepository.findById).toHaveBeenCalledWith('user-123');
     });
@@ -180,8 +180,8 @@ describe('TRPC Router', () => {
       mockUserRepository.findById.mockReturnValue(
         () => Promise.resolve(E.left({
           _tag: 'UserNotFound',
-          userId: 'user-123'
-        }))
+          userId: 'user-123',
+        })),
       );
 
       const caller = appRouter.createCaller(context);
@@ -207,7 +207,7 @@ describe('TRPC Router', () => {
     it('should map ValidationError to BAD_REQUEST', async () => {
       mockCreateUser.mockReturnValue(() => () => Promise.resolve(E.left({
         _tag: 'ValidationError',
-        errors: [{ field: 'email', message: 'Invalid email' }]
+        errors: [{ field: 'email', message: 'Invalid email' }],
       })));
 
       const caller = appRouter.createCaller(context);
@@ -216,7 +216,7 @@ describe('TRPC Router', () => {
         await caller.user.create({
           email: 'test@example.com',
           name: 'Test User',
-          password: 'password123'
+          password: 'password123',
         });
         fail('Should have thrown an error');
       } catch (error) {
@@ -230,8 +230,8 @@ describe('TRPC Router', () => {
       mockUserRepository.findById.mockReturnValue(
         () => Promise.resolve(E.left({
           _tag: 'UserNotFound',
-          userId: 'user-123'
-        }))
+          userId: 'user-123',
+        })),
       );
 
       const caller = appRouter.createCaller(context);
@@ -250,8 +250,8 @@ describe('TRPC Router', () => {
       mockUserRepository.findById.mockReturnValue(
         () => Promise.resolve(E.left({
           _tag: 'DatabaseError',
-          message: 'Connection failed'
-        }))
+          message: 'Connection failed',
+        })),
       );
 
       const caller = appRouter.createCaller(context);

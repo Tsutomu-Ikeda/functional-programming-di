@@ -4,7 +4,7 @@ import * as E from 'fp-ts/lib/Either';
 const mockApp = {
   use: jest.fn(),
   get: jest.fn(),
-  listen: jest.fn()
+  listen: jest.fn(),
 };
 
 // Mock express functions
@@ -75,7 +75,7 @@ describe('ApplicationServer', () => {
       expect(result).toEqual(E.left({
         _tag: 'ServerStartError',
         message: 'Port already in use',
-        port: 3000
+        port: 3000,
       }));
     });
 
@@ -191,7 +191,7 @@ describe('Express App Setup', () => {
 
     // Get the CORS middleware function
     const corsMiddleware = mockApp.use.mock.calls.find(call =>
-      typeof call[0] === 'function' && call[0].length === 3
+      typeof call[0] === 'function' && call[0].length === 3,
     )?.[0];
 
     expect(corsMiddleware).toBeDefined();
@@ -200,7 +200,7 @@ describe('Express App Setup', () => {
     const mockReq = { method: 'OPTIONS' };
     const mockRes = {
       header: jest.fn(),
-      sendStatus: jest.fn()
+      sendStatus: jest.fn(),
     };
     const mockNext = jest.fn();
 
@@ -222,7 +222,7 @@ describe('Express App Setup', () => {
 
     // Get the CORS middleware function
     const corsMiddleware = mockApp.use.mock.calls.find(call =>
-      typeof call[0] === 'function' && call[0].length === 3
+      typeof call[0] === 'function' && call[0].length === 3,
     )?.[0];
 
     expect(corsMiddleware).toBeDefined();
@@ -231,7 +231,7 @@ describe('Express App Setup', () => {
     const mockReq = { method: 'GET' };
     const mockRes = {
       header: jest.fn(),
-      sendStatus: jest.fn()
+      sendStatus: jest.fn(),
     };
     const mockNext = jest.fn();
 
@@ -259,7 +259,7 @@ describe('Health Endpoint', () => {
 
     const mockReq = {};
     const mockRes = {
-      json: jest.fn()
+      json: jest.fn(),
     };
 
     healthHandler(mockReq, mockRes);
@@ -271,9 +271,9 @@ describe('Health Endpoint', () => {
         rest: 'available at /api',
         endpoints: {
           'POST /api/users': 'Create a new user',
-          'GET /api/users/:id': 'Get user by ID'
-        }
-      }
+          'GET /api/users/:id': 'Get user by ID',
+        },
+      },
     });
   });
 });
@@ -294,7 +294,7 @@ describe('API Docs Endpoint', () => {
 
     const mockReq = {};
     const mockRes = {
-      json: jest.fn()
+      json: jest.fn(),
     };
 
     apiDocsHandler(mockReq, mockRes);
@@ -309,16 +309,16 @@ describe('API Docs Endpoint', () => {
           body: {
             email: 'string (required)',
             name: 'string (required)',
-            password: 'string (required, min 6 chars)'
-          }
+            password: 'string (required, min 6 chars)',
+          },
         },
         'GET /api/users/:id': {
           description: 'Get user by ID',
           params: {
-            id: 'string (required)'
-          }
-        }
-      }
+            id: 'string (required)',
+          },
+        },
+      },
     });
   });
 });
@@ -337,7 +337,7 @@ describe('Error Handling Middleware', () => {
 
     // Get the error handling middleware
     const errorHandler = mockApp.use.mock.calls.find(call =>
-      typeof call[0] === 'function' && call[0].length === 4
+      typeof call[0] === 'function' && call[0].length === 4,
     )?.[0];
 
     expect(errorHandler).toBeDefined();
@@ -346,7 +346,7 @@ describe('Error Handling Middleware', () => {
     const mockReq = { context: { requestId: 'test-123' } };
     const mockRes = {
       status: jest.fn().mockReturnThis(),
-      json: jest.fn()
+      json: jest.fn(),
     };
     const mockNext = jest.fn();
 
@@ -357,7 +357,7 @@ describe('Error Handling Middleware', () => {
     expect(mockRes.json).toHaveBeenCalledWith({
       success: false,
       error: 'Internal server error',
-      requestId: 'test-123'
+      requestId: 'test-123',
     });
 
     consoleErrorSpy.mockRestore();

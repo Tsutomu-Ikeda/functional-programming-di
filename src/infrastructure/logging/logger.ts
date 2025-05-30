@@ -19,7 +19,7 @@ export interface LoggerConfig {
 export class RequestScopedLogger implements Logger {
   constructor(
     private requestContext: RequestContext,
-    private config: LoggerConfig = { level: 'info', format: 'json' }
+    private config: LoggerConfig = { level: 'info', format: 'json' },
   ) {}
 
   info = (message: string, context?: object): IO.IO<void> => () => {
@@ -28,7 +28,7 @@ export class RequestScopedLogger implements Logger {
       level: 'info',
       message,
       context,
-      requestId: this.requestContext.requestId
+      requestId: this.requestContext.requestId,
     });
   };
 
@@ -39,7 +39,7 @@ export class RequestScopedLogger implements Logger {
       message,
       error,
       context,
-      requestId: this.requestContext.requestId
+      requestId: this.requestContext.requestId,
     });
   };
 
@@ -49,7 +49,7 @@ export class RequestScopedLogger implements Logger {
       level: 'warn',
       message,
       context,
-      requestId: this.requestContext.requestId
+      requestId: this.requestContext.requestId,
     });
   };
 
@@ -59,7 +59,7 @@ export class RequestScopedLogger implements Logger {
       level: 'debug',
       message,
       context,
-      requestId: this.requestContext.requestId
+      requestId: this.requestContext.requestId,
     });
   };
 
@@ -70,8 +70,8 @@ export class RequestScopedLogger implements Logger {
         error: entry.error ? {
           message: entry.error.message,
           stack: entry.error.stack,
-          name: entry.error.name
-        } : undefined
+          name: entry.error.name,
+        } : undefined,
       }));
     } else {
       const contextStr = entry.context ? ` ${JSON.stringify(entry.context)}` : '';
@@ -83,7 +83,7 @@ export class RequestScopedLogger implements Logger {
 
 export class SingletonLogger implements Logger {
   constructor(
-    private config: LoggerConfig = { level: 'info', format: 'json' }
+    private config: LoggerConfig = { level: 'info', format: 'json' },
   ) {}
 
   info = (message: string, context?: object): IO.IO<void> => () => {
@@ -91,7 +91,7 @@ export class SingletonLogger implements Logger {
       timestamp: new Date(),
       level: 'info',
       message,
-      context
+      context,
     });
   };
 
@@ -101,7 +101,7 @@ export class SingletonLogger implements Logger {
       level: 'error',
       message,
       error,
-      context
+      context,
     });
   };
 
@@ -110,7 +110,7 @@ export class SingletonLogger implements Logger {
       timestamp: new Date(),
       level: 'warn',
       message,
-      context
+      context,
     });
   };
 
@@ -119,7 +119,7 @@ export class SingletonLogger implements Logger {
       timestamp: new Date(),
       level: 'debug',
       message,
-      context
+      context,
     });
   };
 
@@ -130,8 +130,8 @@ export class SingletonLogger implements Logger {
         error: entry.error ? {
           message: entry.error.message,
           stack: entry.error.stack,
-          name: entry.error.name
-        } : undefined
+          name: entry.error.name,
+        } : undefined,
       }));
     } else {
       const contextStr = entry.context ? ` ${JSON.stringify(entry.context)}` : '';

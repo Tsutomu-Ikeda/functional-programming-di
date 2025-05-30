@@ -13,12 +13,12 @@ export function validateCreateUserInput(input: CreateUserInput): E.Either<Domain
   const validateUser = combineValidations<CreateUserInput>(
     validateEmail,
     validateName,
-    validatePassword
+    validatePassword,
   );
 
   return pipe(
     validateUser(input),
-    E.mapLeft(errors => ({ _tag: 'ValidationError' as const, errors }))
+    E.mapLeft(errors => ({ _tag: 'ValidationError' as const, errors })),
   );
 }
 

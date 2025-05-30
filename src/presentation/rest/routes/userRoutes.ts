@@ -45,7 +45,7 @@ type RouteError =
 const createRouteContext = (authReq: AuthenticatedRequest): IO.IO<RouteContext> => () => ({
   container: authReq.container,
   requestContext: authReq.context,
-  logger: new RequestScopedLogger(authReq.context)
+  logger: new RequestScopedLogger(authReq.context),
 });
 
 // Resolve dependencies for create user use case
@@ -62,14 +62,14 @@ const resolveDependencies = (context: RouteContext): TE.TaskEither<RouteError, {
         return {
           userRepository,
           emailService,
-          logger: context.logger
+          logger: context.logger,
         };
       },
       (error) => ({
         _tag: 'DependencyResolutionError' as const,
-        message: error instanceof Error ? error.message : 'Unknown dependency resolution error'
-      })
-    )
+        message: error instanceof Error ? error.message : 'Unknown dependency resolution error',
+      }),
+    ),
   );
 
 // Execute create user use case
@@ -83,14 +83,14 @@ const executeCreateUser = (input: CreateUserInput, deps: {
       createUser(input)(deps),
       (error) => ({
         _tag: 'RouteProcessingError' as const,
-        message: error instanceof Error ? error.message : 'Unknown processing error'
-      } as RouteError)
+        message: error instanceof Error ? error.message : 'Unknown processing error',
+      } as RouteError),
     ),
     TE.flatMap(result =>
       E.isLeft(result)
         ? TE.left(result.left as RouteError)
-        : TE.right(result.right)
-    )
+        : TE.right(result.right),
+    ),
   );
 
 // Execute get user by ID
@@ -100,20 +100,20 @@ const executeGetUser = (userId: string, userRepository: UserRepository): TE.Task
       () => userRepository.findById(userId)(),
       (error) => ({
         _tag: 'RouteProcessingError' as const,
-        message: error instanceof Error ? error.message : 'Unknown processing error'
-      } as RouteError)
+        message: error instanceof Error ? error.message : 'Unknown processing error',
+      } as RouteError),
     ),
     TE.flatMap(result =>
       E.isLeft(result)
         ? TE.left(result.left as RouteError)
-        : TE.right(result.right)
-    )
+        : TE.right(result.right),
+    ),
   );
 
 // Pure function to create success response
 const createSuccessResponse = (data: unknown, _statusCode: number = 200): { success: boolean; data: unknown } => ({
   success: true,
-  data
+  data,
 });
 
 // Types for HTTP responses
@@ -134,8 +134,8 @@ const createValidationErrorResponse = (errors: readonly unknown[]): IO.IO<HttpRe
   body: {
     success: false,
     error: 'Validation failed',
-    details: errors
-  } as ErrorResponseBody
+    details: errors,
+  } as ErrorResponseBody,
 });
 
 const createUserNotFoundResponse = (userId: string): IO.IO<HttpResponse> => () => ({
@@ -143,8 +143,8 @@ const createUserNotFoundResponse = (userId: string): IO.IO<HttpResponse> => () =
   body: {
     success: false,
     error: 'User not found',
-    details: { userId }
-  } as ErrorResponseBody
+    details: { userId },
+  } as ErrorResponseBody,
 });
 
 const createDatabaseErrorResponse = (message: string): IO.IO<HttpResponse> => () => ({
@@ -152,8 +152,8 @@ const createDatabaseErrorResponse = (message: string): IO.IO<HttpResponse> => ()
   body: {
     success: false,
     error: 'Database error',
-    details: { message }
-  } as ErrorResponseBody
+    details: { message },
+  } as ErrorResponseBody,
 });
 
 const createEmailServiceErrorResponse = (message: string): IO.IO<HttpResponse> => () => ({
@@ -161,8 +161,8 @@ const createEmailServiceErrorResponse = (message: string): IO.IO<HttpResponse> =
   body: {
     success: false,
     error: 'Email service error',
-    details: { message }
-  } as ErrorResponseBody
+    details: { message },
+  } as ErrorResponseBody,
 });
 
 const createDependencyResolutionErrorResponse = (message: string): IO.IO<HttpResponse> => () => ({
@@ -170,8 +170,8 @@ const createDependencyResolutionErrorResponse = (message: string): IO.IO<HttpRes
   body: {
     success: false,
     error: 'Service unavailable',
-    details: { message }
-  } as ErrorResponseBody
+    details: { message },
+  } as ErrorResponseBody,
 });
 
 const createRouteProcessingErrorResponse = (message: string): IO.IO<HttpResponse> => () => ({
@@ -179,16 +179,16 @@ const createRouteProcessingErrorResponse = (message: string): IO.IO<HttpResponse
   body: {
     success: false,
     error: 'Processing error',
-    details: { message }
-  } as ErrorResponseBody
+    details: { message },
+  } as ErrorResponseBody,
 });
 
 const createInternalServerErrorResponse = (): IO.IO<HttpResponse> => () => ({
   statusCode: 500,
   body: {
     success: false,
-    error: 'Internal server error'
-  } as ErrorResponseBody
+    error: 'Internal server error',
+  } as ErrorResponseBody,
 });
 
 // Error handler mapping using Record
@@ -215,10 +215,10 @@ const errorHandlers: Record<string, (error: any) => IO.IO<HttpResponse>> = {
         body: {
           success: false,
           error: 'Unauthorized',
-          details: { reason: error.reason }
-        } as ErrorResponseBody
-      })
-    )
+          details: { reason: error.reason },
+        } as ErrorResponseBody,
+      }),
+    ),
 };
 
 // Pure function to create error response using fp-ts Record lookup and Option
@@ -226,7 +226,7 @@ const createErrorResponse = (error: RouteError): IO.IO<HttpResponse> =>
   pipe(
     R.lookup(error._tag)(errorHandlers),
     O.map(handler => handler(error)),
-    O.getOrElse(() => createInternalServerErrorResponse())
+    O.getOrElse(() => createInternalServerErrorResponse()),
   );
 
 // Send response using fp-ts
@@ -241,8 +241,8 @@ const sendResponse = (res: Response, result: E.Either<RouteError, User>, success
       (data) => {
         const successResponse = createSuccessResponse(data, successStatusCode);
         res.status(successStatusCode).json(successResponse);
-      }
-    )
+      },
+    ),
   );
 };
 
@@ -250,7 +250,7 @@ const sendResponse = (res: Response, result: E.Either<RouteError, User>, success
 const processCreateUserRoute = (routeInput: CreateUserRouteInput): TE.TaskEither<RouteError, User> =>
   pipe(
     resolveDependencies(routeInput.context),
-    TE.flatMap(deps => executeCreateUser(routeInput.input, deps))
+    TE.flatMap(deps => executeCreateUser(routeInput.input, deps)),
   );
 
 // Process get user route
@@ -260,10 +260,10 @@ const processGetUserRoute = (routeInput: GetUserRouteInput): TE.TaskEither<Route
       () => routeInput.context.container.resolve<UserRepository>('userRepository'),
       (error) => ({
         _tag: 'DependencyResolutionError' as const,
-        message: error instanceof Error ? error.message : 'Unknown dependency resolution error'
-      })
+        message: error instanceof Error ? error.message : 'Unknown dependency resolution error',
+      }),
     ),
-    TE.flatMap(userRepository => executeGetUser(routeInput.userId, userRepository))
+    TE.flatMap(userRepository => executeGetUser(routeInput.userId, userRepository)),
   );
 
 // Create user route handler
@@ -328,8 +328,8 @@ export const createRouteConfig = (): {
 } => ({
   routes: [
     { method: 'POST', path: '/users', handler: createUserHandler },
-    { method: 'GET', path: '/users/:id', handler: getUserHandler }
+    { method: 'GET', path: '/users/:id', handler: getUserHandler },
   ],
   router: createUserRoutes(),
-  routerFP: createUserRoutesFP
+  routerFP: createUserRoutesFP,
 });

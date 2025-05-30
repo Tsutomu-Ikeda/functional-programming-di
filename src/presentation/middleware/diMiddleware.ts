@@ -27,8 +27,8 @@ const createRequestContext = (req: Request): IO.IO<RequestContext> => () => ({
     userAgent: req.get('User-Agent'),
     ip: req.ip,
     method: req.method,
-    url: req.url
-  }
+    url: req.url,
+  },
 });
 
 // Create scoped container
@@ -38,9 +38,9 @@ const createScopedContainer = (globalContainer: DIContainer, context: RequestCon
       async () => globalContainer.createScope(context),
       (error) => ({
         _tag: 'ContainerScopeError' as const,
-        message: error instanceof Error ? error.message : 'Unknown container scope error'
-      })
-    )
+        message: error instanceof Error ? error.message : 'Unknown container scope error',
+      }),
+    ),
   );
 
 // Create and log request start
@@ -52,15 +52,15 @@ const logRequestStart = (context: RequestContext, req: Request): TE.TaskEither<M
         logger.info('Request started', {
           method: req.method,
           url: req.url,
-          userAgent: req.get('User-Agent')
+          userAgent: req.get('User-Agent'),
         })();
         return logger;
       },
       (error) => ({
         _tag: 'LoggerError' as const,
-        message: error instanceof Error ? error.message : 'Unknown logger error'
-      })
-    )
+        message: error instanceof Error ? error.message : 'Unknown logger error',
+      }),
+    ),
   );
 
 // Setup response cleanup handler
@@ -68,7 +68,7 @@ const setupResponseCleanup = (
   res: Response,
   context: RequestContext,
   logger: RequestScopedLogger,
-  scopedContainer: ScopedContainer
+  scopedContainer: ScopedContainer,
 ): IO.IO<void> => () => {
   res.on('finish', async () => {
     const duration = Date.now() - context.startTime.getTime();
@@ -77,7 +77,7 @@ const setupResponseCleanup = (
     try {
       logger.info('Request completed', {
         statusCode: res.statusCode,
-        duration: `${duration}ms`
+        duration: `${duration}ms`,
       })();
     } catch {
       // Ignore logging errors during cleanup
@@ -96,7 +96,7 @@ const setupResponseCleanup = (
 const attachToRequest = (
   req: Request,
   context: RequestContext,
-  scopedContainer: ScopedContainer
+  scopedContainer: ScopedContainer,
 ): IO.IO<AuthenticatedRequest> => () => {
   const authReq = req as AuthenticatedRequest;
   authReq.container = scopedContainer;
@@ -108,7 +108,7 @@ const attachToRequest = (
 const processRequest = (
   globalContainer: DIContainer,
   req: Request,
-  res: Response
+  res: Response,
 ): TE.TaskEither<MiddlewareError, AuthenticatedRequest> => {
   const context = createRequestContext(req)();
 
@@ -120,10 +120,10 @@ const processRequest = (
         TE.map(logger => {
           setupResponseCleanup(res, context, logger, scopedContainer)();
           return logger;
-        })
-      )
+        }),
+      ),
     ),
-    TE.map(scopedContainer => attachToRequest(req, context, scopedContainer)())
+    TE.map(scopedContainer => attachToRequest(req, context, scopedContainer)()),
   );
 };
 
@@ -135,7 +135,7 @@ const handleMiddlewareError = (error: MiddlewareError, next: NextFunction): IO.I
     error._tag === 'ContainerScopeError' ? 'Failed to create request scope' :
     error._tag === 'LoggerError' ? 'Failed to initialize request logging' :
     error._tag === 'RequestContextError' ? 'Failed to create request context' :
-    'Unknown middleware error'
+    'Unknown middleware error',
   );
 
   next(expressError);
@@ -154,14 +154,14 @@ export const createDIMiddleware = (globalContainer: DIContainer) => {
           () => {
             // The request object has been modified in-place by attachToRequest
             next();
-          }
-        )
+          },
+        ),
       );
     } catch (error) {
       // Handle any unexpected errors
       const middlewareError = {
         _tag: 'ContainerScopeError' as const,
-        message: error instanceof Error ? error.message : 'Unknown middleware error'
+        message: error instanceof Error ? error.message : 'Unknown middleware error',
       };
       handleMiddlewareError(middlewareError, next)();
     }
@@ -178,8 +178,8 @@ export const createDIMiddlewareFP = (globalContainer: DIContainer) =>
         () => T.fromIO(() => {
           // The request object has been modified in-place by attachToRequest
           next();
-        })
-      )
+        }),
+      ),
     );
 
 // Pure function to create middleware configuration
@@ -190,5 +190,5 @@ export const createMiddlewareConfig = (globalContainer: DIContainer): {
 } => ({
   container: globalContainer,
   middleware: createDIMiddleware(globalContainer),
-  middlewareFP: createDIMiddlewareFP(globalContainer)
+  middlewareFP: createDIMiddlewareFP(globalContainer),
 });

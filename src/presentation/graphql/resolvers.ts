@@ -15,7 +15,7 @@ export const resolvers = {
     getUser: async (
       _parent: unknown,
       args: { id: string },
-      context: GraphQLContext
+      context: GraphQLContext,
     ): Promise<{ success: boolean; data: unknown; error: string | null }> => {
       try {
         const userRepository = await context.container.resolve<UserRepository>('userRepository');
@@ -27,9 +27,9 @@ export const resolvers = {
             success: true,
             data: {
               ...result.right,
-              role: result.right.role.toUpperCase()
+              role: result.right.role.toUpperCase(),
             },
-            error: null
+            error: null,
           };
         } else {
           const error = result.left;
@@ -38,13 +38,13 @@ export const resolvers = {
             return {
               success: false,
               data: null,
-              error: `User not found: ${error.userId}`
+              error: `User not found: ${error.userId}`,
             };
           } else {
             return {
               success: false,
               data: null,
-              error: 'Internal server error'
+              error: 'Internal server error',
             };
           }
         }
@@ -52,17 +52,17 @@ export const resolvers = {
         return {
           success: false,
           data: null,
-          error: 'Unexpected error occurred'
+          error: 'Unexpected error occurred',
         };
       }
-    }
+    },
   },
 
   Mutation: {
     createUser: async (
       _parent: unknown,
       args: { input: CreateUserInput },
-      context: GraphQLContext
+      context: GraphQLContext,
     ): Promise<{ success: boolean; data: unknown; error: string | null }> => {
       try {
         // Create request-scoped logger
@@ -75,13 +75,13 @@ export const resolvers = {
         const deps = {
           userRepository,
           emailService,
-          logger: requestLogger
+          logger: requestLogger,
         };
 
         // Execute use case
         const result = await pipe(
           createUser(args.input),
-          (useCase) => useCase(deps)
+          (useCase) => useCase(deps),
         )();
 
         if (result._tag === 'Right') {
@@ -89,9 +89,9 @@ export const resolvers = {
             success: true,
             data: {
               ...result.right,
-              role: result.right.role.toUpperCase()
+              role: result.right.role.toUpperCase(),
             },
-            error: null
+            error: null,
           };
         } else {
           const error = result.left;
@@ -101,31 +101,31 @@ export const resolvers = {
               return {
                 success: false,
                 data: null,
-                error: `Validation failed: ${error.errors.map(e => e.message).join(', ')}`
+                error: `Validation failed: ${error.errors.map(e => e.message).join(', ')}`,
               };
             case 'UserNotFound':
               return {
                 success: false,
                 data: null,
-                error: `User not found: ${error.userId}`
+                error: `User not found: ${error.userId}`,
               };
             case 'DatabaseError':
               return {
                 success: false,
                 data: null,
-                error: `Database error: ${error.message}`
+                error: `Database error: ${error.message}`,
               };
             case 'EmailServiceError':
               return {
                 success: false,
                 data: null,
-                error: `Email service error: ${error.message}`
+                error: `Email service error: ${error.message}`,
               };
             default:
               return {
                 success: false,
                 data: null,
-                error: 'Internal server error'
+                error: 'Internal server error',
               };
           }
         }
@@ -133,9 +133,9 @@ export const resolvers = {
         return {
           success: false,
           data: null,
-          error: 'Unexpected error occurred'
+          error: 'Unexpected error occurred',
         };
       }
-    }
-  }
+    },
+  },
 };

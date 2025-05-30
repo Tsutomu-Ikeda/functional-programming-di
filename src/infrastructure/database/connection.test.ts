@@ -15,7 +15,7 @@ describe('MockDatabaseConnection', () => {
       database: 'test_db',
       username: 'test_user',
       password: 'test_password',
-      maxConnections: 10
+      maxConnections: 10,
     };
     connection = new MockDatabaseConnection(config);
   });
@@ -66,8 +66,8 @@ describe('MockDatabaseConnection', () => {
       expect(result).toEqual(E.right([
         expect.objectContaining({
           lastID: expect.any(Number),
-          changes: 1
-        })
+          changes: 1,
+        }),
       ]));
     });
 
@@ -84,8 +84,8 @@ describe('MockDatabaseConnection', () => {
 
       expect(result).toEqual(E.right([
         expect.objectContaining({
-          changes: 1
-        })
+          changes: 1,
+        }),
       ]));
     });
 
@@ -102,8 +102,8 @@ describe('MockDatabaseConnection', () => {
 
       expect(result).toEqual(E.right([
         expect.objectContaining({
-          changes: 1
-        })
+          changes: 1,
+        }),
       ]));
     });
 
@@ -123,7 +123,7 @@ describe('MockDatabaseConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'DatabaseError',
-        message: 'Unknown database error'
+        message: 'Unknown database error',
       }));
     });
 
@@ -134,7 +134,7 @@ describe('MockDatabaseConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'DatabaseError',
-        message: 'Database not connected'
+        message: 'Database not connected',
       }));
     });
 
@@ -153,8 +153,8 @@ describe('MockDatabaseConnection', () => {
           id: 'param-test-id',
           email: 'param@example.com',
           name: 'Param User',
-          role: 'admin'
-        })
+          role: 'admin',
+        }),
       ]));
     });
   });
@@ -175,8 +175,8 @@ describe('MockDatabaseConnection', () => {
       expect(result).toEqual(E.right([
         expect.objectContaining({
           lastID: expect.any(Number),
-          changes: 1
-        })
+          changes: 1,
+        }),
       ]));
 
       // Verify the user was inserted
@@ -184,8 +184,8 @@ describe('MockDatabaseConnection', () => {
       expect(selectResult).toEqual(E.right([
         expect.objectContaining({
           id: 'tx-test-id',
-          email: 'tx@example.com'
-        })
+          email: 'tx@example.com',
+        }),
       ]));
     });
 
@@ -198,7 +198,7 @@ describe('MockDatabaseConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'DatabaseError',
-        message: 'Transaction failed'
+        message: 'Transaction failed',
       }));
 
       // Verify no data was affected due to rollback
@@ -215,7 +215,7 @@ describe('MockDatabaseConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'DatabaseError',
-        message: 'Transaction failed'
+        message: 'Transaction failed',
       }));
     });
 
@@ -228,7 +228,7 @@ describe('MockDatabaseConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'DatabaseError',
-        message: 'Transaction failed'
+        message: 'Transaction failed',
       }));
     });
 
@@ -241,7 +241,7 @@ describe('MockDatabaseConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'DatabaseError',
-        message: 'Transaction failed'
+        message: 'Transaction failed',
       }));
     });
 
@@ -251,8 +251,8 @@ describe('MockDatabaseConnection', () => {
           _tag: 'ValidationError' as const,
           errors: [
             { field: 'email', message: 'Invalid format' },
-            { field: 'name', message: 'Too short' }
-          ]
+            { field: 'name', message: 'Too short' },
+          ],
         });
       };
 
@@ -260,7 +260,7 @@ describe('MockDatabaseConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'DatabaseError',
-        message: 'Transaction failed'
+        message: 'Transaction failed',
       }));
     });
 
@@ -273,7 +273,7 @@ describe('MockDatabaseConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'DatabaseError',
-        message: 'Transaction failed'
+        message: 'Transaction failed',
       }));
     });
 
@@ -286,7 +286,7 @@ describe('MockDatabaseConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'DatabaseError',
-        message: 'Transaction failed'
+        message: 'Transaction failed',
       }));
     });
 
@@ -298,7 +298,7 @@ describe('MockDatabaseConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'DatabaseError',
-        message: 'Database not connected'
+        message: 'Database not connected',
       }));
     });
 
@@ -313,8 +313,8 @@ describe('MockDatabaseConnection', () => {
       expect(result).toEqual(E.right([
         expect.objectContaining({
           lastID: expect.any(Number),
-          changes: 1
-        })
+          changes: 1,
+        }),
       ]));
 
       // Verify the user was inserted
@@ -322,8 +322,8 @@ describe('MockDatabaseConnection', () => {
       expect(selectResult).toEqual(E.right([
         expect.objectContaining({
           id: 'multi-1',
-          email: 'multi1@example.com'
-        })
+          email: 'multi1@example.com',
+        }),
       ]));
     });
   });
@@ -357,7 +357,7 @@ describe('DatabaseConnectionPool', () => {
       database: 'test_db',
       username: 'test_user',
       password: 'test_password',
-      maxConnections: 10
+      maxConnections: 10,
     };
     pool = new DatabaseConnectionPool(config);
   });
@@ -452,8 +452,8 @@ describe('DatabaseConnectionPool', () => {
       expect(result).toEqual(E.right([
         expect.objectContaining({
           lastID: expect.any(Number),
-          changes: 1
-        })
+          changes: 1,
+        }),
       ]));
 
       // Verify the user was inserted
@@ -461,8 +461,8 @@ describe('DatabaseConnectionPool', () => {
       expect(selectResult).toEqual(E.right([
         expect.objectContaining({
           id: 'pool-test-id',
-          email: 'pool@example.com'
-        })
+          email: 'pool@example.com',
+        }),
       ]));
     });
   });

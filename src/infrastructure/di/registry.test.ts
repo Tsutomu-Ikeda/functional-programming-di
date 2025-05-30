@@ -24,19 +24,19 @@ describe('registry', () => {
       await registerServices(container, config);
 
       expect(registerSpy).toHaveBeenCalledWith('databasePool', expect.objectContaining({
-        lifecycle: 'singleton'
+        lifecycle: 'singleton',
       }));
       expect(registerSpy).toHaveBeenCalledWith('userRepository', expect.objectContaining({
-        lifecycle: 'scoped'
+        lifecycle: 'scoped',
       }));
       expect(registerSpy).toHaveBeenCalledWith('emailService', expect.objectContaining({
-        lifecycle: 'singleton'
+        lifecycle: 'singleton',
       }));
       expect(registerSpy).toHaveBeenCalledWith('appLogger', expect.objectContaining({
-        lifecycle: 'singleton'
+        lifecycle: 'singleton',
       }));
       expect(registerSpy).toHaveBeenCalledWith('requestLogger', expect.objectContaining({
-        lifecycle: 'scoped'
+        lifecycle: 'scoped',
       }));
     });
 
@@ -111,7 +111,7 @@ describe('registry', () => {
         SMTP_PASSWORD: 'smtp_password',
         FROM_EMAIL: 'test@test.com',
         LOG_LEVEL: 'debug',
-        LOG_FORMAT: 'text'
+        LOG_FORMAT: 'text',
       };
 
       const config = createDefaultConfig();
@@ -123,19 +123,19 @@ describe('registry', () => {
           database: 'test_db',
           username: 'test_user',
           password: 'test_password',
-          maxConnections: 20
+          maxConnections: 20,
         },
         email: {
           smtpHost: 'smtp.test.com',
           smtpPort: 465,
           username: 'smtp_user',
           password: 'smtp_password',
-          fromEmail: 'test@test.com'
+          fromEmail: 'test@test.com',
         },
         logger: {
           level: 'debug',
-          format: 'text'
-        }
+          format: 'text',
+        },
       });
 
       process.env = originalEnv;
@@ -154,19 +154,19 @@ describe('registry', () => {
           database: 'app_db',
           username: 'user',
           password: 'password',
-          maxConnections: 10
+          maxConnections: 10,
         },
         email: {
           smtpHost: 'localhost',
           smtpPort: 587,
           username: 'user',
           password: 'password',
-          fromEmail: 'noreply@example.com'
+          fromEmail: 'noreply@example.com',
         },
         logger: {
           level: 'info',
-          format: 'json'
-        }
+          format: 'json',
+        },
       });
 
       process.env = originalEnv;
@@ -178,7 +178,7 @@ describe('registry', () => {
         ...originalEnv,
         DB_PORT: 'invalid',
         SMTP_PORT: 'invalid',
-        DB_MAX_CONNECTIONS: 'invalid'
+        DB_MAX_CONNECTIONS: 'invalid',
       };
 
       const config = createDefaultConfig();

@@ -3,11 +3,11 @@ import { pipe } from 'fp-ts/lib/function';
 import {
   combineValidations,
   required,
-  minLength
+  minLength,
 } from './validation';
 import {
   validateCreateUserInput,
-  CreateUserInput
+  CreateUserInput,
 } from '../domain/userValidation';
 
 describe('validation', () => {
@@ -16,7 +16,7 @@ describe('validation', () => {
       const validInput: CreateUserInput = {
         email: 'test@example.com',
         name: 'John Doe',
-        password: 'password123'
+        password: 'password123',
       };
 
       const result = validateCreateUserInput(validInput);
@@ -28,14 +28,14 @@ describe('validation', () => {
       const invalidInput: CreateUserInput = {
         email: 'invalid-email',
         name: 'John Doe',
-        password: 'password123'
+        password: 'password123',
       };
 
       const result = validateCreateUserInput(invalidInput);
 
       expect(result).toEqual(E.left({
         _tag: 'ValidationError',
-        errors: [{ field: 'email', message: 'Invalid email format' }]
+        errors: [{ field: 'email', message: 'Invalid email format' }],
       }));
     });
 
@@ -43,14 +43,14 @@ describe('validation', () => {
       const invalidInput: CreateUserInput = {
         email: '',
         name: 'John Doe',
-        password: 'password123'
+        password: 'password123',
       };
 
       const result = validateCreateUserInput(invalidInput);
 
       expect(result).toEqual(E.left({
         _tag: 'ValidationError',
-        errors: [{ field: 'email', message: 'Invalid email format' }]
+        errors: [{ field: 'email', message: 'Invalid email format' }],
       }));
     });
 
@@ -58,14 +58,14 @@ describe('validation', () => {
       const invalidInput: CreateUserInput = {
         email: 'test@example.com',
         name: 'J',
-        password: 'password123'
+        password: 'password123',
       };
 
       const result = validateCreateUserInput(invalidInput);
 
       expect(result).toEqual(E.left({
         _tag: 'ValidationError',
-        errors: [{ field: 'name', message: 'Name must be at least 2 characters' }]
+        errors: [{ field: 'name', message: 'Name must be at least 2 characters' }],
       }));
     });
 
@@ -73,14 +73,14 @@ describe('validation', () => {
       const invalidInput: CreateUserInput = {
         email: 'test@example.com',
         name: '',
-        password: 'password123'
+        password: 'password123',
       };
 
       const result = validateCreateUserInput(invalidInput);
 
       expect(result).toEqual(E.left({
         _tag: 'ValidationError',
-        errors: [{ field: 'name', message: 'Name must be at least 2 characters' }]
+        errors: [{ field: 'name', message: 'Name must be at least 2 characters' }],
       }));
     });
 
@@ -88,14 +88,14 @@ describe('validation', () => {
       const invalidInput: CreateUserInput = {
         email: 'test@example.com',
         name: 'John Doe',
-        password: '123'
+        password: '123',
       };
 
       const result = validateCreateUserInput(invalidInput);
 
       expect(result).toEqual(E.left({
         _tag: 'ValidationError',
-        errors: [{ field: 'password', message: 'Password must be at least 6 characters' }]
+        errors: [{ field: 'password', message: 'Password must be at least 6 characters' }],
       }));
     });
 
@@ -103,14 +103,14 @@ describe('validation', () => {
       const invalidInput: CreateUserInput = {
         email: 'test@example.com',
         name: 'John Doe',
-        password: ''
+        password: '',
       };
 
       const result = validateCreateUserInput(invalidInput);
 
       expect(result).toEqual(E.left({
         _tag: 'ValidationError',
-        errors: [{ field: 'password', message: 'Password must be at least 6 characters' }]
+        errors: [{ field: 'password', message: 'Password must be at least 6 characters' }],
       }));
     });
 
@@ -118,7 +118,7 @@ describe('validation', () => {
       const invalidInput: CreateUserInput = {
         email: 'invalid',
         name: 'J',
-        password: '123'
+        password: '123',
       };
 
       const result = validateCreateUserInput(invalidInput);
@@ -128,8 +128,8 @@ describe('validation', () => {
         errors: [
           { field: 'email', message: 'Invalid email format' },
           { field: 'name', message: 'Name must be at least 2 characters' },
-          { field: 'password', message: 'Password must be at least 6 characters' }
-        ]
+          { field: 'password', message: 'Password must be at least 6 characters' },
+        ],
       }));
     });
   });
@@ -146,7 +146,7 @@ describe('validation', () => {
 
       expect(result).toEqual(E.left([{
         field: 'email',
-        message: 'email is required'
+        message: 'email is required',
       }]));
     });
 
@@ -155,7 +155,7 @@ describe('validation', () => {
 
       expect(result).toEqual(E.left([{
         field: 'name',
-        message: 'name is required'
+        message: 'name is required',
       }]));
     });
   });
@@ -178,7 +178,7 @@ describe('validation', () => {
 
       expect(result).toEqual(E.left([{
         field: 'password',
-        message: 'password must be at least 6 characters'
+        message: 'password must be at least 6 characters',
       }]));
     });
   });
@@ -188,12 +188,12 @@ describe('validation', () => {
       const validateUser = combineValidations<{ email: string; name: string }>(
         (user) => pipe(
           required('email')(user.email),
-          E.map(() => user)
+          E.map(() => user),
         ),
         (user) => pipe(
           minLength('name', 3)(user.name),
-          E.map(() => user)
-        )
+          E.map(() => user),
+        ),
       );
 
       const result = validateUser({ email: 'test@example.com', name: 'John' });
@@ -205,19 +205,19 @@ describe('validation', () => {
       const validateUser = combineValidations<{ email: string; name: string }>(
         (user) => pipe(
           required('email')(user.email),
-          E.map(() => user)
+          E.map(() => user),
         ),
         (user) => pipe(
           minLength('name', 3)(user.name),
-          E.map(() => user)
-        )
+          E.map(() => user),
+        ),
       );
 
       const result = validateUser({ email: 'test@example.com', name: 'Jo' });
 
       expect(result).toEqual(E.left([{
         field: 'name',
-        message: 'name must be at least 3 characters'
+        message: 'name must be at least 3 characters',
       }]));
     });
 
@@ -225,19 +225,19 @@ describe('validation', () => {
       const validateUser = combineValidations<{ email: string; name: string }>(
         (user) => pipe(
           required('email')(user.email),
-          E.map(() => user)
+          E.map(() => user),
         ),
         (user) => pipe(
           minLength('name', 3)(user.name),
-          E.map(() => user)
-        )
+          E.map(() => user),
+        ),
       );
 
       const result = validateUser({ email: '', name: 'Jo' });
 
       expect(result).toEqual(E.left([
         { field: 'email', message: 'email is required' },
-        { field: 'name', message: 'name must be at least 3 characters' }
+        { field: 'name', message: 'name must be at least 3 characters' },
       ]));
     });
   });

@@ -19,7 +19,7 @@ export const registerServices = async (container: DIContainer, config: AppConfig
       await pool.initialize();
       return pool;
     },
-    lifecycle: 'singleton'
+    lifecycle: 'singleton',
   });
 
   // User repository (scoped - new instance per request)
@@ -29,19 +29,19 @@ export const registerServices = async (container: DIContainer, config: AppConfig
       const connection = pool.getConnection();
       return new DatabaseUserRepository(connection);
     },
-    lifecycle: 'scoped'
+    lifecycle: 'scoped',
   });
 
   // Email service (singleton)
   container.register<EmailService>('emailService', {
     factory: async () => new MockEmailService(config.email),
-    lifecycle: 'singleton'
+    lifecycle: 'singleton',
   });
 
   // Application logger (singleton)
   container.register<Logger>('appLogger', {
     factory: async () => new SingletonLogger(config.logger),
-    lifecycle: 'singleton'
+    lifecycle: 'singleton',
   });
 
   // Request-scoped logger (scoped - new instance per request with request context)
@@ -50,7 +50,7 @@ export const registerServices = async (container: DIContainer, config: AppConfig
       // This will be overridden in the scoped container with actual request context
       throw new Error('Request logger should be created in scoped container');
     },
-    lifecycle: 'scoped'
+    lifecycle: 'scoped',
   });
 };
 
@@ -61,17 +61,17 @@ export const createDefaultConfig = (): AppConfig => ({
     database: process.env.DB_NAME || 'app_db',
     username: process.env.DB_USER || 'user',
     password: process.env.DB_PASSWORD || 'password',
-    maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS || '10')
+    maxConnections: parseInt(process.env.DB_MAX_CONNECTIONS || '10'),
   },
   email: {
     smtpHost: process.env.SMTP_HOST || 'localhost',
     smtpPort: parseInt(process.env.SMTP_PORT || '587'),
     username: process.env.SMTP_USER || 'user',
     password: process.env.SMTP_PASSWORD || 'password',
-    fromEmail: process.env.FROM_EMAIL || 'noreply@example.com'
+    fromEmail: process.env.FROM_EMAIL || 'noreply@example.com',
   },
   logger: {
     level: (process.env.LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || 'info',
-    format: (process.env.LOG_FORMAT as 'json' | 'text') || 'json'
-  }
+    format: (process.env.LOG_FORMAT as 'json' | 'text') || 'json',
+  },
 });

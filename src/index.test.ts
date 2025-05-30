@@ -9,7 +9,7 @@ import {
   User,
   DomainError,
   CreateUserInput,
-  CreateUserDeps
+  CreateUserDeps,
 } from './index';
 
 describe('Integration Tests', () => {
@@ -22,22 +22,22 @@ describe('Integration Tests', () => {
     mockUserRepository = {
       findById: jest.fn(),
       findByEmail: jest.fn(),
-      save: jest.fn()
+      save: jest.fn(),
     };
 
     mockEmailService = {
-      sendWelcomeEmail: jest.fn()
+      sendWelcomeEmail: jest.fn(),
     };
 
     mockLogger = {
       info: jest.fn().mockReturnValue(IO.of(undefined)),
-      error: jest.fn().mockReturnValue(IO.of(undefined))
+      error: jest.fn().mockReturnValue(IO.of(undefined)),
     };
 
     deps = {
       userRepository: mockUserRepository,
       emailService: mockEmailService,
-      logger: mockLogger
+      logger: mockLogger,
     };
 
     jest.clearAllMocks();
@@ -48,19 +48,19 @@ describe('Integration Tests', () => {
       const input: CreateUserInput = {
         email: 'integration@example.com',
         name: 'Integration Test User',
-        password: 'securePassword123'
+        password: 'securePassword123',
       };
 
       const createdUser: User = {
         id: 'integration-user-id',
         email: input.email,
         name: input.name,
-        role: 'user'
+        role: 'user',
       };
 
       // Setup mocks for successful flow
       mockUserRepository.findByEmail.mockReturnValue(
-        TE.left({ _tag: 'UserNotFound', userId: input.email })
+        TE.left({ _tag: 'UserNotFound', userId: input.email }),
       );
       mockUserRepository.save.mockReturnValue(TE.right(createdUser));
       mockEmailService.sendWelcomeEmail.mockReturnValue(TE.right(undefined));
@@ -78,20 +78,20 @@ describe('Integration Tests', () => {
           email: input.email,
           name: input.name,
           role: 'user',
-          id: expect.any(String)
-        })
+          id: expect.any(String),
+        }),
       );
       expect(mockEmailService.sendWelcomeEmail).toHaveBeenCalledWith(
         expect.objectContaining({
           email: input.email,
           name: input.name,
           role: 'user',
-          id: expect.any(String)
-        })
+          id: expect.any(String),
+        }),
       );
       expect(mockLogger.info).toHaveBeenCalledWith(
         'Creating user',
-        expect.objectContaining({ userId: expect.any(String) })
+        expect.objectContaining({ userId: expect.any(String) }),
       );
 
       // Verify call order
@@ -109,23 +109,23 @@ describe('Integration Tests', () => {
       const input: CreateUserInput = {
         email: 'partial-fail@example.com',
         name: 'Partial Fail User',
-        password: 'password123'
+        password: 'password123',
       };
 
       const createdUser: User = {
         id: 'partial-fail-user-id',
         email: input.email,
         name: input.name,
-        role: 'user'
+        role: 'user',
       };
 
       // Setup mocks - email service fails but user creation succeeds
       mockUserRepository.findByEmail.mockReturnValue(
-        TE.left({ _tag: 'UserNotFound', userId: input.email })
+        TE.left({ _tag: 'UserNotFound', userId: input.email }),
       );
       mockUserRepository.save.mockReturnValue(TE.right(createdUser));
       mockEmailService.sendWelcomeEmail.mockReturnValue(
-        TE.left({ _tag: 'Unauthorized', reason: 'Email service temporarily unavailable' })
+        TE.left({ _tag: 'Unauthorized', reason: 'Email service temporarily unavailable' }),
       );
 
       const result = await createUser(input)(deps)();
@@ -137,7 +137,7 @@ describe('Integration Tests', () => {
       expect(mockLogger.error).toHaveBeenCalledWith(
         'Failed to send welcome email',
         expect.any(Error),
-        { userId: createdUser.id }
+        { userId: createdUser.id },
       );
 
       // Verify user was still saved despite email failure
@@ -148,7 +148,7 @@ describe('Integration Tests', () => {
       const invalidInput: CreateUserInput = {
         email: 'invalid-email-format',
         name: 'A', // Too short
-        password: '123' // Too short
+        password: '123', // Too short
       };
 
       const result = await createUser(invalidInput)(deps)();
@@ -160,10 +160,10 @@ describe('Integration Tests', () => {
             errors: expect.arrayContaining([
               { field: 'email', message: 'Invalid email format' },
               { field: 'name', message: 'Name must be at least 2 characters' },
-              { field: 'password', message: 'Password must be at least 6 characters' }
-            ])
-          })
-        )
+              { field: 'password', message: 'Password must be at least 6 characters' },
+            ]),
+          }),
+        ),
       );
 
       // No external services should be called
@@ -178,12 +178,12 @@ describe('Integration Tests', () => {
       const input: CreateUserInput = {
         email: 'db-error@example.com',
         name: 'DB Error User',
-        password: 'password123'
+        password: 'password123',
       };
 
       const dbError: DomainError = {
         _tag: 'Unauthorized',
-        reason: 'Database connection timeout'
+        reason: 'Database connection timeout',
       };
 
       // Database fails during email check
@@ -204,7 +204,7 @@ describe('Integration Tests', () => {
       const input: CreateUserInput = {
         email: 'concurrent@example.com',
         name: 'Concurrent User',
-        password: 'password123'
+        password: 'password123',
       };
 
       // First call succeeds, second call finds existing user
@@ -214,14 +214,14 @@ describe('Integration Tests', () => {
           id: 'existing-id',
           email: input.email,
           name: 'Existing User',
-          role: 'user'
+          role: 'user',
         }));
 
       mockUserRepository.save.mockReturnValue(TE.right({
         id: 'new-id',
         email: input.email,
         name: input.name,
-        role: 'user'
+        role: 'user',
       }));
 
       mockEmailService.sendWelcomeEmail.mockReturnValue(TE.right(undefined));
@@ -236,8 +236,8 @@ describe('Integration Tests', () => {
         _tag: 'ValidationError',
         errors: expect.arrayContaining([{
           field: 'email',
-          message: 'Email already exists'
-        }])
+          message: 'Email already exists',
+        }]),
       })));
     });
   });

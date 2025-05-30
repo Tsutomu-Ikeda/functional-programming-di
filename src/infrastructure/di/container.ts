@@ -47,7 +47,7 @@ class ScopedContainerImpl implements ScopedContainer {
 
   constructor(
     private parent: Container,
-    private context: RequestContext
+    private context: RequestContext,
   ) {}
 
   async resolve<T>(key: string): Promise<T> {

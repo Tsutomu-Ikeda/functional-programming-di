@@ -1,7 +1,7 @@
 // Mock console methods
 const consoleSpy = {
   log: jest.spyOn(console, 'log').mockImplementation(),
-  error: jest.spyOn(console, 'error').mockImplementation()
+  error: jest.spyOn(console, 'error').mockImplementation(),
 };
 
 // Mock process methods
@@ -11,14 +11,14 @@ const processOnSpy = jest.spyOn(process, 'on').mockImplementation();
 // Mock the server
 const mockServer = {
   start: jest.fn(),
-  stop: jest.fn()
+  stop: jest.fn(),
 };
 
 const mockCreateServer = jest.fn(() => () => mockServer);
 
 // Mock the server module before importing main
 jest.mock('./presentation/server', () => ({
-  createServer: mockCreateServer
+  createServer: mockCreateServer,
 }));
 
 describe('main.ts', () => {

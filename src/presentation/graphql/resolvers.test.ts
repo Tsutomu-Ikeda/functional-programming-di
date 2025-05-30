@@ -18,27 +18,27 @@ describe('GraphQL Resolvers', () => {
     mockUserRepository = {
       findById: jest.fn(),
       save: jest.fn(),
-      findByEmail: jest.fn()
+      findByEmail: jest.fn(),
     };
 
     mockEmailService = {
-      sendWelcomeEmail: jest.fn()
+      sendWelcomeEmail: jest.fn(),
     };
 
     mockContainer = {
       resolve: jest.fn(),
-      dispose: jest.fn()
+      dispose: jest.fn(),
     };
 
     const requestContext: RequestContext = {
       requestId: 'test-request-123',
       startTime: new Date(),
-      metadata: {}
+      metadata: {},
     };
 
     context = {
       container: mockContainer,
-      requestContext
+      requestContext,
     };
 
     // Setup default container resolve behavior
@@ -54,27 +54,27 @@ describe('GraphQL Resolvers', () => {
       id: 'user-123',
       email: 'test@example.com',
       name: 'Test User',
-      role: 'user'
+      role: 'user',
     };
 
     it('should return user successfully', async () => {
       mockUserRepository.findById.mockReturnValue(
-        jest.fn().mockResolvedValue(E.right(testUser))
+        jest.fn().mockResolvedValue(E.right(testUser)),
       );
 
       const result = await resolvers.Query.getUser(
         {},
         { id: 'user-123' },
-        context
+        context,
       );
 
       expect(result).toEqual({
         success: true,
         data: {
           ...testUser,
-          role: 'USER'
+          role: 'USER',
         },
-        error: null
+        error: null,
       });
       expect(mockUserRepository.findById).toHaveBeenCalledWith('user-123');
     });
@@ -83,20 +83,20 @@ describe('GraphQL Resolvers', () => {
       mockUserRepository.findById.mockReturnValue(
         jest.fn().mockResolvedValue(E.left({
           _tag: 'UserNotFound',
-          userId: 'user-123'
-        }))
+          userId: 'user-123',
+        })),
       );
 
       const result = await resolvers.Query.getUser(
         {},
         { id: 'user-123' },
-        context
+        context,
       );
 
       expect(result).toEqual({
         success: false,
         data: null,
-        error: 'User not found: user-123'
+        error: 'User not found: user-123',
       });
     });
 
@@ -104,20 +104,20 @@ describe('GraphQL Resolvers', () => {
       mockUserRepository.findById.mockReturnValue(
         jest.fn().mockResolvedValue(E.left({
           _tag: 'DatabaseError',
-          message: 'Connection failed'
-        }))
+          message: 'Connection failed',
+        })),
       );
 
       const result = await resolvers.Query.getUser(
         {},
         { id: 'user-123' },
-        context
+        context,
       );
 
       expect(result).toEqual({
         success: false,
         data: null,
-        error: 'Internal server error'
+        error: 'Internal server error',
       });
     });
 
@@ -127,13 +127,13 @@ describe('GraphQL Resolvers', () => {
       const result = await resolvers.Query.getUser(
         {},
         { id: 'user-123' },
-        context
+        context,
       );
 
       expect(result).toEqual({
         success: false,
         data: null,
-        error: 'Unexpected error occurred'
+        error: 'Unexpected error occurred',
       });
     });
   });
@@ -142,14 +142,14 @@ describe('GraphQL Resolvers', () => {
     const createUserInput = {
       email: 'test@example.com',
       name: 'Test User',
-      password: 'password123'
+      password: 'password123',
     };
 
     const createdUser: User = {
       id: 'user-123',
       email: 'test@example.com',
       name: 'Test User',
-      role: 'user'
+      role: 'user',
     };
 
     beforeEach(() => {
@@ -162,16 +162,16 @@ describe('GraphQL Resolvers', () => {
       const result = await resolvers.Mutation.createUser(
         {},
         { input: createUserInput },
-        context
+        context,
       );
 
       expect(result).toEqual({
         success: true,
         data: {
           ...createdUser,
-          role: 'USER'
+          role: 'USER',
         },
-        error: null
+        error: null,
       });
     });
 
@@ -181,20 +181,20 @@ describe('GraphQL Resolvers', () => {
         _tag: 'ValidationError',
         errors: [
           { field: 'email', message: 'Invalid email format' },
-          { field: 'password', message: 'Password too short' }
-        ]
+          { field: 'password', message: 'Password too short' },
+        ],
       })));
 
       const result = await resolvers.Mutation.createUser(
         {},
         { input: createUserInput },
-        context
+        context,
       );
 
       expect(result).toEqual({
         success: false,
         data: null,
-        error: 'Validation failed: Invalid email format, Password too short'
+        error: 'Validation failed: Invalid email format, Password too short',
       });
     });
 
@@ -202,19 +202,19 @@ describe('GraphQL Resolvers', () => {
       const { createUser } = require('../../application/usecases/createUser');
       createUser.mockReturnValue(() => jest.fn().mockResolvedValue(E.left({
         _tag: 'UserNotFound',
-        userId: 'user-123'
+        userId: 'user-123',
       })));
 
       const result = await resolvers.Mutation.createUser(
         {},
         { input: createUserInput },
-        context
+        context,
       );
 
       expect(result).toEqual({
         success: false,
         data: null,
-        error: 'User not found: user-123'
+        error: 'User not found: user-123',
       });
     });
 
@@ -222,19 +222,19 @@ describe('GraphQL Resolvers', () => {
       const { createUser } = require('../../application/usecases/createUser');
       createUser.mockReturnValue(() => jest.fn().mockResolvedValue(E.left({
         _tag: 'DatabaseError',
-        message: 'Connection timeout'
+        message: 'Connection timeout',
       })));
 
       const result = await resolvers.Mutation.createUser(
         {},
         { input: createUserInput },
-        context
+        context,
       );
 
       expect(result).toEqual({
         success: false,
         data: null,
-        error: 'Database error: Connection timeout'
+        error: 'Database error: Connection timeout',
       });
     });
 
@@ -242,19 +242,19 @@ describe('GraphQL Resolvers', () => {
       const { createUser } = require('../../application/usecases/createUser');
       createUser.mockReturnValue(() => jest.fn().mockResolvedValue(E.left({
         _tag: 'EmailServiceError',
-        message: 'SMTP server unavailable'
+        message: 'SMTP server unavailable',
       })));
 
       const result = await resolvers.Mutation.createUser(
         {},
         { input: createUserInput },
-        context
+        context,
       );
 
       expect(result).toEqual({
         success: false,
         data: null,
-        error: 'Email service error: SMTP server unavailable'
+        error: 'Email service error: SMTP server unavailable',
       });
     });
 
@@ -262,19 +262,19 @@ describe('GraphQL Resolvers', () => {
       const { createUser } = require('../../application/usecases/createUser');
       createUser.mockReturnValue(() => jest.fn().mockResolvedValue(E.left({
         _tag: 'UnknownError',
-        message: 'Something went wrong'
+        message: 'Something went wrong',
       })));
 
       const result = await resolvers.Mutation.createUser(
         {},
         { input: createUserInput },
-        context
+        context,
       );
 
       expect(result).toEqual({
         success: false,
         data: null,
-        error: 'Internal server error'
+        error: 'Internal server error',
       });
     });
 
@@ -284,13 +284,13 @@ describe('GraphQL Resolvers', () => {
       const result = await resolvers.Mutation.createUser(
         {},
         { input: createUserInput },
-        context
+        context,
       );
 
       expect(result).toEqual({
         success: false,
         data: null,
-        error: 'Unexpected error occurred'
+        error: 'Unexpected error occurred',
       });
     });
 
@@ -298,7 +298,7 @@ describe('GraphQL Resolvers', () => {
       await resolvers.Mutation.createUser(
         {},
         { input: createUserInput },
-        context
+        context,
       );
 
       expect(mockContainer.resolve).toHaveBeenCalledWith('userRepository');

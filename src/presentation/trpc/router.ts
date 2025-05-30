@@ -23,7 +23,7 @@ export const publicProcedure = t.procedure;
 const createUserInputSchema = z.object({
   email: z.string().email(),
   name: z.string().min(2),
-  password: z.string().min(6)
+  password: z.string().min(6),
 });
 
 // Types for better type safety
@@ -52,9 +52,9 @@ const resolveDependencies = (container: ScopedContainer): TE.TaskEither<TRPCErro
       },
       () => new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: 'Failed to resolve dependencies'
-      })
-    )
+        message: 'Failed to resolve dependencies',
+      }),
+    ),
   );
 
 // Pure function to resolve user repository
@@ -64,9 +64,9 @@ const resolveUserRepository = (container: ScopedContainer): TE.TaskEither<TRPCEr
       () => container.resolve<UserRepository>('userRepository'),
       () => new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: 'Failed to resolve user repository'
-      })
-    )
+        message: 'Failed to resolve user repository',
+      }),
+    ),
   );
 
 // Pure function to map domain errors to TRPC errors
@@ -76,33 +76,33 @@ const mapDomainErrorToTRPCError = (error: DomainError): TRPCError => {
       return new TRPCError({
         code: 'BAD_REQUEST',
         message: 'Validation failed',
-        cause: error.errors.map(e => (`${e.field}: ${e.message}`)).join(',')
+        cause: error.errors.map(e => (`${e.field}: ${e.message}`)).join(','),
       });
     }
     case 'UserNotFound': {
       return new TRPCError({
         code: 'NOT_FOUND',
         message: 'User not found',
-        cause: JSON.stringify({ userId: error.userId })
+        cause: JSON.stringify({ userId: error.userId }),
       });
     }
     case 'DatabaseError': {
       return new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Database error',
-        cause: JSON.stringify({ message: error.message })
+        cause: JSON.stringify({ message: error.message }),
       });
     }
     case 'EmailServiceError':
       return new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
         message: 'Email service error',
-        cause: new Error(error.message)
+        cause: new Error(error.message),
       });
     default:
       return new TRPCError({
         code: 'INTERNAL_SERVER_ERROR',
-        message: 'Internal server error'
+        message: 'Internal server error',
       });
   }
 };
@@ -110,45 +110,45 @@ const mapDomainErrorToTRPCError = (error: DomainError): TRPCError => {
 // Pure function to create success response
 const createSuccessResponse = <T>(data: T): SuccessResponse<T> => ({
   success: true,
-  data
+  data,
 });
 
 // Higher-order function to handle TaskEither results in TRPC procedures
 const handleTaskEitherResult = <T>(
-  taskEither: TE.TaskEither<DomainError, T>
+  taskEither: TE.TaskEither<DomainError, T>,
 ): TE.TaskEither<TRPCError, TRPCResponse<T>> =>
   pipe(
     taskEither,
     TE.bimap(
       mapDomainErrorToTRPCError,
-      createSuccessResponse
-    )
+      createSuccessResponse,
+    ),
   );
 
 // Pure function to execute create user use case
 const executeCreateUser = (
   input: z.infer<typeof createUserInputSchema>,
-  deps: { userRepository: UserRepository; emailService: EmailService; logger: RequestScopedLogger }
+  deps: { userRepository: UserRepository; emailService: EmailService; logger: RequestScopedLogger },
 ): TE.TaskEither<DomainError, User> =>
   createUser(input)(deps);
 
 // Pure function to execute get user by ID
 const executeGetUserById = (
   userRepository: UserRepository,
-  userId: string
+  userId: string,
 ): TE.TaskEither<DomainError, User> =>
   userRepository.findById(userId);
 
 // TRPC procedure wrapper that converts TaskEither to Promise
 const withTaskEither = <T>(
-  taskEither: TE.TaskEither<TRPCError, T>
+  taskEither: TE.TaskEither<TRPCError, T>,
 ): Promise<T> =>
   pipe(
     taskEither,
     TE.matchE(
       (error) => () => Promise.reject(error),
-      (result) => () => Promise.resolve(result)
-    )
+      (result) => () => Promise.resolve(result),
+    ),
   )();
 
 export const appRouter = router({
@@ -160,14 +160,14 @@ export const appRouter = router({
           resolveDependencies(ctx.container),
           TE.map(deps => ({
             ...deps,
-            logger: createRequestLogger(ctx.requestContext)()
+            logger: createRequestLogger(ctx.requestContext)(),
           })),
           TE.flatMap(deps =>
             pipe(
               executeCreateUser(input, deps),
-              handleTaskEitherResult
-            )
-          )
+              handleTaskEitherResult,
+            ),
+          ),
         );
 
         return withTaskEither(program);
@@ -181,14 +181,14 @@ export const appRouter = router({
           TE.flatMap(userRepository =>
             pipe(
               executeGetUserById(userRepository, input.id),
-              handleTaskEitherResult
-            )
-          )
+              handleTaskEitherResult,
+            ),
+          ),
         );
 
         return withTaskEither(program);
-      })
-  })
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

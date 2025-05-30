@@ -14,13 +14,13 @@ export type CreateUserDeps = {
 }
 
 export const createUser = (
-  input: CreateUserInput
+  input: CreateUserInput,
 ): RTE.ReaderTaskEither<CreateUserDeps, DomainError, User> =>
   pipe(
     RTE.fromEither(validateCreateUserInput(input)),
     RTE.tap(checkEmailNotExists),
     RTE.flatMap(createAndSaveUser),
-    RTE.tap(sendWelcomeEmailSafely)
+    RTE.tap(sendWelcomeEmailSafely),
   );
 
 const checkEmailNotExists = (validInput: CreateUserInput): RTE.ReaderTaskEither<CreateUserDeps, DomainError, CreateUserInput> =>
@@ -31,15 +31,15 @@ const checkEmailNotExists = (validInput: CreateUserInput): RTE.ReaderTaskEither<
         userRepository.findByEmail(validInput.email),
         TE.flatMap(() => TE.left<DomainError>({
           _tag: 'ValidationError',
-          errors: [{ field: 'email', message: 'Email already exists' }]
+          errors: [{ field: 'email', message: 'Email already exists' }],
         })),
         TE.orElse((error) =>
           error._tag === 'UserNotFound'
             ? TE.right(validInput)
             : TE.left(error)),
-        RTE.fromTaskEither
-      )
-    )
+        RTE.fromTaskEither,
+      ),
+    ),
   );
 
 const createAndSaveUser = (validInput: CreateUserInput): RTE.ReaderTaskEither<CreateUserDeps, DomainError, User> =>
@@ -48,15 +48,15 @@ const createAndSaveUser = (validInput: CreateUserInput): RTE.ReaderTaskEither<Cr
     RTE.tap((user) =>
       pipe(
         RTE.ask<CreateUserDeps>(),
-        RTE.flatMapTaskEither(({ logger }) => TE.fromIO(logger.info('Creating user', { userId: user.id })))
-      )
+        RTE.flatMapTaskEither(({ logger }) => TE.fromIO(logger.info('Creating user', { userId: user.id }))),
+      ),
     ),
     RTE.flatMap((user) =>
       pipe(
         RTE.ask<CreateUserDeps>(),
-        RTE.flatMapTaskEither(({ userRepository }) => userRepository.save(user))
-      )
-    )
+        RTE.flatMapTaskEither(({ userRepository }) => userRepository.save(user)),
+      ),
+    ),
   );
 
 const sendWelcomeEmailSafely = (user: User): RTE.ReaderTaskEither<CreateUserDeps, DomainError, User> =>
@@ -70,7 +70,7 @@ const sendWelcomeEmailSafely = (user: User): RTE.ReaderTaskEither<CreateUserDeps
           logger.error('Failed to send welcome email', new Error(JSON.stringify(error)), { userId: user.id });
           return TE.left(error);
         }),
-        RTE.fromTaskEither
-      )
-    )
+        RTE.fromTaskEither,
+      ),
+    ),
   );

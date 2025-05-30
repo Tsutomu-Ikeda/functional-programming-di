@@ -20,7 +20,7 @@ describe('Logger', () => {
       requestContext = {
         requestId: 'test-request-123',
         startTime: new Date(),
-        metadata: { userId: 'user-123' }
+        metadata: { userId: 'user-123' },
       };
     });
 
@@ -35,16 +35,16 @@ describe('Logger', () => {
         logger.info('Test info message', context)();
 
         expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"info"')
+          expect.stringContaining('"level":"info"'),
         );
         expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"message":"Test info message"')
+          expect.stringContaining('"message":"Test info message"'),
         );
         expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"requestId":"test-request-123"')
+          expect.stringContaining('"requestId":"test-request-123"'),
         );
         expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"context":{"action":"test"}')
+          expect.stringContaining('"context":{"action":"test"}'),
         );
       });
 
@@ -52,10 +52,10 @@ describe('Logger', () => {
         logger.info('Test info message')();
 
         expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"message":"Test info message"')
+          expect.stringContaining('"message":"Test info message"'),
         );
         expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"requestId":"test-request-123"')
+          expect.stringContaining('"requestId":"test-request-123"'),
         );
       });
 
@@ -81,10 +81,10 @@ describe('Logger', () => {
         logger.warn('Test warning message', context)();
 
         expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"warn"')
+          expect.stringContaining('"level":"warn"'),
         );
         expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"message":"Test warning message"')
+          expect.stringContaining('"message":"Test warning message"'),
         );
       });
 
@@ -93,10 +93,10 @@ describe('Logger', () => {
         logger.debug('Test debug message', context)();
 
         expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"debug"')
+          expect.stringContaining('"level":"debug"'),
         );
         expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"message":"Test debug message"')
+          expect.stringContaining('"message":"Test debug message"'),
         );
       });
     });
@@ -154,7 +154,7 @@ describe('Logger', () => {
         logger.info('Test message')();
 
         expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"info"')
+          expect.stringContaining('"level":"info"'),
         );
       });
     });
@@ -198,7 +198,7 @@ describe('Logger', () => {
         logger.warn('Test warning message')();
 
         expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"warn"')
+          expect.stringContaining('"level":"warn"'),
         );
       });
 
@@ -206,7 +206,7 @@ describe('Logger', () => {
         logger.debug('Test debug message')();
 
         expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"debug"')
+          expect.stringContaining('"level":"debug"'),
         );
       });
     });
@@ -251,7 +251,7 @@ describe('Logger', () => {
         logger.info('Test message')();
 
         expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"info"')
+          expect.stringContaining('"level":"info"'),
         );
       });
     });
@@ -265,7 +265,7 @@ describe('Logger', () => {
         message: 'Test message',
         context: { key: 'value' },
         requestId: 'req-123',
-        error: new Error('Test error')
+        error: new Error('Test error'),
       };
 
       expect(logEntry.timestamp).toBeInstanceOf(Date);
@@ -281,7 +281,7 @@ describe('Logger', () => {
     it('should accept valid logger config', () => {
       const config: LoggerConfig = {
         level: 'debug',
-        format: 'text'
+        format: 'text',
       };
 
       expect(config.level).toBe('debug');

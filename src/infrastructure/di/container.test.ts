@@ -12,7 +12,7 @@ describe('Container', () => {
     it('should register a service definition', () => {
       const definition: ServiceDefinition<string> = {
         factory: async () => 'test',
-        lifecycle: 'singleton'
+        lifecycle: 'singleton',
       };
 
       expect(() => container.register('test', definition)).not.toThrow();
@@ -23,7 +23,7 @@ describe('Container', () => {
     it('should resolve singleton service', async () => {
       const definition: ServiceDefinition<string> = {
         factory: async () => 'singleton-value',
-        lifecycle: 'singleton'
+        lifecycle: 'singleton',
       };
 
       container.register('test', definition);
@@ -40,7 +40,7 @@ describe('Container', () => {
       let counter = 0;
       const definition: ServiceDefinition<number> = {
         factory: async () => ++counter,
-        lifecycle: 'transient'
+        lifecycle: 'transient',
       };
 
       container.register('test', definition);
@@ -55,13 +55,13 @@ describe('Container', () => {
     it('should resolve scoped service with context', async () => {
       const definition: ServiceDefinition<string> = {
         factory: async () => 'scoped-value',
-        lifecycle: 'scoped'
+        lifecycle: 'scoped',
       };
 
       const context: RequestContext = {
         requestId: 'test-request',
         startTime: new Date(),
-        metadata: {}
+        metadata: {},
       };
 
       container.register('test', definition);
@@ -78,7 +78,7 @@ describe('Container', () => {
     it('should throw error for scoped service without context', async () => {
       const definition: ServiceDefinition<string> = {
         factory: async () => 'scoped-value',
-        lifecycle: 'scoped'
+        lifecycle: 'scoped',
       };
 
       container.register('test', definition);
@@ -92,7 +92,7 @@ describe('Container', () => {
       const context: RequestContext = {
         requestId: 'test-request',
         startTime: new Date(),
-        metadata: {}
+        metadata: {},
       };
 
       const scopedContainer = container.createScope(context);
@@ -114,7 +114,7 @@ describe('ScopedContainer', () => {
     context = {
       requestId: 'test-request',
       startTime: new Date(),
-      metadata: {}
+      metadata: {},
     };
     scopedContainer = container.createScope(context);
   });
@@ -123,7 +123,7 @@ describe('ScopedContainer', () => {
     it('should resolve singleton service from parent', async () => {
       const definition: ServiceDefinition<string> = {
         factory: async () => 'singleton-value',
-        lifecycle: 'singleton'
+        lifecycle: 'singleton',
       };
 
       container.register('test', definition);
@@ -137,7 +137,7 @@ describe('ScopedContainer', () => {
       let counter = 0;
       const definition: ServiceDefinition<number> = {
         factory: async () => ++counter,
-        lifecycle: 'scoped'
+        lifecycle: 'scoped',
       };
 
       container.register('test', definition);
@@ -153,7 +153,7 @@ describe('ScopedContainer', () => {
       let counter = 0;
       const definition: ServiceDefinition<number> = {
         factory: async () => ++counter,
-        lifecycle: 'transient'
+        lifecycle: 'transient',
       };
 
       container.register('test', definition);
@@ -183,7 +183,7 @@ describe('ScopedContainer', () => {
 
       const definition: ServiceDefinition = {
         factory: async () => mockInstance,
-        lifecycle: 'scoped'
+        lifecycle: 'scoped',
       };
 
       container.register('test', definition);
@@ -199,7 +199,7 @@ describe('ScopedContainer', () => {
 
       const definition: ServiceDefinition = {
         factory: async () => mockInstance,
-        lifecycle: 'scoped'
+        lifecycle: 'scoped',
       };
 
       container.register('test', definition);
@@ -215,7 +215,7 @@ describe('ScopedContainer', () => {
 
       const definition: ServiceDefinition = {
         factory: async () => mockInstance,
-        lifecycle: 'scoped'
+        lifecycle: 'scoped',
       };
 
       container.register('test', definition);

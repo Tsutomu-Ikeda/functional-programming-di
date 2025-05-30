@@ -59,7 +59,8 @@ export default [
       'no-unexpected-multiline': 'error',
       'no-unreachable': 'error',
       'quotes': ['error', 'single'],
-      'quote-props': ['error', 'as-needed']
+      'quote-props': ['error', 'as-needed'],
+      'comma-dangle': ['error', 'always-multiline'],
     },
   },
   {

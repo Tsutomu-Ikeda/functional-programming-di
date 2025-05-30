@@ -4,7 +4,7 @@ export type Injectable<T, U extends unknown[], V> = {
 };
 export const depend = <T extends Record<string, unknown>, U extends unknown[], V>(
   dependencies: T,
-  cb: (deps: T, ...args: U) => V
+  cb: (deps: T, ...args: U) => V,
 ): Injectable<T, U, V> => {
   const fn = (...args: U): V => cb(dependencies, ...args);
   fn.inject = (deps: Partial<T> | ((d: T) => Partial<T>)): Injectable<T, U, V> =>

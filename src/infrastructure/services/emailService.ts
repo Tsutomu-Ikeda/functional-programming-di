@@ -32,8 +32,8 @@ export class MockEmailService implements EmailService {
       },
       (error) => ({
         _tag: 'EmailServiceError' as const,
-        message: error instanceof Error ? error.message : 'Unknown email service error'
-      })
+        message: error instanceof Error ? error.message : 'Unknown email service error',
+      }),
     );
 }
 
@@ -54,7 +54,7 @@ export class RealEmailService implements EmailService {
             <h1>Welcome ${user.name}!</h1>
             <p>Thank you for joining our platform. We're excited to have you on board.</p>
             <p>Your account has been successfully created with the email: ${user.email}</p>
-          `
+          `,
         };
 
         // Simulate sending email
@@ -64,7 +64,7 @@ export class RealEmailService implements EmailService {
       },
       (error) => ({
         _tag: 'EmailServiceError' as const,
-        message: error instanceof Error ? error.message : 'Unknown email service error'
-      })
+        message: error instanceof Error ? error.message : 'Unknown email service error',
+      }),
     );
 }

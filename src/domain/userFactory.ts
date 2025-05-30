@@ -8,7 +8,7 @@ export function createUserEntity(input: CreateUserInput): E.Either<DomainError, 
     id: generateId(),
     email: input.email,
     name: input.name,
-    role: 'user'
+    role: 'user',
   });
 }
 

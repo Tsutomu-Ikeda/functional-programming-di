@@ -15,7 +15,7 @@ describe('SQLiteConnection', () => {
     testDbPath = path.join(__dirname, `test-${Date.now()}-${Math.random()}.db`);
     config = {
       filename: testDbPath,
-      mode: sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE
+      mode: sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
     };
     connection = new SQLiteConnection(config);
   });
@@ -53,7 +53,7 @@ describe('SQLiteConnection', () => {
     it('should handle connection errors', async () => {
       const invalidConfig = {
         filename: '/invalid/path/database.db',
-        mode: sqlite3.OPEN_READWRITE // Only read/write, no create
+        mode: sqlite3.OPEN_READWRITE, // Only read/write, no create
       };
       const invalidConnection = new SQLiteConnection(invalidConfig);
 
@@ -97,8 +97,8 @@ describe('SQLiteConnection', () => {
       expect(result).toEqual(E.right([
         expect.objectContaining({
           lastID: expect.any(Number),
-          changes: 1
-        })
+          changes: 1,
+        }),
       ]));
     });
 
@@ -115,8 +115,8 @@ describe('SQLiteConnection', () => {
 
       expect(result).toEqual(E.right([
         expect.objectContaining({
-          changes: 1
-        })
+          changes: 1,
+        }),
       ]));
     });
 
@@ -133,8 +133,8 @@ describe('SQLiteConnection', () => {
 
       expect(result).toEqual(E.right([
         expect.objectContaining({
-          changes: 1
-        })
+          changes: 1,
+        }),
       ]));
     });
 
@@ -154,7 +154,7 @@ describe('SQLiteConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'DatabaseError',
-        message: 'Unknown database error'
+        message: 'Unknown database error',
       }));
     });
 
@@ -165,7 +165,7 @@ describe('SQLiteConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'DatabaseError',
-        message: 'Database not connected'
+        message: 'Database not connected',
       }));
     });
 
@@ -184,8 +184,8 @@ describe('SQLiteConnection', () => {
           id: 'param-test-id',
           email: 'param@example.com',
           name: 'Param User',
-          role: 'admin'
-        })
+          role: 'admin',
+        }),
       ]));
     });
 
@@ -194,8 +194,8 @@ describe('SQLiteConnection', () => {
 
       expect(result).toEqual(E.right([
         expect.objectContaining({
-          count: expect.any(Number)
-        })
+          count: expect.any(Number),
+        }),
       ]));
     });
   });
@@ -217,8 +217,8 @@ describe('SQLiteConnection', () => {
       expect(result).toEqual(E.right([
         expect.objectContaining({
           lastID: expect.any(Number),
-          changes: 1
-        })
+          changes: 1,
+        }),
       ]));
 
       // Verify the user was inserted
@@ -226,8 +226,8 @@ describe('SQLiteConnection', () => {
       expect(selectResult).toEqual(E.right([
         expect.objectContaining({
           id: 'tx-test-id',
-          email: 'tx@example.com'
-        })
+          email: 'tx@example.com',
+        }),
       ]));
     });
 
@@ -240,7 +240,7 @@ describe('SQLiteConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'DatabaseError',
-        message: 'Unknown database error'
+        message: 'Unknown database error',
       }));
     });
 
@@ -253,7 +253,7 @@ describe('SQLiteConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'DatabaseError',
-        message: 'Simulated error'
+        message: 'Simulated error',
       }));
     });
 
@@ -266,7 +266,7 @@ describe('SQLiteConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'UserNotFound',
-        userId: 'non-existent'
+        userId: 'non-existent',
       }));
     });
 
@@ -279,7 +279,7 @@ describe('SQLiteConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'InvalidEmail',
-        email: 'invalid-email'
+        email: 'invalid-email',
       }));
     });
 
@@ -292,7 +292,7 @@ describe('SQLiteConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'Unauthorized',
-        reason: 'Access denied'
+        reason: 'Access denied',
       }));
     });
 
@@ -302,8 +302,8 @@ describe('SQLiteConnection', () => {
           _tag: 'ValidationError' as const,
           errors: [
             { field: 'email', message: 'Invalid format' },
-            { field: 'name', message: 'Too short' }
-          ]
+            { field: 'name', message: 'Too short' },
+          ],
         });
       };
 
@@ -313,8 +313,8 @@ describe('SQLiteConnection', () => {
         _tag: 'ValidationError',
         errors: [
           { field: 'email', message: 'Invalid format' },
-          { field: 'name', message: 'Too short' }
-        ]
+          { field: 'name', message: 'Too short' },
+        ],
       }));
     });
 
@@ -327,7 +327,7 @@ describe('SQLiteConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'EmailServiceError',
-        message: 'Email service down'
+        message: 'Email service down',
       }));
     });
 
@@ -339,7 +339,7 @@ describe('SQLiteConnection', () => {
 
       expect(result).toEqual(E.left({
         _tag: 'DatabaseError',
-        message: 'Failed to rollback transaction'
+        message: 'Failed to rollback transaction',
       }));
     });
 
@@ -354,8 +354,8 @@ describe('SQLiteConnection', () => {
       expect(result).toEqual(E.right([
         expect.objectContaining({
           lastID: expect.any(Number),
-          changes: 1
-        })
+          changes: 1,
+        }),
       ]));
 
       // Verify the user was inserted
@@ -363,8 +363,8 @@ describe('SQLiteConnection', () => {
       expect(selectResult).toEqual(E.right([
         expect.objectContaining({
           id: 'multi-1',
-          email: 'multi1@example.com'
-        })
+          email: 'multi1@example.com',
+        }),
       ]));
     });
 
@@ -410,7 +410,7 @@ describe('SQLiteConnectionPool', () => {
     testDbPath = path.join(__dirname, `pool-test-${Date.now()}-${Math.random()}.db`);
     config = {
       filename: testDbPath,
-      mode: sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE
+      mode: sqlite3.OPEN_READWRITE | sqlite3.OPEN_CREATE,
     };
     pool = new SQLiteConnectionPool(config);
   });
@@ -519,8 +519,8 @@ describe('SQLiteConnectionPool', () => {
       expect(result).toEqual(E.right([
         expect.objectContaining({
           lastID: expect.any(Number),
-          changes: 1
-        })
+          changes: 1,
+        }),
       ]));
 
       // Verify the user was inserted
@@ -528,8 +528,8 @@ describe('SQLiteConnectionPool', () => {
       expect(selectResult).toEqual(E.right([
         expect.objectContaining({
           id: 'pool-test-id',
-          email: 'pool@example.com'
-        })
+          email: 'pool@example.com',
+        }),
       ]));
     });
 
@@ -548,8 +548,8 @@ describe('SQLiteConnectionPool', () => {
       expect(selectResult).toEqual(E.right([
         expect.objectContaining({
           id: 'persist-test',
-          email: 'persist@example.com'
-        })
+          email: 'persist@example.com',
+        }),
       ]));
 
       // Update the user
@@ -562,8 +562,8 @@ describe('SQLiteConnectionPool', () => {
       expect(verifyResult).toEqual(E.right([
         expect.objectContaining({
           id: 'persist-test',
-          name: 'Updated Persist User'
-        })
+          name: 'Updated Persist User',
+        }),
       ]));
     });
   });
