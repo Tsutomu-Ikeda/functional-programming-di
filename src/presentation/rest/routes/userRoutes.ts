@@ -269,7 +269,7 @@ const processCreateUserRoute = (routeInput: CreateUserRouteInput): TE.TaskEither
 const processBulkCreateUserRoute = (routeInput: BulkCreateUserRouteInput): TE.TaskEither<RouteError, BulkCreateUserResult> =>
   pipe(
     resolveDependencies(routeInput.context),
-    TE.flatMap(deps => 
+    TE.flatMap(deps =>
       pipe(
         TE.tryCatch(
           bulkCreateUsers(routeInput.inputs)(deps),
@@ -331,7 +331,7 @@ const bulkCreateUsersFromCsvHandler = async (req: Request, res: Response, next: 
     }
 
     const fileContentResult = await readFileContent(file.path)();
-    
+
     deleteFile(file.path)(); // Don't await, run in background
 
     if (E.isLeft(fileContentResult)) {
@@ -349,7 +349,7 @@ const bulkCreateUsersFromCsvHandler = async (req: Request, res: Response, next: 
     const routeInput: BulkCreateUserRouteInput = { inputs: userInputs, context };
 
     const result = await processBulkCreateUserRoute(routeInput)();
-    
+
     sendResponse(res, result, 201)();
   } catch (error) {
     next(error);

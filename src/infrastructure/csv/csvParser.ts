@@ -1,5 +1,4 @@
 import * as E from 'fp-ts/lib/Either';
-import { pipe } from 'fp-ts/lib/function';
 import { CreateUserInput } from '../../domain/userValidation';
 import { DomainError } from '../../domain/errors';
 
@@ -17,7 +16,6 @@ export const parseUsersFromCSV = (csvContent: string): E.Either<DomainError, Cre
 
   try {
     const lines = csvContent.split('\n').filter(line => line.trim().length > 0);
-    
     if (lines.length === 0) {
       return E.left({
         _tag: 'CSVParsingError' as const,
@@ -27,9 +25,8 @@ export const parseUsersFromCSV = (csvContent: string): E.Either<DomainError, Cre
 
     const firstLine = lines[0].toLowerCase();
     const isHeader = firstLine.includes('email') && firstLine.includes('name') && firstLine.includes('password');
-    
+
     const startIndex = isHeader ? 1 : 0;
-    
     if (startIndex === 1 && lines.length === 1) {
       return E.left({
         _tag: 'CSVParsingError' as const,
@@ -44,7 +41,6 @@ export const parseUsersFromCSV = (csvContent: string): E.Either<DomainError, Cre
       if (!line) continue;
 
       const values = line.split(',').map(value => value.trim());
-      
       if (values.length < 3) {
         return E.left({
           _tag: 'CSVParsingError' as const,
@@ -53,7 +49,6 @@ export const parseUsersFromCSV = (csvContent: string): E.Either<DomainError, Cre
       }
 
       const [email, name, password] = values;
-      
       users.push({
         email,
         name,
@@ -87,6 +82,5 @@ export const convertUsersToCsv = (users: CreateUserInput[]): string => {
 
   const header = 'email,name,password';
   const rows = users.map(user => `${user.email},${user.name},${user.password}`);
-  
   return [header, ...rows].join('\n');
 };

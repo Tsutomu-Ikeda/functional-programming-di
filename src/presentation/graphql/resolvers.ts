@@ -5,7 +5,7 @@ import { bulkCreateUsers } from '../../application/usecases/bulkCreateUsers';
 import { ScopedContainer, RequestContext } from '../../infrastructure/di/types';
 import { UserRepository, EmailService } from '../../application/ports';
 import { RequestScopedLogger } from '../../infrastructure/logging/logger';
-import { CreateUserInput, BulkCreateUserResult } from '../../domain/userValidation';
+import { CreateUserInput } from '../../domain/userValidation';
 import { parseUsersFromCSV } from '../../infrastructure/csv/csvParser';
 
 export interface GraphQLContext {
@@ -140,7 +140,7 @@ export const resolvers = {
         };
       }
     },
-    
+
     bulkCreateUsers: async (
       _parent: unknown,
       args: { csvContent: string },
@@ -148,7 +148,7 @@ export const resolvers = {
     ): Promise<{ success: boolean; data: unknown; error: string | null }> => {
       try {
         const parseResult = parseUsersFromCSV(args.csvContent);
-        
+
         if (E.isLeft(parseResult)) {
           return {
             success: false,
@@ -156,9 +156,8 @@ export const resolvers = {
             error: `CSV parsing error: ${parseResult.left._tag === 'CSVParsingError' ? parseResult.left.message : 'Unknown error'}`
           };
         }
-        
+
         const userInputs = parseResult.right;
-        
         // Create request-scoped logger
         const requestLogger = new RequestScopedLogger(context.requestContext);
 
@@ -180,7 +179,7 @@ export const resolvers = {
 
         if (result._tag === 'Right') {
           const bulkResult = result.right;
-          
+
           return {
             success: true,
             data: {
@@ -237,7 +236,7 @@ export const resolvers = {
               };
           }
         }
-      } catch (error) {
+      } catch {
         return {
           success: false,
           data: null,

@@ -3,8 +3,6 @@ import multer from 'multer';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as TE from 'fp-ts/lib/TaskEither';
-import * as E from 'fp-ts/lib/Either';
-import { pipe } from 'fp-ts/lib/function';
 import { DomainError } from '../../domain/errors';
 
 const uploadsDir = path.join(process.cwd(), 'uploads');
@@ -22,7 +20,7 @@ const storage = multer.diskStorage({
   }
 });
 
-const csvFileFilter = (_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+const csvFileFilter = (_req: Request, file: any, cb: multer.FileFilterCallback) => {
   const ext = path.extname(file.originalname).toLowerCase();
   if (ext !== '.csv') {
     return cb(new Error('Only CSV files are allowed'));
@@ -55,7 +53,7 @@ export const handleUploadErrors = (err: Error, req: Request, res: Response, next
       }
     });
   }
-  
+
   if (err.message === 'Only CSV files are allowed') {
     return res.status(400).json({
       error: {
@@ -64,7 +62,7 @@ export const handleUploadErrors = (err: Error, req: Request, res: Response, next
       }
     });
   }
-  
+
   next(err);
 };
 

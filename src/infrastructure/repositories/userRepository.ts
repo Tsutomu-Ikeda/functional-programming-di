@@ -48,7 +48,7 @@ export class DatabaseUserRepository implements UserRepository {
     }
 
     return this.db.transaction<User[]>((conn) => {
-      const insertPromises = users.map(user => 
+      const insertPromises = users.map(user =>
         conn.query<User>(
           'INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?) RETURNING *',
           [user.id, user.email, user.name, user.role]
@@ -62,9 +62,9 @@ export class DatabaseUserRepository implements UserRepository {
           if (savedUsers.length === users.length) {
             return TE.right(savedUsers);
           } else {
-            return TE.left({ 
-              _tag: 'DatabaseError' as const, 
-              message: 'Failed to save all users in bulk operation' 
+            return TE.left({
+              _tag: 'DatabaseError' as const,
+              message: 'Failed to save all users in bulk operation'
             });
           }
         })

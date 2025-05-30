@@ -1,7 +1,6 @@
 import * as E from 'fp-ts/lib/Either';
 import { bulkCreateUsers } from './bulkCreateUsers';
 import { CreateUserInput } from '../../domain/userValidation';
-import { User } from '../../domain/user';
 
 const mockUserRepository = {
   findById: jest.fn(),
@@ -52,8 +51,8 @@ describe('bulkCreateUsers', () => {
 
     expect(E.isRight(result)).toBe(true);
     if (E.isRight(result)) {
-      expect(result.right.successful.length).toBe(2);
-      expect(result.right.failed.length).toBe(0);
+      expect(result.right.successful).toHaveLength(2);
+      expect(result.right.failed).toHaveLength(0);
       expect(mockUserRepository.saveBulk).toHaveBeenCalledTimes(1);
       expect(mockEmailService.sendWelcomeEmail).toHaveBeenCalledTimes(2);
       expect(mockLogger.info).toHaveBeenCalledWith(
@@ -75,7 +74,7 @@ describe('bulkCreateUsers', () => {
     if (E.isLeft(result)) {
       expect(result.left._tag).toBe('BulkValidationError');
       if (result.left._tag === 'BulkValidationError') {
-        expect(result.left.failedInputs.length).toBe(2);
+        expect(result.left.failedInputs).toHaveLength(2);
       }
     }
   });
@@ -86,9 +85,9 @@ describe('bulkCreateUsers', () => {
     });
 
     mockUserRepository.saveBulk.mockImplementation(() => {
-      return () => Promise.resolve(E.left({ 
-        _tag: 'DatabaseError', 
-        message: 'Database connection failed' 
+      return () => Promise.resolve(E.left({
+        _tag: 'DatabaseError',
+        message: 'Database connection failed'
       }));
     });
 

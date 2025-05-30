@@ -91,7 +91,7 @@ const mapDomainErrorToTRPCError = (error: DomainError): TRPCError => {
       return new TRPCError({
         code: 'BAD_REQUEST',
         message: 'Bulk validation failed',
-        cause: JSON.stringify({ 
+        cause: JSON.stringify({
           failedInputs: error.failedInputs.map(f => ({
             input: f.input,
             errors: f.errors.map(e => `${e.field}: ${e.message}`)
@@ -165,11 +165,11 @@ const executeBulkCreateUsers = (
   deps: { userRepository: UserRepository; emailService: EmailService; logger: RequestScopedLogger }
 ): TE.TaskEither<DomainError, BulkCreateUserResult> => {
   const parseResult = parseUsersFromCSV(csvContent);
-  
+
   if (E.isLeft(parseResult)) {
     return TE.left(parseResult.left);
   }
-  
+
   const userInputs = parseResult.right;
   return bulkCreateUsers(userInputs)(deps);
 };

@@ -1,3 +1,5 @@
+import { CreateUserInput } from './userValidation';
+
 export interface ValidationError {
   field: string
   message: string
@@ -8,7 +10,7 @@ export type DomainError =
   | { _tag: 'InvalidEmail'; email: string }
   | { _tag: 'Unauthorized'; reason: string }
   | { _tag: 'ValidationError'; errors: readonly ValidationError[] }
-  | { _tag: 'BulkValidationError'; failedInputs: Array<{ input: any; errors: ValidationError[] }> }
+  | { _tag: 'BulkValidationError'; failedInputs: Array<{ input: CreateUserInput; errors: ValidationError[] }> }
   | { _tag: 'DatabaseError'; message: string }
   | { _tag: 'EmailServiceError'; message: string }
   | { _tag: 'CSVParsingError'; message: string }

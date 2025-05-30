@@ -703,7 +703,8 @@ describe('userRoutes', () => {
       const mockUserRepo: UserRepository = {
         findById: jest.fn().mockReturnValue(TE.left({ _tag: 'UserNotFound', userId: 'test' })),
         findByEmail: jest.fn().mockReturnValue(TE.left({ _tag: 'UserNotFound', userId: 'test' })),
-        save: jest.fn().mockReturnValue(TE.right({ id: 'mocked', email: 'mock@test.com', name: 'Mock', role: 'user' }))
+        save: jest.fn().mockReturnValue(TE.right({ id: 'mocked', email: 'mock@test.com', name: 'Mock', role: 'user' })),
+        saveBulk: jest.fn().mockReturnValue(TE.right([{ id: 'mocked', email: 'mock@test.com', name: 'Mock', role: 'user' }]))
       };
 
       const createUserWithDI = depend(
