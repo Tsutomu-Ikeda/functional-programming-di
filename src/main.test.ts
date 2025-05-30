@@ -102,7 +102,7 @@ describe('main.ts', () => {
       mockServer.stop.mockResolvedValue(right(undefined));
 
       const mainModule = await import('./main');
-      
+
       // Ensure the mocked server is set as the global server
       mainModule.setGlobalServer(mockServer);
 
@@ -126,7 +126,7 @@ describe('main.ts', () => {
       mockServer.stop.mockResolvedValue(left(error));
 
       const mainModule = await import('./main');
-      
+
       // Ensure the mocked server is set as the global server
       mainModule.setGlobalServer(mockServer);
 
@@ -151,7 +151,7 @@ describe('main.ts', () => {
 
       const reason = new Error('Unhandled rejection');
       const promise = Promise.reject(reason);
-      
+
       // Catch the rejection to prevent it from being actually unhandled
       promise.catch(() => {});
 

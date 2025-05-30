@@ -222,7 +222,7 @@ describe('TRPC Router', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(TRPCError);
         expect((error as TRPCError).code).toBe('BAD_REQUEST');
-        expect((error as TRPCError).cause?.message).toEqual("email: Invalid email");
+        expect((error as TRPCError).cause?.message).toEqual('email: Invalid email');
       }
     });
 
@@ -242,7 +242,7 @@ describe('TRPC Router', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(TRPCError);
         expect((error as TRPCError).code).toBe('NOT_FOUND');
-        expect((error as TRPCError).cause?.message).toEqual("{\"userId\":\"user-123\"}");
+        expect((error as TRPCError).cause?.message).toEqual('{"userId":"user-123"}');
       }
     });
 
@@ -262,7 +262,7 @@ describe('TRPC Router', () => {
       } catch (error) {
         expect(error).toBeInstanceOf(TRPCError);
         expect((error as TRPCError).code).toBe('INTERNAL_SERVER_ERROR');
-        expect((error as TRPCError).cause?.message).toEqual("{\"message\":\"Connection failed\"}");
+        expect((error as TRPCError).cause?.message).toEqual('{"message":"Connection failed"}');
       }
     });
   });

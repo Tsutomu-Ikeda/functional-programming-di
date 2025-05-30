@@ -76,7 +76,7 @@ const mapDomainErrorToTRPCError = (error: DomainError): TRPCError => {
       return new TRPCError({
         code: 'BAD_REQUEST',
         message: 'Validation failed',
-        cause: error.errors.map(e => (`${e.field}: ${e.message}`)).join(",")
+        cause: error.errors.map(e => (`${e.field}: ${e.message}`)).join(',')
       });
     }
     case 'UserNotFound': {

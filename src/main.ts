@@ -5,7 +5,7 @@ import { createServer } from './presentation/server';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 let globalServer: any = null;
 
-// Export for testing
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const setGlobalServer = (server: any) => {
   globalServer = server;
 };
