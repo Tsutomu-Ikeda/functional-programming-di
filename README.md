@@ -162,9 +162,9 @@ export const createUser = (
 ): RTE.ReaderTaskEither<CreateUserDeps, DomainError, User> =>
   pipe(
     RTE.fromEither(validateCreateUserInput(input)),
-    RTE.chainW(checkEmailNotExists),
-    RTE.chainW(createAndSaveUser),
-    RTE.chainFirstW(sendWelcomeEmailSafely)
+    RTE.flatMap(checkEmailNotExists),
+    RTE.flatMap(createAndSaveUser),
+    RTE.tap(sendWelcomeEmailSafely)
   )
 ```
 

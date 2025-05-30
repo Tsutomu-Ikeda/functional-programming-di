@@ -28,7 +28,7 @@ async function main(): Promise<void> {
 
     pipe(
       startResult,
-      E.fold(
+      E.match(
         (error) => {
           console.error('❌ Failed to start server:', error);
           process.exit(1);
@@ -75,7 +75,7 @@ const shutdown = async (): Promise<void> => {
     const stopResult = await globalServer.stop();
     pipe(
       stopResult,
-      E.fold(
+      E.match(
         (error) => {
           console.error('❌ Error during shutdown:', error);
           process.exit(1);

@@ -18,15 +18,15 @@ export const createUser = (
 ): RTE.ReaderTaskEither<CreateUserDeps, DomainError, User> =>
   pipe(
     RTE.fromEither(validateCreateUserInput(input)),
-    RTE.chainW(checkEmailNotExists),
-    RTE.chainW(createAndSaveUser),
-    RTE.chainFirstW(sendWelcomeEmailSafely)
+    RTE.flatMap(checkEmailNotExists),
+    RTE.flatMap(createAndSaveUser),
+    RTE.tap(sendWelcomeEmailSafely)
   );
 
 const checkEmailNotExists = (validInput: CreateUserInput): RTE.ReaderTaskEither<CreateUserDeps, DomainError, CreateUserInput> =>
   pipe(
     RTE.ask<CreateUserDeps>(),
-    RTE.chainW(({ userRepository }) =>
+    RTE.flatMap(({ userRepository }) =>
       pipe(
         userRepository.findByEmail(validInput.email),
         TE.chain(() => TE.left<DomainError>({
@@ -45,16 +45,16 @@ const checkEmailNotExists = (validInput: CreateUserInput): RTE.ReaderTaskEither<
 const createAndSaveUser = (validInput: CreateUserInput): RTE.ReaderTaskEither<CreateUserDeps, DomainError, User> =>
   pipe(
     RTE.fromEither(createUserEntity(validInput)),
-    RTE.chainFirstW((user) =>
+    RTE.tap((user) =>
       pipe(
         RTE.ask<CreateUserDeps>(),
-        RTE.chainTaskEitherK(({ logger }) => TE.fromIO(logger.info('Creating user', { userId: user.id })))
+        RTE.flatMapTaskEither(({ logger }) => TE.fromIO(logger.info('Creating user', { userId: user.id })))
       )
     ),
-    RTE.chainW((user) =>
+    RTE.flatMap((user) =>
       pipe(
         RTE.ask<CreateUserDeps>(),
-        RTE.chainTaskEitherK(({ userRepository }) => userRepository.save(user))
+        RTE.flatMapTaskEither(({ userRepository }) => userRepository.save(user))
       )
     )
   );
@@ -62,12 +62,7 @@ const createAndSaveUser = (validInput: CreateUserInput): RTE.ReaderTaskEither<Cr
 const sendWelcomeEmailSafely = (user: User): RTE.ReaderTaskEither<CreateUserDeps, DomainError, User> =>
   pipe(
     RTE.ask<CreateUserDeps>(),
-    RTE.chainFirstW(() => {
-      console.log('sending mail to user:', user.email);
-
-      return RTE.ask<CreateUserDeps>();
-    }),
-    RTE.chainW(({ emailService, logger }) =>
+    RTE.flatMap(({ emailService, logger }) =>
       pipe(
         emailService.sendWelcomeEmail(user),
         TE.map(() => user),

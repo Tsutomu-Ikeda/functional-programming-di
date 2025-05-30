@@ -114,7 +114,7 @@ const processRequest = (
 
   return pipe(
     createScopedContainer(globalContainer, context),
-    TE.chainFirst(scopedContainer =>
+    TE.tap(scopedContainer =>
       pipe(
         logRequestStart(context, req),
         TE.map(logger => {
@@ -149,7 +149,7 @@ export const createDIMiddleware = (globalContainer: DIContainer) => {
 
       pipe(
         result,
-        E.fold(
+        E.match(
           (error) => handleMiddlewareError(error, next)(),
           () => {
             // The request object has been modified in-place by attachToRequest
@@ -173,7 +173,7 @@ export const createDIMiddlewareFP = (globalContainer: DIContainer) =>
   (req: Request, res: Response, next: NextFunction): T.Task<void> =>
     pipe(
       processRequest(globalContainer, req, res),
-      TE.fold(
+      TE.matchE(
         (error) => T.fromIO(handleMiddlewareError(error, next)),
         () => T.fromIO(() => {
           // The request object has been modified in-place by attachToRequest

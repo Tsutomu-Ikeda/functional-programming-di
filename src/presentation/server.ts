@@ -138,8 +138,8 @@ const setupMiddlewareAndRoutes = (app: express.Application, container: DIContain
         // Setup endpoints
         pipe(
           setupHealthEndpoint(app),
-          IO.chain(() => setupApiDocsEndpoint(app)),
-          IO.chain(() => setupErrorHandling(app))
+          IO.flatMap(() => setupApiDocsEndpoint(app)),
+          IO.flatMap(() => setupErrorHandling(app))
         )();
 
         return app;
@@ -155,7 +155,7 @@ const setupMiddlewareAndRoutes = (app: express.Application, container: DIContain
 const initializeServerState = (config: ServerConfig): TE.TaskEither<ServerError, ServerState> =>
   pipe(
     initializeContainer(),
-    TE.chain(container =>
+    TE.flatMap(container =>
       pipe(
         setupMiddlewareAndRoutes(createExpressApp()(), container),
         TE.map(app => ({
@@ -221,7 +221,7 @@ export class ApplicationServer {
 
     const result = await pipe(
       initializeServerState(config),
-      TE.chain(startServer),
+      TE.flatMap(startServer),
       TE.map(state => {
         this.state = state;
       })
@@ -252,7 +252,7 @@ export const createServer = (): IO.IO<ApplicationServer> => () => new Applicatio
 export const createAndStartServer = (port: number = 3000): TE.TaskEither<ServerError, ApplicationServer> =>
   pipe(
     TE.of(createServer()()),
-    TE.chainFirst(server =>
+    TE.tap(server =>
       TE.tryCatch(
         () => server.start(port).then(result =>
           E.isLeft(result) ? Promise.reject(result.left) : Promise.resolve(undefined)

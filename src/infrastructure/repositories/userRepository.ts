@@ -11,7 +11,7 @@ export class DatabaseUserRepository implements UserRepository {
   findById = (id: string): TE.TaskEither<DomainError, User> =>
     pipe(
       this.db.query<User>('SELECT * FROM users WHERE id = ?', [id]),
-      TE.chain((users) =>
+      TE.flatMap((users) =>
         users.length > 0
           ? TE.right(users[0])
           : TE.left({ _tag: 'UserNotFound' as const, userId: id })
@@ -21,7 +21,7 @@ export class DatabaseUserRepository implements UserRepository {
   findByEmail = (email: string): TE.TaskEither<DomainError, User> =>
     pipe(
       this.db.query<User>('SELECT * FROM users WHERE email = ?', [email]),
-      TE.chain((users) =>
+      TE.flatMap((users) =>
         users.length > 0
           ? TE.right(users[0])
           : TE.left({ _tag: 'UserNotFound' as const, userId: email })
@@ -34,7 +34,7 @@ export class DatabaseUserRepository implements UserRepository {
         'INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?) RETURNING *',
         [user.id, user.email, user.name, user.role]
       ),
-      TE.chain((users) => {
+      TE.flatMap((users) => {
         return users.length > 0
           ? TE.right(users[0])
           : TE.left({ _tag: 'DatabaseError' as const, message: 'Failed to save user' });

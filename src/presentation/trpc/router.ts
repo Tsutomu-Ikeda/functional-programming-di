@@ -145,7 +145,7 @@ const withTaskEither = <T>(
 ): Promise<T> =>
   pipe(
     taskEither,
-    TE.fold(
+    TE.matchE(
       (error) => () => Promise.reject(error),
       (result) => () => Promise.resolve(result)
     )
@@ -162,7 +162,7 @@ export const appRouter = router({
             ...deps,
             logger: createRequestLogger(ctx.requestContext)()
           })),
-          TE.chain(deps =>
+          TE.flatMap(deps =>
             pipe(
               executeCreateUser(input, deps),
               handleTaskEitherResult
@@ -178,7 +178,7 @@ export const appRouter = router({
       .query(async ({ input, ctx }) => {
         const program = pipe(
           resolveUserRepository(ctx.container),
-          TE.chain(userRepository =>
+          TE.flatMap(userRepository =>
             pipe(
               executeGetUserById(userRepository, input.id),
               handleTaskEitherResult

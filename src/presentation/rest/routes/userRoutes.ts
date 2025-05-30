@@ -86,7 +86,7 @@ const executeCreateUser = (input: CreateUserInput, deps: {
         message: error instanceof Error ? error.message : 'Unknown processing error'
       } as RouteError)
     ),
-    TE.chain(result =>
+    TE.flatMap(result =>
       E.isLeft(result)
         ? TE.left(result.left as RouteError)
         : TE.right(result.right)
@@ -103,7 +103,7 @@ const executeGetUser = (userId: string, userRepository: UserRepository): TE.Task
         message: error instanceof Error ? error.message : 'Unknown processing error'
       } as RouteError)
     ),
-    TE.chain(result =>
+    TE.flatMap(result =>
       E.isLeft(result)
         ? TE.left(result.left as RouteError)
         : TE.right(result.right)
@@ -233,7 +233,7 @@ const createErrorResponse = (error: RouteError): IO.IO<HttpResponse> =>
 const sendResponse = (res: Response, result: E.Either<RouteError, User>, successStatusCode: number = 200): IO.IO<void> => () => {
   pipe(
     result,
-    E.fold(
+    E.match(
       (error) => {
         const errorResponse = createErrorResponse(error)();
         res.status(errorResponse.statusCode).json(errorResponse.body);
@@ -250,7 +250,7 @@ const sendResponse = (res: Response, result: E.Either<RouteError, User>, success
 const processCreateUserRoute = (routeInput: CreateUserRouteInput): TE.TaskEither<RouteError, User> =>
   pipe(
     resolveDependencies(routeInput.context),
-    TE.chain(deps => executeCreateUser(routeInput.input, deps))
+    TE.flatMap(deps => executeCreateUser(routeInput.input, deps))
   );
 
 // Process get user route
@@ -263,7 +263,7 @@ const processGetUserRoute = (routeInput: GetUserRouteInput): TE.TaskEither<Route
         message: error instanceof Error ? error.message : 'Unknown dependency resolution error'
       })
     ),
-    TE.chain(userRepository => executeGetUser(routeInput.userId, userRepository))
+    TE.flatMap(userRepository => executeGetUser(routeInput.userId, userRepository))
   );
 
 // Create user route handler

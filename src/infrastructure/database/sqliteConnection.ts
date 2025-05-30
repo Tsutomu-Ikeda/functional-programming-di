@@ -97,8 +97,8 @@ export class SQLiteConnection implements DatabaseConnection {
           message: error instanceof Error ? error.message : 'Failed to begin transaction'
         })
       ),
-      TE.chain(() => fn(this) as TE.TaskEither<{ _tag: 'DatabaseError'; message: string; }, T>),
-      TE.chainFirst((_result) =>
+      TE.flatMap(() => fn(this) as TE.TaskEither<{ _tag: 'DatabaseError'; message: string; }, T>),
+      TE.tap((_result) =>
         TE.tryCatch(
           async () => {
             return new Promise<void>((resolve, reject) => {
@@ -130,7 +130,7 @@ export class SQLiteConnection implements DatabaseConnection {
               message: 'Failed to rollback transaction'
             })
           ),
-          TE.chain(() => TE.left(error))
+          TE.flatMap(() => TE.left(error))
         )
       )
     );
