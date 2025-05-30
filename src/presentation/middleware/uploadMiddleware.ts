@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import multer from 'multer';
+import { Express } from 'express';
 import * as path from 'path';
 import * as fs from 'fs';
 import * as TE from 'fp-ts/lib/TaskEither';
@@ -20,7 +21,7 @@ const storage = multer.diskStorage({
   }
 });
 
-const csvFileFilter = (_req: Request, file: any, cb: multer.FileFilterCallback) => {
+const csvFileFilter = (_req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
   const ext = path.extname(file.originalname).toLowerCase();
   if (ext !== '.csv') {
     return cb(new Error('Only CSV files are allowed'));

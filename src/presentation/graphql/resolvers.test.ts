@@ -18,7 +18,8 @@ describe('GraphQL Resolvers', () => {
     mockUserRepository = {
       findById: jest.fn(),
       save: jest.fn(),
-      findByEmail: jest.fn()
+      findByEmail: jest.fn(),
+      saveBulk: jest.fn()
     };
 
     mockEmailService = {

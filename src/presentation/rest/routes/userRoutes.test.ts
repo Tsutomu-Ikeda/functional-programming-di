@@ -519,7 +519,7 @@ describe('userRoutes', () => {
     it('should create route configuration', () => {
       const config = createRouteConfig();
 
-      expect(config.routes).toHaveLength(2);
+      expect(config.routes).toHaveLength(3);
       expect(config.routes[0]).toEqual({
         method: 'POST',
         path: '/users',
