@@ -37,7 +37,7 @@ const createScopedContainer = (globalContainer: DIContainer, context: RequestCon
     TE.tryCatch(
       async () => globalContainer.createScope(context),
       (error) => ({
-        _tag: 'ContainerScopeError' as const,
+        _tag: 'ContainerScopeError',
         message: error instanceof Error ? error.message : 'Unknown container scope error',
       }),
     ),
@@ -57,7 +57,7 @@ const logRequestStart = (context: RequestContext, req: Request): TE.TaskEither<M
         return logger;
       },
       (error) => ({
-        _tag: 'LoggerError' as const,
+        _tag: 'LoggerError',
         message: error instanceof Error ? error.message : 'Unknown logger error',
       }),
     ),
@@ -159,8 +159,8 @@ export const createDIMiddleware = (globalContainer: DIContainer) => {
       );
     } catch (error) {
       // Handle any unexpected errors
-      const middlewareError = {
-        _tag: 'ContainerScopeError' as const,
+      const middlewareError: MiddlewareError = {
+        _tag: 'ContainerScopeError',
         message: error instanceof Error ? error.message : 'Unknown middleware error',
       };
       handleMiddlewareError(middlewareError, next)();

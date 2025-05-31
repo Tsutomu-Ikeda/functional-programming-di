@@ -61,6 +61,14 @@ export default [
       'quotes': ['error', 'single'],
       'quote-props': ['error', 'as-needed'],
       'comma-dangle': ['error', 'always-multiline'],
+      // Prohibit 'as const' assertions
+      'no-restricted-syntax': [
+        'error',
+        {
+          selector: 'TSAsExpression[typeAnnotation.type="TSTypeReference"][typeAnnotation.typeName.name="const"]',
+          message: 'Using "as const" is not allowed. Consider using explicit type annotations instead.',
+        },
+      ],
     },
   },
   {

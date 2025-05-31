@@ -5,6 +5,7 @@ import { SQLiteConnection, SQLiteConnectionPool, SQLiteConfig } from './sqliteCo
 import { promises as fs } from 'fs';
 import path from 'path';
 import { DatabaseConnection } from './connection';
+import { DomainError } from '../../domain/errors';
 
 describe('SQLiteConnection', () => {
   let connection: SQLiteConnection;
@@ -246,7 +247,7 @@ describe('SQLiteConnection', () => {
 
     it('should rollback transaction on domain error', async () => {
       const transactionFn = () => {
-        return TE.left({ _tag: 'DatabaseError' as const, message: 'Simulated error' });
+        return TE.left<DomainError>({ _tag: 'DatabaseError', message: 'Simulated error' });
       };
 
       const result = await connection.transaction(transactionFn)();
@@ -259,7 +260,7 @@ describe('SQLiteConnection', () => {
 
     it('should handle UserNotFound error in transaction', async () => {
       const transactionFn = () => {
-        return TE.left({ _tag: 'UserNotFound' as const, userId: 'non-existent' });
+        return TE.left<DomainError>({ _tag: 'UserNotFound', userId: 'non-existent' });
       };
 
       const result = await connection.transaction(transactionFn)();
@@ -272,7 +273,7 @@ describe('SQLiteConnection', () => {
 
     it('should handle InvalidEmail error in transaction', async () => {
       const transactionFn = () => {
-        return TE.left({ _tag: 'InvalidEmail' as const, email: 'invalid-email' });
+        return TE.left<DomainError>({ _tag: 'InvalidEmail', email: 'invalid-email' });
       };
 
       const result = await connection.transaction(transactionFn)();
@@ -285,7 +286,7 @@ describe('SQLiteConnection', () => {
 
     it('should handle Unauthorized error in transaction', async () => {
       const transactionFn = () => {
-        return TE.left({ _tag: 'Unauthorized' as const, reason: 'Access denied' });
+        return TE.left<DomainError>({ _tag: 'Unauthorized', reason: 'Access denied' });
       };
 
       const result = await connection.transaction(transactionFn)();
@@ -298,8 +299,8 @@ describe('SQLiteConnection', () => {
 
     it('should handle ValidationError in transaction', async () => {
       const transactionFn = () => {
-        return TE.left({
-          _tag: 'ValidationError' as const,
+        return TE.left<DomainError>({
+          _tag: 'ValidationError',
           errors: [
             { field: 'email', message: 'Invalid format' },
             { field: 'name', message: 'Too short' },
@@ -320,7 +321,7 @@ describe('SQLiteConnection', () => {
 
     it('should handle EmailServiceError in transaction', async () => {
       const transactionFn = () => {
-        return TE.left({ _tag: 'EmailServiceError' as const, message: 'Email service down' });
+        return TE.left<DomainError>({ _tag: 'EmailServiceError', message: 'Email service down' });
       };
 
       const result = await connection.transaction(transactionFn)();

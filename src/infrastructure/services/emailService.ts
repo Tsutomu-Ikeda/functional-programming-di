@@ -31,7 +31,7 @@ export class MockEmailService implements EmailService {
         return undefined;
       },
       (error) => ({
-        _tag: 'EmailServiceError' as const,
+        _tag: 'EmailServiceError',
         message: error instanceof Error ? error.message : 'Unknown email service error',
       }),
     );
@@ -63,7 +63,7 @@ export class RealEmailService implements EmailService {
         return undefined;
       },
       (error) => ({
-        _tag: 'EmailServiceError' as const,
+        _tag: 'EmailServiceError',
         message: error instanceof Error ? error.message : 'Unknown email service error',
       }),
     );

@@ -104,7 +104,7 @@ export class MockDatabaseConnection implements DatabaseConnection {
         });
       },
       (error) => ({
-        _tag: 'DatabaseError' as const,
+        _tag: 'DatabaseError',
         message: error instanceof Error ? error.message : 'Unknown database error',
       }),
     );
@@ -184,7 +184,7 @@ export class MockDatabaseConnection implements DatabaseConnection {
         }
       },
       (error) => ({
-        _tag: 'DatabaseError' as const,
+        _tag: 'DatabaseError',
         message: error instanceof Error ? error.message : 'Transaction failed',
       }),
     );

@@ -16,7 +16,7 @@ export function validateCreateUserInput(input: CreateUserInput): E.Either<Domain
       validateName,
       validatePassword,
     )(input),
-    E.mapLeft(errors => ({ _tag: 'ValidationError' as const, errors })),
+    E.mapLeft(errors => ({ _tag: 'ValidationError', errors })),
   );
 }
 

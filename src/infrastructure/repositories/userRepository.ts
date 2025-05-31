@@ -14,7 +14,7 @@ export class DatabaseUserRepository implements UserRepository {
       TE.flatMap((users) =>
         users.length > 0
           ? TE.right(users[0])
-          : TE.left({ _tag: 'UserNotFound' as const, userId: id }),
+          : TE.left<DomainError>({ _tag: 'UserNotFound', userId: id }),
       ),
     );
 
@@ -24,7 +24,7 @@ export class DatabaseUserRepository implements UserRepository {
       TE.flatMap((users) =>
         users.length > 0
           ? TE.right(users[0])
-          : TE.left({ _tag: 'UserNotFound' as const, userId: email }),
+          : TE.left<DomainError>({ _tag: 'UserNotFound', userId: email }),
       ),
     );
 
@@ -37,7 +37,7 @@ export class DatabaseUserRepository implements UserRepository {
       TE.flatMap((users) => {
         return users.length > 0
           ? TE.right(users[0])
-          : TE.left({ _tag: 'DatabaseError' as const, message: 'Failed to save user' });
+          : TE.left<DomainError>({ _tag: 'DatabaseError', message: 'Failed to save user' });
       },
       ),
     );

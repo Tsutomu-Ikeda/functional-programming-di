@@ -66,7 +66,7 @@ const resolveDependencies = (context: RouteContext): TE.TaskEither<RouteError, {
         };
       },
       (error) => ({
-        _tag: 'DependencyResolutionError' as const,
+        _tag: 'DependencyResolutionError',
         message: error instanceof Error ? error.message : 'Unknown dependency resolution error',
       }),
     ),
@@ -82,7 +82,7 @@ const executeCreateUser = (input: CreateUserInput, deps: {
     TE.tryCatch(
       createUser(input)(deps),
       (error) => ({
-        _tag: 'RouteProcessingError' as const,
+        _tag: 'RouteProcessingError',
         message: error instanceof Error ? error.message : 'Unknown processing error',
       } as RouteError),
     ),
@@ -99,7 +99,7 @@ const executeGetUser = (userId: string, userRepository: UserRepository): TE.Task
     TE.tryCatch(
       () => userRepository.findById(userId)(),
       (error) => ({
-        _tag: 'RouteProcessingError' as const,
+        _tag: 'RouteProcessingError',
         message: error instanceof Error ? error.message : 'Unknown processing error',
       } as RouteError),
     ),
@@ -258,8 +258,8 @@ const processGetUserRoute = (routeInput: GetUserRouteInput): TE.TaskEither<Route
   pipe(
     TE.tryCatch(
       () => routeInput.context.container.resolve<UserRepository>('userRepository'),
-      (error) => ({
-        _tag: 'DependencyResolutionError' as const,
+      (error): RouteError => ({
+        _tag: 'DependencyResolutionError',
         message: error instanceof Error ? error.message : 'Unknown dependency resolution error',
       }),
     ),

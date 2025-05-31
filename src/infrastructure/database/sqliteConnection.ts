@@ -71,7 +71,7 @@ export class SQLiteConnection implements DatabaseConnection {
         });
       },
       (error) => ({
-        _tag: 'DatabaseError' as const,
+        _tag: 'DatabaseError',
         message: error instanceof Error ? error.message : 'Unknown database error',
       }),
     );
@@ -92,8 +92,8 @@ export class SQLiteConnection implements DatabaseConnection {
             });
           });
         },
-        (error) => ({
-          _tag: 'DatabaseError' as const,
+        (error): DomainError => ({
+          _tag: 'DatabaseError',
           message: error instanceof Error ? error.message : 'Failed to begin transaction',
         }),
       ),
@@ -108,8 +108,8 @@ export class SQLiteConnection implements DatabaseConnection {
               });
             });
           },
-          (error) => ({
-            _tag: 'DatabaseError' as const,
+          (error): DomainError => ({
+            _tag: 'DatabaseError',
             message: error instanceof Error ? error.message : 'Failed to commit transaction',
           }),
         ),
@@ -125,8 +125,8 @@ export class SQLiteConnection implements DatabaseConnection {
                 });
               });
             },
-            () => ({
-              _tag: 'DatabaseError' as const,
+            (): DomainError => ({
+              _tag: 'DatabaseError',
               message: 'Failed to rollback transaction',
             }),
           ),

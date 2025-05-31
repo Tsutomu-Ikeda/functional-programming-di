@@ -61,7 +61,7 @@ const initializeContainer = (): TE.TaskEither<ServerError, DIContainer> =>
         return container;
       },
       (error) => ({
-        _tag: 'ContainerInitializationError' as const,
+        _tag: 'ContainerInitializationError',
         message: error instanceof Error ? error.message : 'Unknown container initialization error',
       }),
     ),
@@ -145,7 +145,7 @@ const setupMiddlewareAndRoutes = (app: express.Application, container: DIContain
         return app;
       },
       (error) => ({
-        _tag: 'MiddlewareSetupError' as const,
+        _tag: 'MiddlewareSetupError',
         message: error instanceof Error ? error.message : 'Unknown middleware setup error',
       }),
     ),
@@ -189,7 +189,7 @@ const startServer = (state: ServerState): TE.TaskEither<ServerError, ServerState
         }
       }),
       (error) => ({
-        _tag: 'ServerStartError' as const,
+        _tag: 'ServerStartError',
         message: error instanceof Error ? error.message : 'Unknown server start error',
         port: state.config.port,
       }),
@@ -205,7 +205,7 @@ const stopServer = (state: ServerState): TE.TaskEither<ServerError, void> =>
         // await state.container.dispose();
       },
       (error) => ({
-        _tag: 'ServerStartError' as const,
+        _tag: 'ServerStartError',
         message: error instanceof Error ? error.message : 'Unknown server stop error',
         port: state.config.port,
       }),
