@@ -63,6 +63,5 @@ const sendWelcomeEmail = effects.async<User, DomainError>(
         logger.error('Failed to send welcome email', new Error(JSON.stringify(error)), { userId: user.id });
         return TE.left(error);
       }),
-      TE.map(() => undefined),
     ),
 );
