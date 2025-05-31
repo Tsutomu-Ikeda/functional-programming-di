@@ -4,6 +4,35 @@ import * as IO from 'fp-ts/lib/IO';
 import { pipe } from 'fp-ts/lib/function';
 
 /**
+ * Interface for effect combinators
+ */
+export interface EffectCombinators<R> {
+  /**
+   * Create a synchronous effect using IO
+   */
+  sync: <T>(effectFn: (env: R, context: T) => IO.IO<void>) =>
+    (context: T) => RTE.ReaderTaskEither<R, never, T>;
+
+  /**
+   * Create an asynchronous effect using TaskEither
+   */
+  async: <T, E>(effectFn: (env: R, context: T) => TE.TaskEither<E, void>) =>
+    (context: T) => RTE.ReaderTaskEither<R, E, T>;
+
+  /**
+   * Create a synchronous transformation using IO
+   */
+  syncTransform: <TIn, TOut>(transformFn: (env: R, input: TIn) => IO.IO<TOut>) =>
+    (input: TIn) => RTE.ReaderTaskEither<R, never, TOut>;
+
+  /**
+   * Create an asynchronous transformation using TaskEither
+   */
+  asyncTransform: <TIn, TOut, E>(transformFn: (env: R, input: TIn) => TE.TaskEither<E, TOut>) =>
+    (input: TIn) => RTE.ReaderTaskEither<R, E, TOut>;
+}
+
+/**
  * Generic effect combinator for ReaderTaskEither
  * Executes a side effect and passes through the context unchanged
  */
@@ -37,7 +66,7 @@ export const withAsyncEffect = <R, T, E>(
       ),
     );
 
-export const createEffect = <R>() => ({
+export const createEffect = <R>(): EffectCombinators<R> => ({
   /**
    * Create a synchronous effect using IO
    */
