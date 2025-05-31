@@ -90,7 +90,7 @@ describe('Integration Tests', () => {
         }),
       );
       expect(mockLogger.info).toHaveBeenCalledWith(
-        'Creating user',
+        'Creating user entity',
         expect.objectContaining({ userId: expect.any(String) }),
       );
 

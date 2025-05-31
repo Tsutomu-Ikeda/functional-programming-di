@@ -6,12 +6,15 @@ import { DomainError } from '../../domain/errors';
 import { UserRepository, EmailService, Logger } from '../ports';
 import { validateCreateUserInput, CreateUserInput } from '../../domain/userValidation';
 import { createUserEntity } from '../../domain/userFactory';
+import { createEffect } from '../combinators';
 
 export type CreateUserDeps = {
   userRepository: UserRepository
   emailService: EmailService
   logger: Logger
 }
+
+const effects = createEffect<CreateUserDeps>();
 
 export const createUser = (
   input: CreateUserInput,
@@ -20,6 +23,9 @@ export const createUser = (
     RTE.fromEither(validateCreateUserInput(input)),
     RTE.tap(checkEmailNotExists),
     RTE.flatMap(createAndSaveUser),
+    RTE.tap(effects.sync(
+      ({ logger }, user) => logger.info('User created successfully', { userId: user.id }),
+    )),
     RTE.tap(sendWelcomeEmailSafely),
   );
 
@@ -45,12 +51,9 @@ const checkEmailNotExists = (validInput: CreateUserInput): RTE.ReaderTaskEither<
 const createAndSaveUser = (validInput: CreateUserInput): RTE.ReaderTaskEither<CreateUserDeps, DomainError, User> =>
   pipe(
     RTE.fromEither(createUserEntity(validInput)),
-    RTE.tap((user) =>
-      pipe(
-        RTE.ask<CreateUserDeps>(),
-        RTE.flatMapTaskEither(({ logger }) => TE.fromIO(logger.info('Creating user', { userId: user.id }))),
-      ),
-    ),
+    RTE.tap(effects.sync(
+      ({ logger }, user) => logger.info('Creating user entity', { userId: user.id }),
+    )),
     RTE.flatMap((user) =>
       pipe(
         RTE.ask<CreateUserDeps>(),
@@ -59,18 +62,14 @@ const createAndSaveUser = (validInput: CreateUserInput): RTE.ReaderTaskEither<Cr
     ),
   );
 
-const sendWelcomeEmailSafely = (user: User): RTE.ReaderTaskEither<CreateUserDeps, DomainError, User> =>
-  pipe(
-    RTE.ask<CreateUserDeps>(),
-    RTE.flatMap(({ emailService, logger }) =>
-      pipe(
-        emailService.sendWelcomeEmail(user),
-        TE.map(() => user),
-        TE.orElse((error) => {
-          logger.error('Failed to send welcome email', new Error(JSON.stringify(error)), { userId: user.id });
-          return TE.left(error);
-        }),
-        RTE.fromTaskEither,
-      ),
+const sendWelcomeEmailSafely = effects.async<User, DomainError>(
+  ({ emailService, logger }, user) =>
+    pipe(
+      emailService.sendWelcomeEmail(user),
+      TE.orElse((error) => {
+        logger.error('Failed to send welcome email', new Error(JSON.stringify(error)), { userId: user.id });
+        return TE.left(error);
+      }),
+      TE.map(() => undefined),
     ),
-  );
+);

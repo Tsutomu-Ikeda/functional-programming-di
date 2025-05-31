@@ -10,14 +10,12 @@ export interface CreateUserInput {
 }
 
 export function validateCreateUserInput(input: CreateUserInput): E.Either<DomainError, CreateUserInput> {
-  const validateUser = combineValidations<CreateUserInput>(
-    validateEmail,
-    validateName,
-    validatePassword,
-  );
-
   return pipe(
-    validateUser(input),
+    combineValidations<CreateUserInput>(
+      validateEmail,
+      validateName,
+      validatePassword,
+    )(input),
     E.mapLeft(errors => ({ _tag: 'ValidationError' as const, errors })),
   );
 }

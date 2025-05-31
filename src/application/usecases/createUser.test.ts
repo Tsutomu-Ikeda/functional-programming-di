@@ -75,10 +75,10 @@ describe('createUser usecase', () => {
         }),
       );
       expect(mockEmailService.sendWelcomeEmail).toHaveBeenCalledWith(expectedUser);
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        'Creating user',
-        expect.objectContaining({ userId: expect.any(String) }),
-      );
+      expect(mockLogger.info.mock.calls).toEqual([
+        ['Creating user entity', expect.objectContaining({ userId: expect.any(String) })],
+        ['User created successfully', expect.objectContaining({ userId: expectedUser.id })],
+      ]);
     });
 
     it('should continue even if welcome email fails', async () => {
@@ -286,10 +286,10 @@ describe('createUser usecase', () => {
 
       await createUser(input)(deps)();
 
-      expect(mockLogger.info).toHaveBeenCalledWith(
-        'Creating user',
-        expect.objectContaining({ userId: expect.any(String) }),
-      );
+      expect(mockLogger.info.mock.calls).toEqual([
+        ['Creating user entity', expect.objectContaining({ userId: expect.any(String) })],
+        ['User created successfully', expect.objectContaining({ userId: expectedUser.id })],
+      ]);
     });
 
     it('should log email sending errors', async () => {
