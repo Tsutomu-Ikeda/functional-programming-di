@@ -45,19 +45,15 @@ const checkEmailNotExists = effects.async<CreateUserInput, DomainError>((
         : TE.left(error)),
   ));
 
-const createAndSaveUser = (validInput: CreateUserInput): RTE.ReaderTaskEither<CreateUserDeps, DomainError, User> =>
+const createAndSaveUser = effects.asyncTransform<CreateUserInput, User, DomainError>((
+  { userRepository, logger },
+  validInput,
+): TE.TaskEither<DomainError, User> =>
   pipe(
-    RTE.fromEither(createUserEntity(validInput)),
-    RTE.tap(effects.sync(
-      ({ logger }, user) => logger.info('Creating user entity', { userId: user.id }),
-    )),
-    RTE.flatMap((user) =>
-      pipe(
-        RTE.ask<CreateUserDeps>(),
-        RTE.flatMapTaskEither(({ userRepository }) => userRepository.save(user)),
-      ),
-    ),
-  );
+    TE.fromEither(createUserEntity(validInput)),
+    TE.tap((user) => TE.fromIO(() => logger.info('Creating user entity', { userId: user.id }))),
+    TE.flatMap((user) => userRepository.save(user)),
+  ));
 
 const sendWelcomeEmail = effects.async<User, DomainError>(
   ({ emailService, logger }, user) =>
