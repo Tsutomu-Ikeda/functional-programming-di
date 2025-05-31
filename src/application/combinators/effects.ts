@@ -51,6 +51,18 @@ export const createEffect = <R>() => ({
     withAsyncEffect<R, T, E>(effectFn),
 
   /**
+   * Create a synchronous transformation using IO
+   */
+  syncTransform: <TIn, TOut>(transformFn: (env: R, input: TIn) => IO.IO<TOut>) =>
+    (input: TIn): RTE.ReaderTaskEither<R, never, TOut> =>
+      pipe(
+        RTE.ask<R>(),
+        RTE.flatMapTaskEither((env) =>
+          TE.fromIO(transformFn(env, input)),
+        ),
+      ),
+
+  /**
    * Create an asynchronous transformation using TaskEither
    */
   asyncTransform: <TIn, TOut, E>(transformFn: (env: R, input: TIn) => TE.TaskEither<E, TOut>) =>
