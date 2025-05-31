@@ -26,7 +26,7 @@ export const createUser = (
     RTE.tap(effects.sync(
       ({ logger }, user) => logger.info('User created successfully', { userId: user.id }),
     )),
-    RTE.tap(sendWelcomeEmailSafely),
+    RTE.tap(sendWelcomeEmail),
   );
 
 const checkEmailNotExists = (validInput: CreateUserInput): RTE.ReaderTaskEither<CreateUserDeps, DomainError, CreateUserInput> =>
@@ -62,7 +62,7 @@ const createAndSaveUser = (validInput: CreateUserInput): RTE.ReaderTaskEither<Cr
     ),
   );
 
-const sendWelcomeEmailSafely = effects.async<User, DomainError>(
+const sendWelcomeEmail = effects.async<User, DomainError>(
   ({ emailService, logger }, user) =>
     pipe(
       emailService.sendWelcomeEmail(user),
