@@ -29,24 +29,21 @@ export const createUser = (
     RTE.tap(sendWelcomeEmail),
   );
 
-const checkEmailNotExists = (validInput: CreateUserInput): RTE.ReaderTaskEither<CreateUserDeps, DomainError, CreateUserInput> =>
+const checkEmailNotExists = effects.async<CreateUserInput, DomainError>((
+  { userRepository },
+  validInput,
+): TE.TaskEither<DomainError, void> =>
   pipe(
-    RTE.ask<CreateUserDeps>(),
-    RTE.flatMap(({ userRepository }) =>
-      pipe(
-        userRepository.findByEmail(validInput.email),
-        TE.flatMap(() => TE.left<DomainError>({
-          _tag: 'ValidationError',
-          errors: [{ field: 'email', message: 'Email already exists' }],
-        })),
-        TE.orElse((error) =>
-          error._tag === 'UserNotFound'
-            ? TE.right(validInput)
-            : TE.left(error)),
-        RTE.fromTaskEither,
-      ),
-    ),
-  );
+    userRepository.findByEmail(validInput.email),
+    TE.flatMap(() => TE.left<DomainError>({
+      _tag: 'ValidationError',
+      errors: [{ field: 'email', message: 'Email already exists' }],
+    })),
+    TE.orElse((error) =>
+      error._tag === 'UserNotFound'
+        ? TE.right(undefined)
+        : TE.left(error)),
+  ));
 
 const createAndSaveUser = (validInput: CreateUserInput): RTE.ReaderTaskEither<CreateUserDeps, DomainError, User> =>
   pipe(
