@@ -16,9 +16,7 @@ export type CreateUserDeps = {
 
 const effects = createEffect<CreateUserDeps>();
 
-export const createUser = (
-  input: CreateUserInput,
-): RTE.ReaderTaskEither<CreateUserDeps, DomainError, User> =>
+export const createUser = (input: CreateUserInput) =>
   pipe(
     RTE.fromEither(validateCreateUserInput(input)),
     RTE.tap(checkEmailNotExists),
@@ -29,31 +27,29 @@ export const createUser = (
     RTE.tap(sendWelcomeEmail),
   );
 
-const checkEmailNotExists = effects.async<CreateUserInput, DomainError>((
-  { userRepository },
-  validInput,
-): TE.TaskEither<DomainError, void> =>
-  pipe(
-    userRepository.findByEmail(validInput.email),
-    TE.flatMap(() => TE.left<DomainError>({
-      _tag: 'ValidationError',
-      errors: [{ field: 'email', message: 'Email already exists' }],
-    })),
-    TE.orElse((error) =>
-      error._tag === 'UserNotFound'
-        ? TE.right(undefined)
-        : TE.left(error)),
-  ));
+const checkEmailNotExists = effects.async<CreateUserInput, DomainError>(
+  ({ userRepository }, validInput,) =>
+    pipe(
+      userRepository.findByEmail(validInput.email),
+      TE.flatMap(() => TE.left<DomainError>({
+        _tag: 'ValidationError',
+        errors: [{ field: 'email', message: 'Email already exists' }],
+      })),
+      TE.orElse((error) =>
+        error._tag === 'UserNotFound'
+          ? TE.right(undefined)
+          : TE.left(error)),
+    )
+);
 
-const createAndSaveUser = effects.asyncTransform<CreateUserInput, User, DomainError>((
-  { userRepository, logger },
-  validInput,
-): TE.TaskEither<DomainError, User> =>
-  pipe(
-    TE.fromEither(createUserEntity(validInput)),
-    TE.tap((user) => TE.fromIO(() => logger.info('Creating user entity', { userId: user.id }))),
-    TE.flatMap((user) => userRepository.save(user)),
-  ));
+const createAndSaveUser = effects.asyncTransform<CreateUserInput, User, DomainError>(
+  ({ userRepository, logger }, validInput) =>
+    pipe(
+      TE.fromEither(createUserEntity(validInput)),
+      TE.tap((user) => TE.fromIO(() => logger.info('Creating user entity', { userId: user.id }))),
+      TE.flatMap((user) => userRepository.save(user)),
+    ),
+);
 
 const sendWelcomeEmail = effects.async<User, DomainError>(
   ({ emailService, logger }, user) =>
