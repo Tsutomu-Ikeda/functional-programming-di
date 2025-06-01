@@ -1,8 +1,8 @@
 import * as TE from 'fp-ts/lib/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
 import sqlite3 from 'sqlite3';
-import { DomainError } from '../../domain/errors';
-import { DatabaseConnection } from './connection';
+import type { DomainError } from '../../domain/errors';
+import type { DatabaseConnection } from './connection';
 
 export interface SQLiteConfig {
   filename: string;

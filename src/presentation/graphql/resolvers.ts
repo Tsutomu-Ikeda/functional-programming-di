@@ -1,9 +1,9 @@
 import { pipe } from 'fp-ts/lib/function';
 import { createUser } from '../../application/usecases/createUser';
-import { ScopedContainer, RequestContext } from '../../infrastructure/di/types';
-import { UserRepository, EmailService } from '../../application/ports';
+import type { ScopedContainer, RequestContext } from '../../infrastructure/di/types';
+import type { UserRepository, EmailService } from '../../application/ports';
 import { RequestScopedLogger } from '../../infrastructure/logging/logger';
-import { CreateUserInput } from '../../domain/userValidation';
+import type { CreateUserInput } from '../../domain/userValidation';
 
 export interface GraphQLContext {
   container: ScopedContainer;

@@ -1,9 +1,12 @@
-import { DIContainer } from './types';
-import { DatabaseConnectionPool, DatabaseConfig } from '../database/connection';
+import type { DIContainer } from './types';
+import type { DatabaseConfig } from '../database/connection';
+import { DatabaseConnectionPool } from '../database/connection';
 import { DatabaseUserRepository } from '../repositories/userRepository';
-import { MockEmailService, EmailConfig } from '../services/emailService';
-import { SingletonLogger, LoggerConfig } from '../logging/logger';
-import { UserRepository, EmailService, Logger } from '../../application/ports';
+import type { EmailConfig } from '../services/emailService';
+import { MockEmailService } from '../services/emailService';
+import type { LoggerConfig } from '../logging/logger';
+import { SingletonLogger } from '../logging/logger';
+import type { UserRepository, EmailService, Logger } from '../../application/ports';
 
 export interface AppConfig {
   database: DatabaseConfig;

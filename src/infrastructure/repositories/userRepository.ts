@@ -1,9 +1,9 @@
 import * as TE from 'fp-ts/lib/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
-import { User } from '../../domain/user';
-import { DomainError } from '../../domain/errors';
-import { UserRepository } from '../../application/ports';
-import { DatabaseConnection } from '../database/connection';
+import type { User } from '../../domain/user';
+import type { DomainError } from '../../domain/errors';
+import type { UserRepository } from '../../application/ports';
+import type { DatabaseConnection } from '../database/connection';
 
 export class DatabaseUserRepository implements UserRepository {
   constructor(private db: DatabaseConnection) {}

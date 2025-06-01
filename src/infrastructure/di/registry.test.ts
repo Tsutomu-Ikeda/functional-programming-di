@@ -1,6 +1,7 @@
-import { registerServices, createDefaultConfig, AppConfig } from './registry';
+import type { AppConfig } from './registry';
+import { registerServices, createDefaultConfig } from './registry';
 import { createContainer } from './container';
-import { DIContainer } from './types';
+import type { DIContainer } from './types';
 
 // Mock the dependencies
 jest.mock('../database/connection');

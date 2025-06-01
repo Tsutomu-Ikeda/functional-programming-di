@@ -1,6 +1,7 @@
 import * as E from 'fp-ts/lib/Either';
-import { MockEmailService, RealEmailService, EmailConfig } from './emailService';
-import { User } from '../../domain/user';
+import type { EmailConfig } from './emailService';
+import { MockEmailService, RealEmailService } from './emailService';
+import type { User } from '../../domain/user';
 
 describe('EmailService', () => {
   const mockConfig: EmailConfig = {

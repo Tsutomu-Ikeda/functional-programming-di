@@ -1,8 +1,9 @@
 import * as TE from 'fp-ts/TaskEither';
 import * as E from 'fp-ts/Either';
-import { MockDatabaseConnection, DatabaseConnectionPool, DatabaseConfig, DatabaseConnection } from './connection';
-import { DomainError } from '../../domain/errors';
-import { User } from '../../domain/user';
+import type { DatabaseConfig, DatabaseConnection } from './connection';
+import { MockDatabaseConnection, DatabaseConnectionPool } from './connection';
+import type { DomainError } from '../../domain/errors';
+import type { User } from '../../domain/user';
 
 describe('MockDatabaseConnection', () => {
   let connection: MockDatabaseConnection;

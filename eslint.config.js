@@ -62,6 +62,7 @@ export default [
           message: 'Using "as const" is not allowed. Consider using explicit type annotations instead.',
         },
       ],
+      '@typescript-eslint/consistent-type-imports': ['error', { fixStyle: 'separate-type-imports', prefer: 'type-imports' }],
     },
   },
   {

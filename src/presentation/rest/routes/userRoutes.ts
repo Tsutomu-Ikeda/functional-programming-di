@@ -1,17 +1,19 @@
-import { Router, Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
+import { Router } from 'express';
 import * as TE from 'fp-ts/lib/TaskEither';
 import * as E from 'fp-ts/lib/Either';
 import * as IO from 'fp-ts/lib/IO';
 import * as O from 'fp-ts/lib/Option';
 import * as R from 'fp-ts/lib/Record';
 import { pipe } from 'fp-ts/lib/function';
-import { createUser, CreateUserDeps } from '../../../application/usecases/createUser';
-import { ScopedContainer, RequestContext } from '../../../infrastructure/di/types';
-import { UserRepository, EmailService } from '../../../application/ports';
+import type { CreateUserDeps } from '../../../application/usecases/createUser';
+import { createUser } from '../../../application/usecases/createUser';
+import type { ScopedContainer, RequestContext } from '../../../infrastructure/di/types';
+import type { UserRepository, EmailService } from '../../../application/ports';
 import { RequestScopedLogger } from '../../../infrastructure/logging/logger';
-import { CreateUserInput } from '../../../domain/userValidation';
-import { DomainError } from '../../../domain/errors';
-import { User } from '../../../domain/user';
+import type { CreateUserInput } from '../../../domain/userValidation';
+import type { DomainError } from '../../../domain/errors';
+import type { User } from '../../../domain/user';
 
 export interface AuthenticatedRequest extends Request {
   container: ScopedContainer;

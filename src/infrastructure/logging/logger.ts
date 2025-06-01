@@ -1,6 +1,6 @@
-import * as IO from 'fp-ts/lib/IO';
-import { Logger } from '../../application/ports';
-import { RequestContext } from '../di/types';
+import type * as IO from 'fp-ts/lib/IO';
+import type { Logger } from '../../application/ports';
+import type { RequestContext } from '../di/types';
 
 export interface LogEntry {
   timestamp: Date;

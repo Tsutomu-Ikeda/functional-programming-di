@@ -1,11 +1,11 @@
-import { Request, Response, NextFunction } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import { v4 as uuidv4 } from 'uuid';
 import * as TE from 'fp-ts/lib/TaskEither';
 import * as T from 'fp-ts/lib/Task';
-import * as IO from 'fp-ts/lib/IO';
+import type * as IO from 'fp-ts/lib/IO';
 import * as E from 'fp-ts/lib/Either';
 import { pipe } from 'fp-ts/lib/function';
-import { DIContainer, RequestContext, ScopedContainer } from '../../infrastructure/di/types';
+import type { DIContainer, RequestContext, ScopedContainer } from '../../infrastructure/di/types';
 import { RequestScopedLogger } from '../../infrastructure/logging/logger';
 
 export interface AuthenticatedRequest extends Request {

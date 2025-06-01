@@ -1,20 +1,21 @@
-import { Response } from 'express';
+import type { Response } from 'express';
 import * as TE from 'fp-ts/lib/TaskEither';
 import * as E from 'fp-ts/lib/Either';
 import * as IO from 'fp-ts/lib/IO';
-import { createUserRoutes, createUserRoutesFP, createRouteConfig, AuthenticatedRequest } from './userRoutes';
-import { ScopedContainer, RequestContext } from '../../../infrastructure/di/types';
-import { UserRepository, EmailService } from '../../../application/ports';
+import type { AuthenticatedRequest } from './userRoutes';
+import { createUserRoutes, createUserRoutesFP, createRouteConfig } from './userRoutes';
+import type { ScopedContainer, RequestContext } from '../../../infrastructure/di/types';
+import type { UserRepository, EmailService } from '../../../application/ports';
 import { RequestScopedLogger } from '../../../infrastructure/logging/logger';
-import { CreateUserInput } from '../../../domain/userValidation';
-import { User } from '../../../domain/user';
-import { DomainError } from '../../../domain/errors';
+import type { CreateUserInput } from '../../../domain/userValidation';
+import type { User } from '../../../domain/user';
+import type { DomainError } from '../../../domain/errors';
 import { SQLiteConnectionPool } from '../../../infrastructure/database/sqliteConnection';
 import { DatabaseUserRepository } from '../../../infrastructure/repositories/userRepository';
 import { depend } from '../../../infrastructure/di/types';
 import path from 'path';
 import fs from 'fs';
-import { CreateUserDeps } from '../../../application/usecases/createUser';
+import type { CreateUserDeps } from '../../../application/usecases/createUser';
 
 // Test database setup
 const TEST_DB_PATH = path.join(__dirname, '../../../test.db');

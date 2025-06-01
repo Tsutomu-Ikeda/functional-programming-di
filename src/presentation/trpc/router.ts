@@ -1,14 +1,15 @@
 import { initTRPC, TRPCError } from '@trpc/server';
 import { z } from 'zod';
 import * as TE from 'fp-ts/lib/TaskEither';
-import * as IO from 'fp-ts/lib/IO';
+import type * as IO from 'fp-ts/lib/IO';
 import { pipe } from 'fp-ts/lib/function';
-import { createUser, CreateUserDeps } from '../../application/usecases/createUser';
-import { ScopedContainer, RequestContext } from '../../infrastructure/di/types';
-import { UserRepository, EmailService } from '../../application/ports';
+import type { CreateUserDeps } from '../../application/usecases/createUser';
+import { createUser } from '../../application/usecases/createUser';
+import type { ScopedContainer, RequestContext } from '../../infrastructure/di/types';
+import type { UserRepository, EmailService } from '../../application/ports';
 import { RequestScopedLogger } from '../../infrastructure/logging/logger';
-import { DomainError } from '../../domain/errors';
-import { User } from '../../domain/user';
+import type { DomainError } from '../../domain/errors';
+import type { User } from '../../domain/user';
 
 export interface TRPCContext {
   container: ScopedContainer;

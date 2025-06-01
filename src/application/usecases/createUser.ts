@@ -1,10 +1,11 @@
 import * as TE from 'fp-ts/lib/TaskEither';
 import * as RTE from 'fp-ts/lib/ReaderTaskEither';
 import { pipe } from 'fp-ts/lib/function';
-import { User } from '../../domain/user';
-import { DomainError } from '../../domain/errors';
-import { UserRepositoryDep, LoggerDep, EmailServiceDep } from '../ports';
-import { validateCreateUserInput, CreateUserInput } from '../../domain/userValidation';
+import type { User } from '../../domain/user';
+import type { DomainError } from '../../domain/errors';
+import type { UserRepositoryDep, LoggerDep, EmailServiceDep } from '../ports';
+import type { CreateUserInput } from '../../domain/userValidation';
+import { validateCreateUserInput } from '../../domain/userValidation';
 import { createUserEntity } from '../../domain/userFactory';
 import { fx } from '../combinators';
 

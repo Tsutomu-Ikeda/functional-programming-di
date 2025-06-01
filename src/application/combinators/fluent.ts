@@ -1,6 +1,6 @@
 import * as TE from 'fp-ts/lib/TaskEither';
-import * as RTE from 'fp-ts/lib/ReaderTaskEither';
-import { DomainError } from '../../domain/errors';
+import type * as RTE from 'fp-ts/lib/ReaderTaskEither';
+import type { DomainError } from '../../domain/errors';
 
 export const fx = {
   async: <I, O = void, Err = DomainError>() => ({

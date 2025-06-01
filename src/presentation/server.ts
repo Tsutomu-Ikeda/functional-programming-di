@@ -7,7 +7,7 @@ import { createContainer } from '../infrastructure/di/container';
 import { registerServices, createDefaultConfig } from '../infrastructure/di/registry';
 import { createDIMiddleware } from './middleware/diMiddleware';
 import { createUserRoutes } from './rest/routes/userRoutes';
-import { DIContainer } from '../infrastructure/di/types';
+import type { DIContainer } from '../infrastructure/di/types';
 
 // Types for server configuration and state
 interface ServerConfig {

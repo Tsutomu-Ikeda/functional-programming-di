@@ -1,6 +1,6 @@
 import * as E from 'fp-ts/Either';
 import { createUserEntity } from './userFactory';
-import { CreateUserInput } from './userValidation';
+import type { CreateUserInput } from './userValidation';
 
 describe('userFactory', () => {
   describe('createUserEntity', () => {

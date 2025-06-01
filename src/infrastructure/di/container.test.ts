@@ -1,5 +1,5 @@
 import { Container, createContainer } from './container';
-import { ServiceDefinition, RequestContext, ScopedContainer } from './types';
+import type { ServiceDefinition, RequestContext, ScopedContainer } from './types';
 
 describe('Container', () => {
   let container: Container;

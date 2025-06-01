@@ -1,5 +1,5 @@
 import * as E from 'fp-ts/lib/Either';
-import { ValidationError } from '../domain/errors';
+import type { ValidationError } from '../domain/errors';
 
 export function combineValidations<T>(
   ...validations: Array<(value: T) => E.Either<ValidationError[], T>>
