@@ -34,29 +34,17 @@ describe('Logger', () => {
         const context = { action: 'test' };
         logger.info('Test info message', context)();
 
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"info"'),
-        );
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"message":"Test info message"'),
-        );
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"requestId":"test-request-123"'),
-        );
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"context":{"action":"test"}'),
-        );
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"info"'));
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"message":"Test info message"'));
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"requestId":"test-request-123"'));
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"context":{"action":"test"}'));
       });
 
       it('should log info message without context', () => {
         logger.info('Test info message')();
 
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"message":"Test info message"'),
-        );
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"requestId":"test-request-123"'),
-        );
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"message":"Test info message"'));
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"requestId":"test-request-123"'));
       });
 
       it('should log error message with error object', () => {
@@ -80,24 +68,16 @@ describe('Logger', () => {
         const context = { warning: 'deprecated' };
         logger.warn('Test warning message', context)();
 
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"warn"'),
-        );
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"message":"Test warning message"'),
-        );
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"warn"'));
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"message":"Test warning message"'));
       });
 
       it('should log debug message', () => {
         const context = { debug: 'info' };
         logger.debug('Test debug message', context)();
 
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"debug"'),
-        );
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"message":"Test debug message"'),
-        );
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"debug"'));
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"message":"Test debug message"'));
       });
     });
 
@@ -153,9 +133,7 @@ describe('Logger', () => {
       it('should use default JSON format', () => {
         logger.info('Test message')();
 
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"info"'),
-        );
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"info"'));
       });
     });
   });
@@ -197,17 +175,13 @@ describe('Logger', () => {
       it('should log warn message', () => {
         logger.warn('Test warning message')();
 
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"warn"'),
-        );
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"warn"'));
       });
 
       it('should log debug message', () => {
         logger.debug('Test debug message')();
 
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"debug"'),
-        );
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"debug"'));
       });
     });
 
@@ -250,9 +224,7 @@ describe('Logger', () => {
       it('should use default JSON format', () => {
         logger.info('Test message')();
 
-        expect(consoleSpy).toHaveBeenCalledWith(
-          expect.stringContaining('"level":"info"'),
-        );
+        expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('"level":"info"'));
       });
     });
   });

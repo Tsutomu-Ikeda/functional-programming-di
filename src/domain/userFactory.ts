@@ -12,5 +12,4 @@ export function createUserEntity(input: CreateUserInput): E.Either<DomainError, 
   });
 }
 
-const generateId = (): string =>
-  Math.random().toString(36).substring(2, 15);
+const generateId = (): string => Math.random().toString(36).substring(2, 15);

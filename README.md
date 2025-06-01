@@ -35,7 +35,7 @@ export type Injectable<T, U extends any[], V> = {
 
 export const depend = <T extends Record<string, any>, U extends any[], V>(
   dependencies: T,
-  cb: (deps: T, ...args: U) => V
+  cb: (deps: T, ...args: U) => V,
 ): Injectable<T, U, V> => {
   const fn = (...args: U) => cb(dependencies, ...args);
   fn.inject = (deps: Partial<T> | ((d: T) => Partial<T>)) =>
@@ -49,19 +49,25 @@ export const depend = <T extends Record<string, any>, U extends any[], V>(
 ### ライフサイクル管理
 
 #### Singleton
+
 アプリケーション起動時に一度だけ作成され、全リクエストで共有されます。
+
 - データベース接続プール
 - 設定オブジェクト
 - アプリケーションレベルのロガー
 
 #### Scoped
+
 リクエストごとに新しいインスタンスが作成され、リクエスト終了時に破棄されます。
+
 - リクエストスコープのロガー（リクエストIDを含む）
 - ユーザーリポジトリ
 - リクエスト固有のサービス
 
 #### Transient
+
 呼び出しごとに新しいインスタンスが作成されます。
+
 - 一時的な計算オブジェクト
 - ステートレスなユーティリティ
 
@@ -72,7 +78,7 @@ export const depend = <T extends Record<string, any>, U extends any[], V>(
 const requestContext: RequestContext = {
   requestId: uuidv4(),
   startTime: new Date(),
-  metadata: { userAgent, ip, method, url }
+  metadata: { userAgent, ip, method, url },
 };
 
 // 2. スコープコンテナ作成
@@ -126,6 +132,7 @@ pnpm test:watch
 ### REST API
 
 #### ユーザー作成
+
 ```bash
 POST /api/users
 Content-Type: application/json
@@ -138,16 +145,19 @@ Content-Type: application/json
 ```
 
 #### ユーザー取得
+
 ```bash
 GET /api/users/:id
 ```
 
 #### ヘルスチェック
+
 ```bash
 GET /health
 ```
 
 #### API ドキュメント
+
 ```bash
 GET /api
 ```
@@ -157,15 +167,13 @@ GET /api
 ### ユースケースの実装
 
 ```typescript
-export const createUser = (
-  input: CreateUserInput
-): RTE.ReaderTaskEither<CreateUserDeps, DomainError, User> =>
+export const createUser = (input: CreateUserInput): RTE.ReaderTaskEither<CreateUserDeps, DomainError, User> =>
   pipe(
     RTE.fromEither(validateCreateUserInput(input)),
     RTE.flatMap(checkEmailNotExists),
     RTE.flatMap(createAndSaveUser),
-    RTE.tap(sendWelcomeEmailSafely)
-  )
+    RTE.tap(sendWelcomeEmailSafely),
+  );
 ```
 
 ### DIコンテナの使用
@@ -177,7 +185,7 @@ container.register<UserRepository>('userRepository', {
     const pool = await container.resolve<DatabaseConnectionPool>('databasePool');
     return new DatabaseUserRepository(pool.getConnection());
   },
-  lifecycle: 'scoped'
+  lifecycle: 'scoped',
 });
 
 // サービス解決
@@ -198,11 +206,13 @@ logger.info('User creation started', { email: input.email })();
 ## 🧪 テスト戦略
 
 ### 単体テスト
+
 - ドメインロジックのテスト
 - ユースケースのテスト
 - DIコンテナのテスト
 
 ### 統合テスト
+
 - API エンドポイントのテスト
 - データベース操作のテスト
 - サービス間の連携テスト

@@ -72,11 +72,13 @@ describe('ApplicationServer', () => {
 
       const result = await server.start(3000);
 
-      expect(result).toEqual(E.left({
-        _tag: 'ServerStartError',
-        message: 'Port already in use',
-        port: 3000,
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'ServerStartError',
+          message: 'Port already in use',
+          port: 3000,
+        }),
+      );
     });
 
     it('should log all server endpoints on successful start', async () => {
@@ -190,8 +192,8 @@ describe('Express App Setup', () => {
     await server.start(3000);
 
     // Get the CORS middleware function
-    const corsMiddleware = mockApp.use.mock.calls.find(call =>
-      typeof call[0] === 'function' && call[0].length === 3,
+    const corsMiddleware = mockApp.use.mock.calls.find(
+      (call) => typeof call[0] === 'function' && call[0].length === 3,
     )?.[0];
 
     expect(corsMiddleware).toBeDefined();
@@ -221,8 +223,8 @@ describe('Express App Setup', () => {
     await server.start(3000);
 
     // Get the CORS middleware function
-    const corsMiddleware = mockApp.use.mock.calls.find(call =>
-      typeof call[0] === 'function' && call[0].length === 3,
+    const corsMiddleware = mockApp.use.mock.calls.find(
+      (call) => typeof call[0] === 'function' && call[0].length === 3,
     )?.[0];
 
     expect(corsMiddleware).toBeDefined();
@@ -254,7 +256,7 @@ describe('Health Endpoint', () => {
     await server.start(3000);
 
     // Get the health endpoint handler
-    const healthHandler = mockApp.get.mock.calls.find(call => call[0] === '/health')?.[1];
+    const healthHandler = mockApp.get.mock.calls.find((call) => call[0] === '/health')?.[1];
     expect(healthHandler).toBeDefined();
 
     const mockReq = {};
@@ -289,7 +291,7 @@ describe('API Docs Endpoint', () => {
     await server.start(3000);
 
     // Get the API docs endpoint handler
-    const apiDocsHandler = mockApp.get.mock.calls.find(call => call[0] === '/api')?.[1];
+    const apiDocsHandler = mockApp.get.mock.calls.find((call) => call[0] === '/api')?.[1];
     expect(apiDocsHandler).toBeDefined();
 
     const mockReq = {};
@@ -336,8 +338,8 @@ describe('Error Handling Middleware', () => {
     await server.start(3000);
 
     // Get the error handling middleware
-    const errorHandler = mockApp.use.mock.calls.find(call =>
-      typeof call[0] === 'function' && call[0].length === 4,
+    const errorHandler = mockApp.use.mock.calls.find(
+      (call) => typeof call[0] === 'function' && call[0].length === 4,
     )?.[0];
 
     expect(errorHandler).toBeDefined();

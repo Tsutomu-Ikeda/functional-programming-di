@@ -107,7 +107,7 @@ describe('main.ts', () => {
       mainModule.setGlobalServer(mockServer);
 
       // Get the shutdown handler
-      const shutdownHandler = processOnSpy.mock.calls.find(call => call[0] === 'SIGINT')?.[1] as Function;
+      const shutdownHandler = processOnSpy.mock.calls.find((call) => call[0] === 'SIGINT')?.[1] as Function;
       expect(shutdownHandler).toBeDefined();
 
       // Call shutdown handler
@@ -131,7 +131,7 @@ describe('main.ts', () => {
       mainModule.setGlobalServer(mockServer);
 
       // Get the shutdown handler
-      const shutdownHandler = processOnSpy.mock.calls.find(call => call[0] === 'SIGINT')?.[1] as Function;
+      const shutdownHandler = processOnSpy.mock.calls.find((call) => call[0] === 'SIGINT')?.[1] as Function;
 
       // Call shutdown handler
       await shutdownHandler();
@@ -146,7 +146,9 @@ describe('main.ts', () => {
       await import('./main');
 
       // Get the unhandledRejection handler
-      const rejectionHandler = processOnSpy.mock.calls.find(call => call[0] === 'unhandledRejection')?.[1] as Function;
+      const rejectionHandler = processOnSpy.mock.calls.find(
+        (call) => call[0] === 'unhandledRejection',
+      )?.[1] as Function;
       expect(rejectionHandler).toBeDefined();
 
       const reason = new Error('Unhandled rejection');
@@ -165,7 +167,7 @@ describe('main.ts', () => {
       await import('./main');
 
       // Get the uncaughtException handler
-      const exceptionHandler = processOnSpy.mock.calls.find(call => call[0] === 'uncaughtException')?.[1] as Function;
+      const exceptionHandler = processOnSpy.mock.calls.find((call) => call[0] === 'uncaughtException')?.[1] as Function;
       expect(exceptionHandler).toBeDefined();
 
       const error = new Error('Uncaught exception');

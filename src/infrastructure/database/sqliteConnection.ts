@@ -59,12 +59,17 @@ export class SQLiteConnection implements DatabaseConnection {
               }
             });
           } else {
-            this.db!.run(sql, params || [], function(err) {
+            this.db!.run(sql, params || [], function (err) {
               if (err) {
                 reject(err);
               } else {
                 // For INSERT/UPDATE/DELETE without RETURNING, return affected rows info
-                resolve([{ lastID: this.lastID, changes: this.changes } as unknown as T]);
+                resolve([
+                  {
+                    lastID: this.lastID,
+                    changes: this.changes,
+                  } as unknown as T,
+                ]);
               }
             });
           }
@@ -97,7 +102,7 @@ export class SQLiteConnection implements DatabaseConnection {
           message: error instanceof Error ? error.message : 'Failed to begin transaction',
         }),
       ),
-      TE.flatMap(() => fn(this) as TE.TaskEither<{ _tag: 'DatabaseError'; message: string; }, T>),
+      TE.flatMap(() => fn(this) as TE.TaskEither<{ _tag: 'DatabaseError'; message: string }, T>),
       TE.tap((_result) =>
         TE.tryCatch(
           async () => {

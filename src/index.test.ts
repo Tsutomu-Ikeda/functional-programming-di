@@ -59,9 +59,7 @@ describe('Integration Tests', () => {
       };
 
       // Setup mocks for successful flow
-      mockUserRepository.findByEmail.mockReturnValue(
-        TE.left({ _tag: 'UserNotFound', userId: input.email }),
-      );
+      mockUserRepository.findByEmail.mockReturnValue(TE.left({ _tag: 'UserNotFound', userId: input.email }));
       mockUserRepository.save.mockReturnValue(TE.right(createdUser));
       mockEmailService.sendWelcomeEmail.mockReturnValue(TE.right(undefined));
 
@@ -120,12 +118,13 @@ describe('Integration Tests', () => {
       };
 
       // Setup mocks - email service fails but user creation succeeds
-      mockUserRepository.findByEmail.mockReturnValue(
-        TE.left({ _tag: 'UserNotFound', userId: input.email }),
-      );
+      mockUserRepository.findByEmail.mockReturnValue(TE.left({ _tag: 'UserNotFound', userId: input.email }));
       mockUserRepository.save.mockReturnValue(TE.right(createdUser));
       mockEmailService.sendWelcomeEmail.mockReturnValue(
-        TE.left({ _tag: 'Unauthorized', reason: 'Email service temporarily unavailable' }),
+        TE.left({
+          _tag: 'Unauthorized',
+          reason: 'Email service temporarily unavailable',
+        }),
       );
 
       const result = await createUser(input)(deps)();
@@ -134,11 +133,9 @@ describe('Integration Tests', () => {
       expect(E.isLeft(result)).toBe(true);
 
       // Verify error was logged
-      expect(mockLogger.error).toHaveBeenCalledWith(
-        'Failed to send welcome email',
-        expect.any(Error),
-        { userId: createdUser.id },
-      );
+      expect(mockLogger.error).toHaveBeenCalledWith('Failed to send welcome email', expect.any(Error), {
+        userId: createdUser.id,
+      });
 
       // Verify user was still saved despite email failure
       expect(mockUserRepository.save).toHaveBeenCalled();
@@ -160,7 +157,10 @@ describe('Integration Tests', () => {
             errors: expect.arrayContaining([
               { field: 'email', message: 'Invalid email format' },
               { field: 'name', message: 'Name must be at least 2 characters' },
-              { field: 'password', message: 'Password must be at least 6 characters' },
+              {
+                field: 'password',
+                message: 'Password must be at least 6 characters',
+              },
             ]),
           }),
         ),
@@ -210,19 +210,23 @@ describe('Integration Tests', () => {
       // First call succeeds, second call finds existing user
       mockUserRepository.findByEmail
         .mockReturnValueOnce(TE.left({ _tag: 'UserNotFound', userId: input.email }))
-        .mockReturnValueOnce(TE.right({
-          id: 'existing-id',
-          email: input.email,
-          name: 'Existing User',
-          role: 'user',
-        }));
+        .mockReturnValueOnce(
+          TE.right({
+            id: 'existing-id',
+            email: input.email,
+            name: 'Existing User',
+            role: 'user',
+          }),
+        );
 
-      mockUserRepository.save.mockReturnValue(TE.right({
-        id: 'new-id',
-        email: input.email,
-        name: input.name,
-        role: 'user',
-      }));
+      mockUserRepository.save.mockReturnValue(
+        TE.right({
+          id: 'new-id',
+          email: input.email,
+          name: input.name,
+          role: 'user',
+        }),
+      );
 
       mockEmailService.sendWelcomeEmail.mockReturnValue(TE.right(undefined));
 
@@ -232,13 +236,19 @@ describe('Integration Tests', () => {
 
       // Second creation should fail with validation error
       const result2 = await createUser(input)(deps)();
-      expect(result2).toEqual(E.left(expect.objectContaining({
-        _tag: 'ValidationError',
-        errors: expect.arrayContaining([{
-          field: 'email',
-          message: 'Email already exists',
-        }]),
-      })));
+      expect(result2).toEqual(
+        E.left(
+          expect.objectContaining({
+            _tag: 'ValidationError',
+            errors: expect.arrayContaining([
+              {
+                field: 'email',
+                message: 'Email already exists',
+              },
+            ]),
+          }),
+        ),
+      );
     });
   });
 });

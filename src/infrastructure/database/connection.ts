@@ -92,12 +92,17 @@ export class MockDatabaseConnection implements DatabaseConnection {
               }
             });
           } else {
-            this.db!.run(sql, params || [], function(err) {
+            this.db!.run(sql, params || [], function (err) {
               if (err) {
                 reject(err);
               } else {
                 // For INSERT/UPDATE/DELETE without RETURNING, return affected rows info
-                resolve([{ lastID: this.lastID, changes: this.changes } as unknown as T]);
+                resolve([
+                  {
+                    lastID: this.lastID,
+                    changes: this.changes,
+                  } as unknown as T,
+                ]);
               }
             });
           }
@@ -155,7 +160,7 @@ export class MockDatabaseConnection implements DatabaseConnection {
                 errorMessage = `Unauthorized: ${error.reason}`;
                 break;
               case 'ValidationError':
-                errorMessage = `Validation error: ${error.errors.map(e => e.message).join(', ')}`;
+                errorMessage = `Validation error: ${error.errors.map((e) => e.message).join(', ')}`;
                 break;
               default:
                 errorMessage = 'Unknown error';

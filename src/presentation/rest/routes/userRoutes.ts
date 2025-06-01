@@ -42,18 +42,25 @@ type RouteError =
   | DomainError;
 
 // Pure function to create route context
-const createRouteContext = (authReq: AuthenticatedRequest): IO.IO<RouteContext> => () => ({
-  container: authReq.container,
-  requestContext: authReq.context,
-  logger: new RequestScopedLogger(authReq.context),
-});
+const createRouteContext =
+  (authReq: AuthenticatedRequest): IO.IO<RouteContext> =>
+  () => ({
+    container: authReq.container,
+    requestContext: authReq.context,
+    logger: new RequestScopedLogger(authReq.context),
+  });
 
 // Resolve dependencies for create user use case
-const resolveDependencies = (context: RouteContext): TE.TaskEither<RouteError, {
-  userRepository: UserRepository;
-  emailService: EmailService;
-  logger: RequestScopedLogger;
-}> =>
+const resolveDependencies = (
+  context: RouteContext,
+): TE.TaskEither<
+  RouteError,
+  {
+    userRepository: UserRepository;
+    emailService: EmailService;
+    logger: RequestScopedLogger;
+  }
+> =>
   pipe(
     TE.tryCatch(
       async () => {
@@ -73,24 +80,24 @@ const resolveDependencies = (context: RouteContext): TE.TaskEither<RouteError, {
   );
 
 // Execute create user use case
-const executeCreateUser = (input: CreateUserInput, deps: {
-  userRepository: UserRepository;
-  emailService: EmailService;
-  logger: RequestScopedLogger;
-}): TE.TaskEither<RouteError, User> =>
+const executeCreateUser = (
+  input: CreateUserInput,
+  deps: {
+    userRepository: UserRepository;
+    emailService: EmailService;
+    logger: RequestScopedLogger;
+  },
+): TE.TaskEither<RouteError, User> =>
   pipe(
     TE.tryCatch(
       createUser(input)(deps),
-      (error) => ({
-        _tag: 'RouteProcessingError',
-        message: error instanceof Error ? error.message : 'Unknown processing error',
-      } as RouteError),
+      (error) =>
+        ({
+          _tag: 'RouteProcessingError',
+          message: error instanceof Error ? error.message : 'Unknown processing error',
+        }) as RouteError,
     ),
-    TE.flatMap(result =>
-      E.isLeft(result)
-        ? TE.left(result.left as RouteError)
-        : TE.right(result.right),
-    ),
+    TE.flatMap((result) => (E.isLeft(result) ? TE.left(result.left as RouteError) : TE.right(result.right))),
   );
 
 // Execute get user by ID
@@ -98,16 +105,13 @@ const executeGetUser = (userId: string, userRepository: UserRepository): TE.Task
   pipe(
     TE.tryCatch(
       () => userRepository.findById(userId)(),
-      (error) => ({
-        _tag: 'RouteProcessingError',
-        message: error instanceof Error ? error.message : 'Unknown processing error',
-      } as RouteError),
+      (error) =>
+        ({
+          _tag: 'RouteProcessingError',
+          message: error instanceof Error ? error.message : 'Unknown processing error',
+        }) as RouteError,
     ),
-    TE.flatMap(result =>
-      E.isLeft(result)
-        ? TE.left(result.left as RouteError)
-        : TE.right(result.right),
-    ),
+    TE.flatMap((result) => (E.isLeft(result) ? TE.left(result.left as RouteError) : TE.right(result.right))),
   );
 
 // Pure function to create success response
@@ -129,59 +133,71 @@ interface ErrorResponseBody {
 }
 
 // Pure functions for creating specific error responses
-const createValidationErrorResponse = (errors: readonly unknown[]): IO.IO<HttpResponse> => () => ({
-  statusCode: 400,
-  body: {
-    success: false,
-    error: 'Validation failed',
-    details: errors,
-  } as ErrorResponseBody,
-});
+const createValidationErrorResponse =
+  (errors: readonly unknown[]): IO.IO<HttpResponse> =>
+  () => ({
+    statusCode: 400,
+    body: {
+      success: false,
+      error: 'Validation failed',
+      details: errors,
+    } as ErrorResponseBody,
+  });
 
-const createUserNotFoundResponse = (userId: string): IO.IO<HttpResponse> => () => ({
-  statusCode: 404,
-  body: {
-    success: false,
-    error: 'User not found',
-    details: { userId },
-  } as ErrorResponseBody,
-});
+const createUserNotFoundResponse =
+  (userId: string): IO.IO<HttpResponse> =>
+  () => ({
+    statusCode: 404,
+    body: {
+      success: false,
+      error: 'User not found',
+      details: { userId },
+    } as ErrorResponseBody,
+  });
 
-const createDatabaseErrorResponse = (message: string): IO.IO<HttpResponse> => () => ({
-  statusCode: 500,
-  body: {
-    success: false,
-    error: 'Database error',
-    details: { message },
-  } as ErrorResponseBody,
-});
+const createDatabaseErrorResponse =
+  (message: string): IO.IO<HttpResponse> =>
+  () => ({
+    statusCode: 500,
+    body: {
+      success: false,
+      error: 'Database error',
+      details: { message },
+    } as ErrorResponseBody,
+  });
 
-const createEmailServiceErrorResponse = (message: string): IO.IO<HttpResponse> => () => ({
-  statusCode: 500,
-  body: {
-    success: false,
-    error: 'Email service error',
-    details: { message },
-  } as ErrorResponseBody,
-});
+const createEmailServiceErrorResponse =
+  (message: string): IO.IO<HttpResponse> =>
+  () => ({
+    statusCode: 500,
+    body: {
+      success: false,
+      error: 'Email service error',
+      details: { message },
+    } as ErrorResponseBody,
+  });
 
-const createDependencyResolutionErrorResponse = (message: string): IO.IO<HttpResponse> => () => ({
-  statusCode: 500,
-  body: {
-    success: false,
-    error: 'Service unavailable',
-    details: { message },
-  } as ErrorResponseBody,
-});
+const createDependencyResolutionErrorResponse =
+  (message: string): IO.IO<HttpResponse> =>
+  () => ({
+    statusCode: 500,
+    body: {
+      success: false,
+      error: 'Service unavailable',
+      details: { message },
+    } as ErrorResponseBody,
+  });
 
-const createRouteProcessingErrorResponse = (message: string): IO.IO<HttpResponse> => () => ({
-  statusCode: 500,
-  body: {
-    success: false,
-    error: 'Processing error',
-    details: { message },
-  } as ErrorResponseBody,
-});
+const createRouteProcessingErrorResponse =
+  (message: string): IO.IO<HttpResponse> =>
+  () => ({
+    statusCode: 500,
+    body: {
+      success: false,
+      error: 'Processing error',
+      details: { message },
+    } as ErrorResponseBody,
+  });
 
 const createInternalServerErrorResponse = (): IO.IO<HttpResponse> => () => ({
   statusCode: 500,
@@ -196,10 +212,8 @@ const createInternalServerErrorResponse = (): IO.IO<HttpResponse> => () => ({
 const errorHandlers: Record<string, (error: any) => IO.IO<HttpResponse>> = {
   ValidationError: (error: Extract<RouteError, { _tag: 'ValidationError' }>) =>
     createValidationErrorResponse(error.errors),
-  UserNotFound: (error: Extract<RouteError, { _tag: 'UserNotFound' }>) =>
-    createUserNotFoundResponse(error.userId),
-  DatabaseError: (error: Extract<RouteError, { _tag: 'DatabaseError' }>) =>
-    createDatabaseErrorResponse(error.message),
+  UserNotFound: (error: Extract<RouteError, { _tag: 'UserNotFound' }>) => createUserNotFoundResponse(error.userId),
+  DatabaseError: (error: Extract<RouteError, { _tag: 'DatabaseError' }>) => createDatabaseErrorResponse(error.message),
   EmailServiceError: (error: Extract<RouteError, { _tag: 'EmailServiceError' }>) =>
     createEmailServiceErrorResponse(error.message),
   DependencyResolutionError: (error: Extract<RouteError, { _tag: 'DependencyResolutionError' }>) =>
@@ -225,32 +239,34 @@ const errorHandlers: Record<string, (error: any) => IO.IO<HttpResponse>> = {
 const createErrorResponse = (error: RouteError): IO.IO<HttpResponse> =>
   pipe(
     R.lookup(error._tag)(errorHandlers),
-    O.map(handler => handler(error)),
+    O.map((handler) => handler(error)),
     O.getOrElse(() => createInternalServerErrorResponse()),
   );
 
 // Send response using fp-ts
-const sendResponse = (res: Response, result: E.Either<RouteError, User>, successStatusCode: number = 200): IO.IO<void> => () => {
-  pipe(
-    result,
-    E.match(
-      (error) => {
-        const errorResponse = createErrorResponse(error)();
-        res.status(errorResponse.statusCode).json(errorResponse.body);
-      },
-      (data) => {
-        const successResponse = createSuccessResponse(data, successStatusCode);
-        res.status(successStatusCode).json(successResponse);
-      },
-    ),
-  );
-};
+const sendResponse =
+  (res: Response, result: E.Either<RouteError, User>, successStatusCode: number = 200): IO.IO<void> =>
+  () => {
+    pipe(
+      result,
+      E.match(
+        (error) => {
+          const errorResponse = createErrorResponse(error)();
+          res.status(errorResponse.statusCode).json(errorResponse.body);
+        },
+        (data) => {
+          const successResponse = createSuccessResponse(data, successStatusCode);
+          res.status(successStatusCode).json(successResponse);
+        },
+      ),
+    );
+  };
 
 // Process create user route
 const processCreateUserRoute = (routeInput: CreateUserRouteInput): TE.TaskEither<RouteError, User> =>
   pipe(
     resolveDependencies(routeInput.context),
-    TE.flatMap(deps => executeCreateUser(routeInput.input, deps)),
+    TE.flatMap((deps) => executeCreateUser(routeInput.input, deps)),
   );
 
 // Process get user route
@@ -263,7 +279,7 @@ const processGetUserRoute = (routeInput: GetUserRouteInput): TE.TaskEither<Route
         message: error instanceof Error ? error.message : 'Unknown dependency resolution error',
       }),
     ),
-    TE.flatMap(userRepository => executeGetUser(routeInput.userId, userRepository)),
+    TE.flatMap((userRepository) => executeGetUser(routeInput.userId, userRepository)),
   );
 
 // Create user route handler
@@ -322,7 +338,11 @@ export const createUserRoutesFP = (): IO.IO<Router> => () => {
 
 // Pure function to create route configuration
 export const createRouteConfig = (): {
-  routes: Array<{ method: string; path: string; handler: (req: Request, res: Response, next: NextFunction) => Promise<void> }>;
+  routes: Array<{
+    method: string;
+    path: string;
+    handler: (req: Request, res: Response, next: NextFunction) => Promise<void>;
+  }>;
   router: Router;
   routerFP: () => IO.IO<Router>;
 } => ({

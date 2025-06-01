@@ -2,12 +2,7 @@ import { Response } from 'express';
 import * as TE from 'fp-ts/lib/TaskEither';
 import * as E from 'fp-ts/lib/Either';
 import * as IO from 'fp-ts/lib/IO';
-import {
-  createUserRoutes,
-  createUserRoutesFP,
-  createRouteConfig,
-  AuthenticatedRequest,
-} from './userRoutes';
+import { createUserRoutes, createUserRoutesFP, createRouteConfig, AuthenticatedRequest } from './userRoutes';
 import { ScopedContainer, RequestContext } from '../../../infrastructure/di/types';
 import { UserRepository, EmailService } from '../../../application/ports';
 import { RequestScopedLogger } from '../../../infrastructure/logging/logger';
@@ -30,10 +25,7 @@ class MockEmailService implements EmailService {
 
 class MockLogger extends RequestScopedLogger {
   constructor() {
-    super(
-      { requestId: 'test-request', startTime: new Date(), metadata: {} },
-      { level: 'info', format: 'json' },
-    );
+    super({ requestId: 'test-request', startTime: new Date(), metadata: {} }, { level: 'info', format: 'json' });
   }
 
   info = jest.fn().mockReturnValue(IO.of(undefined));
@@ -73,91 +65,92 @@ const createMockRequest = (
   params: Record<string, string> = {},
   container: ScopedContainer,
   context: RequestContext,
-): AuthenticatedRequest => ({
-  body,
-  params,
-  container,
-  context,
-  // Express Request properties (minimal mock)
-  get: jest.fn(),
-  header: jest.fn(),
-  accepts: jest.fn(),
-  acceptsCharsets: jest.fn(),
-  acceptsEncodings: jest.fn(),
-  acceptsLanguages: jest.fn(),
-  range: jest.fn(),
-  param: jest.fn(),
-  is: jest.fn(),
-  protocol: 'http',
-  secure: false,
-  ip: '127.0.0.1',
-  ips: [],
-  subdomains: [],
-  path: '/users',
-  hostname: 'localhost',
-  host: 'localhost',
-  fresh: false,
-  stale: true,
-  xhr: false,
-  route: undefined,
-  signedCookies: {},
-  originalUrl: '/users',
-  url: '/users',
-  baseUrl: '',
-  cookies: {},
-  method: 'POST',
-  query: {},
-  res: undefined,
-  socket: undefined,
-  httpVersion: '1.1',
-  httpVersionMajor: 1,
-  httpVersionMinor: 1,
-  complete: true,
-  connection: undefined,
-  headers: {},
-  rawHeaders: [],
-  trailers: {},
-  rawTrailers: [],
-  setTimeout: jest.fn(),
-  statusCode: undefined,
-  statusMessage: undefined,
-  destroy: jest.fn(),
-  readable: true,
-  readableEncoding: null,
-  readableEnded: false,
-  readableFlowing: null,
-  readableHighWaterMark: 16384,
-  readableLength: 0,
-  readableObjectMode: false,
-  destroyed: false,
-  _read: jest.fn(),
-  read: jest.fn(),
-  setEncoding: jest.fn(),
-  pause: jest.fn(),
-  resume: jest.fn(),
-  isPaused: jest.fn(),
-  unpipe: jest.fn(),
-  unshift: jest.fn(),
-  wrap: jest.fn(),
-  push: jest.fn(),
-  _destroy: jest.fn(),
-  addListener: jest.fn(),
-  emit: jest.fn(),
-  on: jest.fn(),
-  once: jest.fn(),
-  prependListener: jest.fn(),
-  prependOnceListener: jest.fn(),
-  removeListener: jest.fn(),
-  off: jest.fn(),
-  removeAllListeners: jest.fn(),
-  setMaxListeners: jest.fn(),
-  getMaxListeners: jest.fn(),
-  listeners: jest.fn(),
-  rawListeners: jest.fn(),
-  listenerCount: jest.fn(),
-  eventNames: jest.fn(),
-  pipe: jest.fn(),
-} as unknown as AuthenticatedRequest);
+): AuthenticatedRequest =>
+  ({
+    body,
+    params,
+    container,
+    context,
+    // Express Request properties (minimal mock)
+    get: jest.fn(),
+    header: jest.fn(),
+    accepts: jest.fn(),
+    acceptsCharsets: jest.fn(),
+    acceptsEncodings: jest.fn(),
+    acceptsLanguages: jest.fn(),
+    range: jest.fn(),
+    param: jest.fn(),
+    is: jest.fn(),
+    protocol: 'http',
+    secure: false,
+    ip: '127.0.0.1',
+    ips: [],
+    subdomains: [],
+    path: '/users',
+    hostname: 'localhost',
+    host: 'localhost',
+    fresh: false,
+    stale: true,
+    xhr: false,
+    route: undefined,
+    signedCookies: {},
+    originalUrl: '/users',
+    url: '/users',
+    baseUrl: '',
+    cookies: {},
+    method: 'POST',
+    query: {},
+    res: undefined,
+    socket: undefined,
+    httpVersion: '1.1',
+    httpVersionMajor: 1,
+    httpVersionMinor: 1,
+    complete: true,
+    connection: undefined,
+    headers: {},
+    rawHeaders: [],
+    trailers: {},
+    rawTrailers: [],
+    setTimeout: jest.fn(),
+    statusCode: undefined,
+    statusMessage: undefined,
+    destroy: jest.fn(),
+    readable: true,
+    readableEncoding: null,
+    readableEnded: false,
+    readableFlowing: null,
+    readableHighWaterMark: 16384,
+    readableLength: 0,
+    readableObjectMode: false,
+    destroyed: false,
+    _read: jest.fn(),
+    read: jest.fn(),
+    setEncoding: jest.fn(),
+    pause: jest.fn(),
+    resume: jest.fn(),
+    isPaused: jest.fn(),
+    unpipe: jest.fn(),
+    unshift: jest.fn(),
+    wrap: jest.fn(),
+    push: jest.fn(),
+    _destroy: jest.fn(),
+    addListener: jest.fn(),
+    emit: jest.fn(),
+    on: jest.fn(),
+    once: jest.fn(),
+    prependListener: jest.fn(),
+    prependOnceListener: jest.fn(),
+    removeListener: jest.fn(),
+    off: jest.fn(),
+    removeAllListeners: jest.fn(),
+    setMaxListeners: jest.fn(),
+    getMaxListeners: jest.fn(),
+    listeners: jest.fn(),
+    rawListeners: jest.fn(),
+    listenerCount: jest.fn(),
+    eventNames: jest.fn(),
+    pipe: jest.fn(),
+  }) as unknown as AuthenticatedRequest;
 
 // Helper to create mock response
 const createMockResponse = (): Response => {
@@ -306,10 +299,12 @@ describe('userRoutes', () => {
         name: 'Existing User',
         role: 'user',
       };
-      await connection.query(
-        'INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)',
-        [existingUser.id, existingUser.email, existingUser.name, existingUser.role],
-      )();
+      await connection.query('INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)', [
+        existingUser.id,
+        existingUser.email,
+        existingUser.name,
+        existingUser.role,
+      ])();
 
       const req = createMockRequest(input, {}, container, context);
       const res = createMockResponse();
@@ -430,10 +425,12 @@ describe('userRoutes', () => {
       };
 
       const connection = sqlitePool.getConnection();
-      await connection.query(
-        'INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)',
-        [user.id, user.email, user.name, user.role],
-      )();
+      await connection.query('INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)', [
+        user.id,
+        user.email,
+        user.name,
+        user.role,
+      ])();
 
       const req = createMockRequest({}, { id: user.id }, container, context);
       const res = createMockResponse();
@@ -539,7 +536,10 @@ describe('userRoutes', () => {
     it('should handle various error types correctly', async () => {
       const testCases = [
         {
-          error: { _tag: 'ValidationError', errors: [{ field: 'email', message: 'Invalid' }] } as DomainError,
+          error: {
+            _tag: 'ValidationError',
+            errors: [{ field: 'email', message: 'Invalid' }],
+          } as DomainError,
           expectedStatus: 400,
           expectedError: 'Validation failed',
         },
@@ -549,12 +549,18 @@ describe('userRoutes', () => {
           expectedError: 'User not found',
         },
         {
-          error: { _tag: 'DatabaseError', message: 'Connection failed' } as DomainError,
+          error: {
+            _tag: 'DatabaseError',
+            message: 'Connection failed',
+          } as DomainError,
           expectedStatus: 500,
           expectedError: 'Database error',
         },
         {
-          error: { _tag: 'EmailServiceError', message: 'Service down' } as DomainError,
+          error: {
+            _tag: 'EmailServiceError',
+            message: 'Service down',
+          } as DomainError,
           expectedStatus: 500,
           expectedError: 'Email service error',
         },
@@ -564,7 +570,10 @@ describe('userRoutes', () => {
           expectedError: 'Validation failed',
         },
         {
-          error: { _tag: 'Unauthorized', reason: 'Invalid token' } as DomainError,
+          error: {
+            _tag: 'Unauthorized',
+            reason: 'Invalid token',
+          } as DomainError,
           expectedStatus: 401,
           expectedError: 'Unauthorized',
         },
@@ -591,8 +600,7 @@ describe('userRoutes', () => {
         const next = jest.fn();
 
         const router = createUserRoutes();
-        const getUserHandler = router.stack
-          .find((layer) => layer.route?.path === '/users/:id' && layer.route?.get)
+        const getUserHandler = router.stack.find((layer) => layer.route?.path === '/users/:id' && layer.route?.get)
           ?.route?.stack?.[0]?.handle;
 
         await getUserHandler!(req, res, next);
@@ -652,9 +660,7 @@ describe('userRoutes', () => {
       // Try to save second user with same email
       const saveResult2 = await userRepository.save(user2)();
       expect(E.isLeft(saveResult2)).toBe(true);
-      expect(saveResult2).toEqual(
-        E.left(expect.objectContaining({ _tag: 'DatabaseError' })),
-      );
+      expect(saveResult2).toEqual(E.left(expect.objectContaining({ _tag: 'DatabaseError' })));
     });
   });
 
@@ -667,11 +673,21 @@ describe('userRoutes', () => {
           emailService,
           logger,
         },
-        async (deps: { userRepository: UserRepository; emailService: EmailService; logger: RequestScopedLogger }, input: CreateUserInput) => {
+        async (
+          deps: {
+            userRepository: UserRepository;
+            emailService: EmailService;
+            logger: RequestScopedLogger;
+          },
+          input: CreateUserInput,
+        ) => {
           // This simulates how the actual route handler would work
           const result = await deps.userRepository.findByEmail(input.email)();
           if (E.isRight(result)) {
-            return E.left({ _tag: 'ValidationError', errors: [{ field: 'email', message: 'Email already exists' }] } as DomainError);
+            return E.left({
+              _tag: 'ValidationError',
+              errors: [{ field: 'email', message: 'Email already exists' }],
+            } as DomainError);
           }
 
           const newUser: User = {
@@ -693,17 +709,27 @@ describe('userRoutes', () => {
 
       const result = await createUserWithDI(input);
       expect(result).toEqual(
-        E.right(expect.objectContaining({
-          email: input.email,
-          name: input.name,
-        })));
+        E.right(
+          expect.objectContaining({
+            email: input.email,
+            name: input.name,
+          }),
+        ),
+      );
     });
 
     it('should allow dependency injection override', async () => {
       const mockUserRepo: UserRepository = {
         findById: jest.fn().mockReturnValue(TE.left({ _tag: 'UserNotFound', userId: 'test' })),
         findByEmail: jest.fn().mockReturnValue(TE.left({ _tag: 'UserNotFound', userId: 'test' })),
-        save: jest.fn().mockReturnValue(TE.right({ id: 'mocked', email: 'mock@test.com', name: 'Mock', role: 'user' })),
+        save: jest.fn().mockReturnValue(
+          TE.right({
+            id: 'mocked',
+            email: 'mock@test.com',
+            name: 'Mock',
+            role: 'user',
+          }),
+        ),
       };
 
       const createUserWithDI = depend(
@@ -712,7 +738,14 @@ describe('userRoutes', () => {
           emailService,
           logger,
         },
-        async (deps: { userRepository: UserRepository; emailService: EmailService; logger: RequestScopedLogger }, input: CreateUserInput) => {
+        async (
+          deps: {
+            userRepository: UserRepository;
+            emailService: EmailService;
+            logger: RequestScopedLogger;
+          },
+          input: CreateUserInput,
+        ) => {
           const newUser: User = {
             id: 'test-id',
             email: input.email,
@@ -725,7 +758,9 @@ describe('userRoutes', () => {
       );
 
       // Inject mock repository
-      const createUserWithMock = createUserWithDI.inject({ userRepository: mockUserRepo });
+      const createUserWithMock = createUserWithDI.inject({
+        userRepository: mockUserRepo,
+      });
 
       const input: CreateUserInput = {
         email: 'mock-test@example.com',
@@ -735,9 +770,12 @@ describe('userRoutes', () => {
 
       const result = await createUserWithMock(input);
       expect(result).toEqual(
-        E.right(expect.objectContaining({
-          id: 'mocked',
-        })));
+        E.right(
+          expect.objectContaining({
+            id: 'mocked',
+          }),
+        ),
+      );
       expect(mockUserRepo.save).toHaveBeenCalled();
     });
   });

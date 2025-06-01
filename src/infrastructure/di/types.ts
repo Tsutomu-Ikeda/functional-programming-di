@@ -14,7 +14,7 @@ export const depend = <T extends Record<string, unknown>, U extends unknown[], V
   return fn;
 };
 
-export type Lifecycle = 'singleton' | 'scoped' | 'transient'
+export type Lifecycle = 'singleton' | 'scoped' | 'transient';
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export interface ServiceDefinition<T = any> {

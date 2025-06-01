@@ -86,9 +86,9 @@ describe('GraphQL Schema', () => {
       expect(userRoleType.name).toBe('UserRole');
 
       const values = userRoleType.getValues();
-      expect(values.map(v => v.name)).toContain('ADMIN');
-      expect(values.map(v => v.name)).toContain('USER');
-      expect(values.map(v => v.name)).toContain('GUEST');
+      expect(values.map((v) => v.name)).toContain('ADMIN');
+      expect(values.map((v) => v.name)).toContain('USER');
+      expect(values.map((v) => v.name)).toContain('GUEST');
     });
 
     it('should have CreateUserInput input type', () => {

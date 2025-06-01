@@ -44,10 +44,12 @@ describe('EmailService', () => {
 
       const result = await emailService.sendWelcomeEmail(testUser)();
 
-      expect(result).toEqual(E.left({
-        _tag: 'EmailServiceError',
-        message: 'SMTP server unavailable',
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'EmailServiceError',
+          message: 'SMTP server unavailable',
+        }),
+      );
     });
 
     it('should handle unknown errors', async () => {
@@ -58,10 +60,12 @@ describe('EmailService', () => {
 
       const result = await emailService.sendWelcomeEmail(testUser)();
 
-      expect(result).toEqual(E.left({
-        _tag: 'EmailServiceError',
-        message: 'Unknown email service error',
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'EmailServiceError',
+          message: 'Unknown email service error',
+        }),
+      );
     });
 
     it('should simulate email sending delay', async () => {
@@ -90,12 +94,15 @@ describe('EmailService', () => {
       const result = await emailService.sendWelcomeEmail(testUser)();
 
       expect(result._tag).toBe('Right');
-      expect(consoleSpy).toHaveBeenCalledWith('Sending email:', expect.objectContaining({
-        to: testUser.email,
-        from: mockConfig.fromEmail,
-        subject: 'Welcome to our platform!',
-        html: expect.stringContaining(`Welcome ${testUser.name}!`),
-      }));
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'Sending email:',
+        expect.objectContaining({
+          to: testUser.email,
+          from: mockConfig.fromEmail,
+          subject: 'Welcome to our platform!',
+          html: expect.stringContaining(`Welcome ${testUser.name}!`),
+        }),
+      );
     });
 
     it('should include user details in email content', async () => {
@@ -117,10 +124,12 @@ describe('EmailService', () => {
 
       const result = await emailService.sendWelcomeEmail(testUser)();
 
-      expect(result).toEqual(E.left({
-        _tag: 'EmailServiceError',
-        message: 'Email sending failed',
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'EmailServiceError',
+          message: 'Email sending failed',
+        }),
+      );
     });
 
     it('should handle unknown errors', async () => {
@@ -130,10 +139,12 @@ describe('EmailService', () => {
 
       const result = await emailService.sendWelcomeEmail(testUser)();
 
-      expect(result).toEqual(E.left({
-        _tag: 'EmailServiceError',
-        message: 'Unknown email service error',
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'EmailServiceError',
+          message: 'Unknown email service error',
+        }),
+      );
     });
   });
 

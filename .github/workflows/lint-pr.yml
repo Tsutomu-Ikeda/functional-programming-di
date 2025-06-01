@@ -2,44 +2,44 @@ name: ESLint PR Review
 
 on:
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
 
 jobs:
   eslint:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '20.x'
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
 
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: 9
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
 
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
 
-    - name: Run ESLint with JSON output
-      run: |
-        pnpm lint --format=json --output-file eslint-results.json || true
+      - name: Run ESLint with JSON output
+        run: |
+          pnpm lint --format=json --output-file eslint-results.json || true
 
-    - name: Annotate ESLint results
-      uses: ataylorme/eslint-annotate-action@v2
-      if: always()
-      with:
-        repo-token: "${{ secrets.GITHUB_TOKEN }}"
-        report-json: "eslint-results.json"
-        check-name: "ESLint Results"
+      - name: Annotate ESLint results
+        uses: ataylorme/eslint-annotate-action@v2
+        if: always()
+        with:
+          repo-token: '${{ secrets.GITHUB_TOKEN }}'
+          report-json: 'eslint-results.json'
+          check-name: 'ESLint Results'
 
-    - name: Upload ESLint results
-      uses: actions/upload-artifact@v3
-      if: always()
-      with:
-        name: eslint-results
-        path: eslint-results.json
+      - name: Upload ESLint results
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: eslint-results
+          path: eslint-results.json

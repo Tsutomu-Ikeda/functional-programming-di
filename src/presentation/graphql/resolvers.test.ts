@@ -58,15 +58,9 @@ describe('GraphQL Resolvers', () => {
     };
 
     it('should return user successfully', async () => {
-      mockUserRepository.findById.mockReturnValue(
-        jest.fn().mockResolvedValue(E.right(testUser)),
-      );
+      mockUserRepository.findById.mockReturnValue(jest.fn().mockResolvedValue(E.right(testUser)));
 
-      const result = await resolvers.Query.getUser(
-        {},
-        { id: 'user-123' },
-        context,
-      );
+      const result = await resolvers.Query.getUser({}, { id: 'user-123' }, context);
 
       expect(result).toEqual({
         success: true,
@@ -81,17 +75,15 @@ describe('GraphQL Resolvers', () => {
 
     it('should handle user not found error', async () => {
       mockUserRepository.findById.mockReturnValue(
-        jest.fn().mockResolvedValue(E.left({
-          _tag: 'UserNotFound',
-          userId: 'user-123',
-        })),
+        jest.fn().mockResolvedValue(
+          E.left({
+            _tag: 'UserNotFound',
+            userId: 'user-123',
+          }),
+        ),
       );
 
-      const result = await resolvers.Query.getUser(
-        {},
-        { id: 'user-123' },
-        context,
-      );
+      const result = await resolvers.Query.getUser({}, { id: 'user-123' }, context);
 
       expect(result).toEqual({
         success: false,
@@ -102,17 +94,15 @@ describe('GraphQL Resolvers', () => {
 
     it('should handle database error', async () => {
       mockUserRepository.findById.mockReturnValue(
-        jest.fn().mockResolvedValue(E.left({
-          _tag: 'DatabaseError',
-          message: 'Connection failed',
-        })),
+        jest.fn().mockResolvedValue(
+          E.left({
+            _tag: 'DatabaseError',
+            message: 'Connection failed',
+          }),
+        ),
       );
 
-      const result = await resolvers.Query.getUser(
-        {},
-        { id: 'user-123' },
-        context,
-      );
+      const result = await resolvers.Query.getUser({}, { id: 'user-123' }, context);
 
       expect(result).toEqual({
         success: false,
@@ -124,11 +114,7 @@ describe('GraphQL Resolvers', () => {
     it('should handle unexpected errors', async () => {
       mockContainer.resolve.mockRejectedValue(new Error('Container error'));
 
-      const result = await resolvers.Query.getUser(
-        {},
-        { id: 'user-123' },
-        context,
-      );
+      const result = await resolvers.Query.getUser({}, { id: 'user-123' }, context);
 
       expect(result).toEqual({
         success: false,
@@ -159,11 +145,7 @@ describe('GraphQL Resolvers', () => {
     });
 
     it('should create user successfully', async () => {
-      const result = await resolvers.Mutation.createUser(
-        {},
-        { input: createUserInput },
-        context,
-      );
+      const result = await resolvers.Mutation.createUser({}, { input: createUserInput }, context);
 
       expect(result).toEqual({
         success: true,
@@ -177,19 +159,19 @@ describe('GraphQL Resolvers', () => {
 
     it('should handle validation error', async () => {
       const { createUser } = require('../../application/usecases/createUser');
-      createUser.mockReturnValue(() => jest.fn().mockResolvedValue(E.left({
-        _tag: 'ValidationError',
-        errors: [
-          { field: 'email', message: 'Invalid email format' },
-          { field: 'password', message: 'Password too short' },
-        ],
-      })));
-
-      const result = await resolvers.Mutation.createUser(
-        {},
-        { input: createUserInput },
-        context,
+      createUser.mockReturnValue(() =>
+        jest.fn().mockResolvedValue(
+          E.left({
+            _tag: 'ValidationError',
+            errors: [
+              { field: 'email', message: 'Invalid email format' },
+              { field: 'password', message: 'Password too short' },
+            ],
+          }),
+        ),
       );
+
+      const result = await resolvers.Mutation.createUser({}, { input: createUserInput }, context);
 
       expect(result).toEqual({
         success: false,
@@ -200,16 +182,16 @@ describe('GraphQL Resolvers', () => {
 
     it('should handle user not found error', async () => {
       const { createUser } = require('../../application/usecases/createUser');
-      createUser.mockReturnValue(() => jest.fn().mockResolvedValue(E.left({
-        _tag: 'UserNotFound',
-        userId: 'user-123',
-      })));
-
-      const result = await resolvers.Mutation.createUser(
-        {},
-        { input: createUserInput },
-        context,
+      createUser.mockReturnValue(() =>
+        jest.fn().mockResolvedValue(
+          E.left({
+            _tag: 'UserNotFound',
+            userId: 'user-123',
+          }),
+        ),
       );
+
+      const result = await resolvers.Mutation.createUser({}, { input: createUserInput }, context);
 
       expect(result).toEqual({
         success: false,
@@ -220,16 +202,16 @@ describe('GraphQL Resolvers', () => {
 
     it('should handle database error', async () => {
       const { createUser } = require('../../application/usecases/createUser');
-      createUser.mockReturnValue(() => jest.fn().mockResolvedValue(E.left({
-        _tag: 'DatabaseError',
-        message: 'Connection timeout',
-      })));
-
-      const result = await resolvers.Mutation.createUser(
-        {},
-        { input: createUserInput },
-        context,
+      createUser.mockReturnValue(() =>
+        jest.fn().mockResolvedValue(
+          E.left({
+            _tag: 'DatabaseError',
+            message: 'Connection timeout',
+          }),
+        ),
       );
+
+      const result = await resolvers.Mutation.createUser({}, { input: createUserInput }, context);
 
       expect(result).toEqual({
         success: false,
@@ -240,16 +222,16 @@ describe('GraphQL Resolvers', () => {
 
     it('should handle email service error', async () => {
       const { createUser } = require('../../application/usecases/createUser');
-      createUser.mockReturnValue(() => jest.fn().mockResolvedValue(E.left({
-        _tag: 'EmailServiceError',
-        message: 'SMTP server unavailable',
-      })));
-
-      const result = await resolvers.Mutation.createUser(
-        {},
-        { input: createUserInput },
-        context,
+      createUser.mockReturnValue(() =>
+        jest.fn().mockResolvedValue(
+          E.left({
+            _tag: 'EmailServiceError',
+            message: 'SMTP server unavailable',
+          }),
+        ),
       );
+
+      const result = await resolvers.Mutation.createUser({}, { input: createUserInput }, context);
 
       expect(result).toEqual({
         success: false,
@@ -260,16 +242,16 @@ describe('GraphQL Resolvers', () => {
 
     it('should handle unknown error types', async () => {
       const { createUser } = require('../../application/usecases/createUser');
-      createUser.mockReturnValue(() => jest.fn().mockResolvedValue(E.left({
-        _tag: 'UnknownError',
-        message: 'Something went wrong',
-      })));
-
-      const result = await resolvers.Mutation.createUser(
-        {},
-        { input: createUserInput },
-        context,
+      createUser.mockReturnValue(() =>
+        jest.fn().mockResolvedValue(
+          E.left({
+            _tag: 'UnknownError',
+            message: 'Something went wrong',
+          }),
+        ),
       );
+
+      const result = await resolvers.Mutation.createUser({}, { input: createUserInput }, context);
 
       expect(result).toEqual({
         success: false,
@@ -281,11 +263,7 @@ describe('GraphQL Resolvers', () => {
     it('should handle unexpected errors', async () => {
       mockContainer.resolve.mockRejectedValue(new Error('Container error'));
 
-      const result = await resolvers.Mutation.createUser(
-        {},
-        { input: createUserInput },
-        context,
-      );
+      const result = await resolvers.Mutation.createUser({}, { input: createUserInput }, context);
 
       expect(result).toEqual({
         success: false,
@@ -295,11 +273,7 @@ describe('GraphQL Resolvers', () => {
     });
 
     it('should resolve dependencies correctly', async () => {
-      await resolvers.Mutation.createUser(
-        {},
-        { input: createUserInput },
-        context,
-      );
+      await resolvers.Mutation.createUser({}, { input: createUserInput }, context);
 
       expect(mockContainer.resolve).toHaveBeenCalledWith('userRepository');
       expect(mockContainer.resolve).toHaveBeenCalledWith('emailService');

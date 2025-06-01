@@ -2,9 +2,12 @@ import js from '@eslint/js';
 import tseslint from '@typescript-eslint/eslint-plugin';
 import tsparser from '@typescript-eslint/parser';
 import jest from 'eslint-plugin-jest';
+import prettier from 'eslint-plugin-prettier';
+import prettierConfig from 'eslint-config-prettier';
 
 export default [
   js.configs.recommended,
+  prettierConfig,
   {
     files: ['**/*.ts', '**/*.tsx'],
     languageOptions: {
@@ -34,6 +37,7 @@ export default [
     },
     plugins: {
       '@typescript-eslint': tseslint,
+      prettier,
     },
     rules: {
       '@typescript-eslint/no-unused-vars': [
@@ -49,18 +53,7 @@ export default [
       '@typescript-eslint/no-inferrable-types': 'off',
       'prefer-const': 'error',
       'no-var': 'error',
-      'no-trailing-spaces': 'error',
-      'no-multiple-empty-lines': ['error', { max: 1, maxEOF: 0, maxBOF: 0 }],
-      'eol-last': ['error', 'always'],
-      'semi': ['error', 'always'],
-      'semi-spacing': ['error', { 'after': true, 'before': false }],
-      'semi-style': ['error', 'last'],
-      'no-extra-semi': 'error',
-      'no-unexpected-multiline': 'error',
-      'no-unreachable': 'error',
-      'quotes': ['error', 'single'],
-      'quote-props': ['error', 'as-needed'],
-      'comma-dangle': ['error', 'always-multiline'],
+      'prettier/prettier': 'error',
       // Prohibit 'as const' assertions
       'no-restricted-syntax': [
         'error',

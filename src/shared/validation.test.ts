@@ -1,14 +1,7 @@
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/lib/function';
-import {
-  combineValidations,
-  required,
-  minLength,
-} from './validation';
-import {
-  validateCreateUserInput,
-  CreateUserInput,
-} from '../domain/userValidation';
+import { combineValidations, required, minLength } from './validation';
+import { validateCreateUserInput, CreateUserInput } from '../domain/userValidation';
 
 describe('validation', () => {
   describe('validateCreateUserInput', () => {
@@ -33,10 +26,12 @@ describe('validation', () => {
 
       const result = validateCreateUserInput(invalidInput);
 
-      expect(result).toEqual(E.left({
-        _tag: 'ValidationError',
-        errors: [{ field: 'email', message: 'Invalid email format' }],
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'ValidationError',
+          errors: [{ field: 'email', message: 'Invalid email format' }],
+        }),
+      );
     });
 
     it('should return Left for empty email', () => {
@@ -48,10 +43,12 @@ describe('validation', () => {
 
       const result = validateCreateUserInput(invalidInput);
 
-      expect(result).toEqual(E.left({
-        _tag: 'ValidationError',
-        errors: [{ field: 'email', message: 'Invalid email format' }],
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'ValidationError',
+          errors: [{ field: 'email', message: 'Invalid email format' }],
+        }),
+      );
     });
 
     it('should return Left for short name', () => {
@@ -63,10 +60,12 @@ describe('validation', () => {
 
       const result = validateCreateUserInput(invalidInput);
 
-      expect(result).toEqual(E.left({
-        _tag: 'ValidationError',
-        errors: [{ field: 'name', message: 'Name must be at least 2 characters' }],
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'ValidationError',
+          errors: [{ field: 'name', message: 'Name must be at least 2 characters' }],
+        }),
+      );
     });
 
     it('should return Left for empty name', () => {
@@ -78,10 +77,12 @@ describe('validation', () => {
 
       const result = validateCreateUserInput(invalidInput);
 
-      expect(result).toEqual(E.left({
-        _tag: 'ValidationError',
-        errors: [{ field: 'name', message: 'Name must be at least 2 characters' }],
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'ValidationError',
+          errors: [{ field: 'name', message: 'Name must be at least 2 characters' }],
+        }),
+      );
     });
 
     it('should return Left for short password', () => {
@@ -93,10 +94,17 @@ describe('validation', () => {
 
       const result = validateCreateUserInput(invalidInput);
 
-      expect(result).toEqual(E.left({
-        _tag: 'ValidationError',
-        errors: [{ field: 'password', message: 'Password must be at least 6 characters' }],
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'ValidationError',
+          errors: [
+            {
+              field: 'password',
+              message: 'Password must be at least 6 characters',
+            },
+          ],
+        }),
+      );
     });
 
     it('should return Left for empty password', () => {
@@ -108,10 +116,17 @@ describe('validation', () => {
 
       const result = validateCreateUserInput(invalidInput);
 
-      expect(result).toEqual(E.left({
-        _tag: 'ValidationError',
-        errors: [{ field: 'password', message: 'Password must be at least 6 characters' }],
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'ValidationError',
+          errors: [
+            {
+              field: 'password',
+              message: 'Password must be at least 6 characters',
+            },
+          ],
+        }),
+      );
     });
 
     it('should accumulate multiple validation errors', () => {
@@ -123,14 +138,19 @@ describe('validation', () => {
 
       const result = validateCreateUserInput(invalidInput);
 
-      expect(result).toEqual(E.left({
-        _tag: 'ValidationError',
-        errors: [
-          { field: 'email', message: 'Invalid email format' },
-          { field: 'name', message: 'Name must be at least 2 characters' },
-          { field: 'password', message: 'Password must be at least 6 characters' },
-        ],
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'ValidationError',
+          errors: [
+            { field: 'email', message: 'Invalid email format' },
+            { field: 'name', message: 'Name must be at least 2 characters' },
+            {
+              field: 'password',
+              message: 'Password must be at least 6 characters',
+            },
+          ],
+        }),
+      );
     });
   });
 
@@ -144,19 +164,27 @@ describe('validation', () => {
     it('should return Left for empty string', () => {
       const result = required('email')('');
 
-      expect(result).toEqual(E.left([{
-        field: 'email',
-        message: 'email is required',
-      }]));
+      expect(result).toEqual(
+        E.left([
+          {
+            field: 'email',
+            message: 'email is required',
+          },
+        ]),
+      );
     });
 
     it('should return Left for whitespace-only string', () => {
       const result = required('name')('   ');
 
-      expect(result).toEqual(E.left([{
-        field: 'name',
-        message: 'name is required',
-      }]));
+      expect(result).toEqual(
+        E.left([
+          {
+            field: 'name',
+            message: 'name is required',
+          },
+        ]),
+      );
     });
   });
 
@@ -176,24 +204,30 @@ describe('validation', () => {
     it('should return Left for string below minimum length', () => {
       const result = minLength('password', 6)('123');
 
-      expect(result).toEqual(E.left([{
-        field: 'password',
-        message: 'password must be at least 6 characters',
-      }]));
+      expect(result).toEqual(
+        E.left([
+          {
+            field: 'password',
+            message: 'password must be at least 6 characters',
+          },
+        ]),
+      );
     });
   });
 
   describe('combineValidations', () => {
     it('should return Right when all validations pass', () => {
       const validateUser = combineValidations<{ email: string; name: string }>(
-        (user) => pipe(
-          required('email')(user.email),
-          E.map(() => user),
-        ),
-        (user) => pipe(
-          minLength('name', 3)(user.name),
-          E.map(() => user),
-        ),
+        (user) =>
+          pipe(
+            required('email')(user.email),
+            E.map(() => user),
+          ),
+        (user) =>
+          pipe(
+            minLength('name', 3)(user.name),
+            E.map(() => user),
+          ),
       );
 
       const result = validateUser({ email: 'test@example.com', name: 'John' });
@@ -203,42 +237,52 @@ describe('validation', () => {
 
     it('should return Left when any validation fails', () => {
       const validateUser = combineValidations<{ email: string; name: string }>(
-        (user) => pipe(
-          required('email')(user.email),
-          E.map(() => user),
-        ),
-        (user) => pipe(
-          minLength('name', 3)(user.name),
-          E.map(() => user),
-        ),
+        (user) =>
+          pipe(
+            required('email')(user.email),
+            E.map(() => user),
+          ),
+        (user) =>
+          pipe(
+            minLength('name', 3)(user.name),
+            E.map(() => user),
+          ),
       );
 
       const result = validateUser({ email: 'test@example.com', name: 'Jo' });
 
-      expect(result).toEqual(E.left([{
-        field: 'name',
-        message: 'name must be at least 3 characters',
-      }]));
+      expect(result).toEqual(
+        E.left([
+          {
+            field: 'name',
+            message: 'name must be at least 3 characters',
+          },
+        ]),
+      );
     });
 
     it('should accumulate errors from multiple failed validations', () => {
       const validateUser = combineValidations<{ email: string; name: string }>(
-        (user) => pipe(
-          required('email')(user.email),
-          E.map(() => user),
-        ),
-        (user) => pipe(
-          minLength('name', 3)(user.name),
-          E.map(() => user),
-        ),
+        (user) =>
+          pipe(
+            required('email')(user.email),
+            E.map(() => user),
+          ),
+        (user) =>
+          pipe(
+            minLength('name', 3)(user.name),
+            E.map(() => user),
+          ),
       );
 
       const result = validateUser({ email: '', name: 'Jo' });
 
-      expect(result).toEqual(E.left([
-        { field: 'email', message: 'email is required' },
-        { field: 'name', message: 'name must be at least 3 characters' },
-      ]));
+      expect(result).toEqual(
+        E.left([
+          { field: 'email', message: 'email is required' },
+          { field: 'name', message: 'name must be at least 3 characters' },
+        ]),
+      );
     });
   });
 });

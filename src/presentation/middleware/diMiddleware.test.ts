@@ -1,10 +1,5 @@
 import { Request, Response, NextFunction } from 'express';
-import {
-  createDIMiddleware,
-  createDIMiddlewareFP,
-  createMiddlewareConfig,
-  AuthenticatedRequest,
-} from './diMiddleware';
+import { createDIMiddleware, createDIMiddlewareFP, createMiddlewareConfig, AuthenticatedRequest } from './diMiddleware';
 import { DIContainer, ScopedContainer } from '../../infrastructure/di/types';
 
 // Mock uuid
@@ -115,10 +110,13 @@ describe('DI Middleware', () => {
 
       await middleware(mockReq as Request, mockRes as Response, mockNext);
 
-      expect(consoleSpy).toHaveBeenCalledWith('DI Middleware error:', expect.objectContaining({
-        _tag: 'ContainerScopeError',
-        message: 'Container creation failed',
-      }));
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'DI Middleware error:',
+        expect.objectContaining({
+          _tag: 'ContainerScopeError',
+          message: 'Container creation failed',
+        }),
+      );
       expect(mockNext).toHaveBeenCalledWith(expect.any(Error));
     });
 
@@ -131,10 +129,13 @@ describe('DI Middleware', () => {
 
       await middleware(mockReq as Request, mockRes as Response, mockNext);
 
-      expect(consoleSpy).toHaveBeenCalledWith('DI Middleware error:', expect.objectContaining({
-        _tag: 'ContainerScopeError',
-        message: 'Unknown container scope error',
-      }));
+      expect(consoleSpy).toHaveBeenCalledWith(
+        'DI Middleware error:',
+        expect.objectContaining({
+          _tag: 'ContainerScopeError',
+          message: 'Unknown container scope error',
+        }),
+      );
     });
   });
 
@@ -145,9 +146,7 @@ describe('DI Middleware', () => {
       await middleware(mockReq as Request, mockRes as Response, mockNext);
 
       // Get the finish handler
-      const finishHandler = (mockRes.on as jest.Mock).mock.calls.find(
-        call => call[0] === 'finish',
-      )?.[1];
+      const finishHandler = (mockRes.on as jest.Mock).mock.calls.find((call) => call[0] === 'finish')?.[1];
 
       expect(finishHandler).toBeDefined();
 
@@ -165,9 +164,7 @@ describe('DI Middleware', () => {
       await middleware(mockReq as Request, mockRes as Response, mockNext);
 
       // Get and call the finish handler
-      const finishHandler = (mockRes.on as jest.Mock).mock.calls.find(
-        call => call[0] === 'finish',
-      )?.[1];
+      const finishHandler = (mockRes.on as jest.Mock).mock.calls.find((call) => call[0] === 'finish')?.[1];
 
       // Should not throw
       await expect(finishHandler()).resolves.toBeUndefined();
@@ -232,7 +229,7 @@ describe('DI Middleware', () => {
         get: jest.fn((header) => {
           if (header === 'User-Agent') return 'Mozilla/5.0';
           return undefined;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
         }) as any,
         ip: '192.168.1.1',
         method: 'POST',

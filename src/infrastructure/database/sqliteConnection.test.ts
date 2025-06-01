@@ -95,18 +95,24 @@ describe('SQLiteConnection', () => {
 
       const result = await connection.query(insertSql, params)();
 
-      expect(result).toEqual(E.right([
-        expect.objectContaining({
-          lastID: expect.any(Number),
-          changes: 1,
-        }),
-      ]));
+      expect(result).toEqual(
+        E.right([
+          expect.objectContaining({
+            lastID: expect.any(Number),
+            changes: 1,
+          }),
+        ]),
+      );
     });
 
     it('should execute UPDATE queries and return metadata', async () => {
       // First insert a user
-      await connection.query('INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)',
-        ['test-id', 'test@example.com', 'Test User', 'user'])();
+      await connection.query('INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)', [
+        'test-id',
+        'test@example.com',
+        'Test User',
+        'user',
+      ])();
 
       // Then update the user
       const updateSql = 'UPDATE users SET name = ? WHERE id = ?';
@@ -114,17 +120,23 @@ describe('SQLiteConnection', () => {
 
       const result = await connection.query(updateSql, params)();
 
-      expect(result).toEqual(E.right([
-        expect.objectContaining({
-          changes: 1,
-        }),
-      ]));
+      expect(result).toEqual(
+        E.right([
+          expect.objectContaining({
+            changes: 1,
+          }),
+        ]),
+      );
     });
 
     it('should execute DELETE queries and return metadata', async () => {
       // First insert a user
-      await connection.query('INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)',
-        ['test-id', 'test@example.com', 'Test User', 'user'])();
+      await connection.query('INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)', [
+        'test-id',
+        'test@example.com',
+        'Test User',
+        'user',
+      ])();
 
       // Then delete the user
       const deleteSql = 'DELETE FROM users WHERE id = ?';
@@ -132,11 +144,13 @@ describe('SQLiteConnection', () => {
 
       const result = await connection.query(deleteSql, params)();
 
-      expect(result).toEqual(E.right([
-        expect.objectContaining({
-          changes: 1,
-        }),
-      ]));
+      expect(result).toEqual(
+        E.right([
+          expect.objectContaining({
+            changes: 1,
+          }),
+        ]),
+      );
     });
 
     it('should handle queries with RETURNING clause', async () => {
@@ -153,10 +167,12 @@ describe('SQLiteConnection', () => {
     it('should return DatabaseError for invalid SQL', async () => {
       const result = await connection.query('INVALID SQL STATEMENT')();
 
-      expect(result).toEqual(E.left({
-        _tag: 'DatabaseError',
-        message: 'Unknown database error',
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'DatabaseError',
+          message: 'Unknown database error',
+        }),
+      );
     });
 
     it('should return DatabaseError when not connected', async () => {
@@ -164,10 +180,12 @@ describe('SQLiteConnection', () => {
 
       const result = await disconnectedConnection.query('SELECT * FROM users')();
 
-      expect(result).toEqual(E.left({
-        _tag: 'DatabaseError',
-        message: 'Database not connected',
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'DatabaseError',
+          message: 'Database not connected',
+        }),
+      );
     });
 
     it('should handle queries with parameters', async () => {
@@ -180,24 +198,28 @@ describe('SQLiteConnection', () => {
       const selectSql = 'SELECT * FROM users WHERE email = ?';
       const selectResult = await connection.query(selectSql, ['param@example.com'])();
 
-      expect(selectResult).toEqual(E.right([
-        expect.objectContaining({
-          id: 'param-test-id',
-          email: 'param@example.com',
-          name: 'Param User',
-          role: 'admin',
-        }),
-      ]));
+      expect(selectResult).toEqual(
+        E.right([
+          expect.objectContaining({
+            id: 'param-test-id',
+            email: 'param@example.com',
+            name: 'Param User',
+            role: 'admin',
+          }),
+        ]),
+      );
     });
 
     it('should handle queries without parameters', async () => {
       const result = await connection.query('SELECT COUNT(*) as count FROM users')();
 
-      expect(result).toEqual(E.right([
-        expect.objectContaining({
-          count: expect.any(Number),
-        }),
-      ]));
+      expect(result).toEqual(
+        E.right([
+          expect.objectContaining({
+            count: expect.any(Number),
+          }),
+        ]),
+      );
     });
   });
 
@@ -209,27 +231,35 @@ describe('SQLiteConnection', () => {
 
     it('should execute successful transaction', async () => {
       const transactionFn = (conn: DatabaseConnection) => {
-        return conn.query('INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)',
-          ['tx-test-id', 'tx@example.com', 'Transaction User', 'user']);
+        return conn.query('INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)', [
+          'tx-test-id',
+          'tx@example.com',
+          'Transaction User',
+          'user',
+        ]);
       };
 
       const result = await connection.transaction(transactionFn)();
 
-      expect(result).toEqual(E.right([
-        expect.objectContaining({
-          lastID: expect.any(Number),
-          changes: 1,
-        }),
-      ]));
+      expect(result).toEqual(
+        E.right([
+          expect.objectContaining({
+            lastID: expect.any(Number),
+            changes: 1,
+          }),
+        ]),
+      );
 
       // Verify the user was inserted
       const selectResult = await connection.query('SELECT * FROM users WHERE id = ?', ['tx-test-id'])();
-      expect(selectResult).toEqual(E.right([
-        expect.objectContaining({
-          id: 'tx-test-id',
-          email: 'tx@example.com',
-        }),
-      ]));
+      expect(selectResult).toEqual(
+        E.right([
+          expect.objectContaining({
+            id: 'tx-test-id',
+            email: 'tx@example.com',
+          }),
+        ]),
+      );
     });
 
     it('should rollback transaction on query error', async () => {
@@ -239,62 +269,84 @@ describe('SQLiteConnection', () => {
 
       const result = await connection.transaction(transactionFn)();
 
-      expect(result).toEqual(E.left({
-        _tag: 'DatabaseError',
-        message: 'Unknown database error',
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'DatabaseError',
+          message: 'Unknown database error',
+        }),
+      );
     });
 
     it('should rollback transaction on domain error', async () => {
       const transactionFn = () => {
-        return TE.left<DomainError>({ _tag: 'DatabaseError', message: 'Simulated error' });
+        return TE.left<DomainError>({
+          _tag: 'DatabaseError',
+          message: 'Simulated error',
+        });
       };
 
       const result = await connection.transaction(transactionFn)();
 
-      expect(result).toEqual(E.left({
-        _tag: 'DatabaseError',
-        message: 'Simulated error',
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'DatabaseError',
+          message: 'Simulated error',
+        }),
+      );
     });
 
     it('should handle UserNotFound error in transaction', async () => {
       const transactionFn = () => {
-        return TE.left<DomainError>({ _tag: 'UserNotFound', userId: 'non-existent' });
+        return TE.left<DomainError>({
+          _tag: 'UserNotFound',
+          userId: 'non-existent',
+        });
       };
 
       const result = await connection.transaction(transactionFn)();
 
-      expect(result).toEqual(E.left({
-        _tag: 'UserNotFound',
-        userId: 'non-existent',
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'UserNotFound',
+          userId: 'non-existent',
+        }),
+      );
     });
 
     it('should handle InvalidEmail error in transaction', async () => {
       const transactionFn = () => {
-        return TE.left<DomainError>({ _tag: 'InvalidEmail', email: 'invalid-email' });
+        return TE.left<DomainError>({
+          _tag: 'InvalidEmail',
+          email: 'invalid-email',
+        });
       };
 
       const result = await connection.transaction(transactionFn)();
 
-      expect(result).toEqual(E.left({
-        _tag: 'InvalidEmail',
-        email: 'invalid-email',
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'InvalidEmail',
+          email: 'invalid-email',
+        }),
+      );
     });
 
     it('should handle Unauthorized error in transaction', async () => {
       const transactionFn = () => {
-        return TE.left<DomainError>({ _tag: 'Unauthorized', reason: 'Access denied' });
+        return TE.left<DomainError>({
+          _tag: 'Unauthorized',
+          reason: 'Access denied',
+        });
       };
 
       const result = await connection.transaction(transactionFn)();
 
-      expect(result).toEqual(E.left({
-        _tag: 'Unauthorized',
-        reason: 'Access denied',
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'Unauthorized',
+          reason: 'Access denied',
+        }),
+      );
     });
 
     it('should handle ValidationError in transaction', async () => {
@@ -310,26 +362,33 @@ describe('SQLiteConnection', () => {
 
       const result = await connection.transaction(transactionFn)();
 
-      expect(result).toEqual(E.left({
-        _tag: 'ValidationError',
-        errors: [
-          { field: 'email', message: 'Invalid format' },
-          { field: 'name', message: 'Too short' },
-        ],
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'ValidationError',
+          errors: [
+            { field: 'email', message: 'Invalid format' },
+            { field: 'name', message: 'Too short' },
+          ],
+        }),
+      );
     });
 
     it('should handle EmailServiceError in transaction', async () => {
       const transactionFn = () => {
-        return TE.left<DomainError>({ _tag: 'EmailServiceError', message: 'Email service down' });
+        return TE.left<DomainError>({
+          _tag: 'EmailServiceError',
+          message: 'Email service down',
+        });
       };
 
       const result = await connection.transaction(transactionFn)();
 
-      expect(result).toEqual(E.left({
-        _tag: 'EmailServiceError',
-        message: 'Email service down',
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'EmailServiceError',
+          message: 'Email service down',
+        }),
+      );
     });
 
     it('should return DatabaseError when not connected', async () => {
@@ -338,35 +397,45 @@ describe('SQLiteConnection', () => {
       const transactionFn = () => TE.right('test');
       const result = await disconnectedConnection.transaction(transactionFn)();
 
-      expect(result).toEqual(E.left({
-        _tag: 'DatabaseError',
-        message: 'Failed to rollback transaction',
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'DatabaseError',
+          message: 'Failed to rollback transaction',
+        }),
+      );
     });
 
     it('should handle operations in transaction', async () => {
       const transactionFn = (conn: DatabaseConnection) => {
-        return conn.query('INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)',
-          ['multi-1', 'multi1@example.com', 'Multi User 1', 'user']);
+        return conn.query('INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)', [
+          'multi-1',
+          'multi1@example.com',
+          'Multi User 1',
+          'user',
+        ]);
       };
 
       const result = await connection.transaction(transactionFn)();
 
-      expect(result).toEqual(E.right([
-        expect.objectContaining({
-          lastID: expect.any(Number),
-          changes: 1,
-        }),
-      ]));
+      expect(result).toEqual(
+        E.right([
+          expect.objectContaining({
+            lastID: expect.any(Number),
+            changes: 1,
+          }),
+        ]),
+      );
 
       // Verify the user was inserted
       const selectResult = await connection.query('SELECT * FROM users WHERE id = ?', ['multi-1'])();
-      expect(selectResult).toEqual(E.right([
-        expect.objectContaining({
-          id: 'multi-1',
-          email: 'multi1@example.com',
-        }),
-      ]));
+      expect(selectResult).toEqual(
+        E.right([
+          expect.objectContaining({
+            id: 'multi-1',
+            email: 'multi1@example.com',
+          }),
+        ]),
+      );
     });
 
     it('should rollback operations on error', async () => {
@@ -511,27 +580,35 @@ describe('SQLiteConnectionPool', () => {
 
       const connection = pool.getConnection();
       const transactionFn = (conn: DatabaseConnection) => {
-        return conn.query('INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)',
-          ['pool-test-id', 'pool@example.com', 'Pool User', 'user']);
+        return conn.query('INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)', [
+          'pool-test-id',
+          'pool@example.com',
+          'Pool User',
+          'user',
+        ]);
       };
 
       const result = await connection.transaction(transactionFn)();
 
-      expect(result).toEqual(E.right([
-        expect.objectContaining({
-          lastID: expect.any(Number),
-          changes: 1,
-        }),
-      ]));
+      expect(result).toEqual(
+        E.right([
+          expect.objectContaining({
+            lastID: expect.any(Number),
+            changes: 1,
+          }),
+        ]),
+      );
 
       // Verify the user was inserted
       const selectResult = await connection.query('SELECT * FROM users WHERE id = ?', ['pool-test-id'])();
-      expect(selectResult).toEqual(E.right([
-        expect.objectContaining({
-          id: 'pool-test-id',
-          email: 'pool@example.com',
-        }),
-      ]));
+      expect(selectResult).toEqual(
+        E.right([
+          expect.objectContaining({
+            id: 'pool-test-id',
+            email: 'pool@example.com',
+          }),
+        ]),
+      );
     });
 
     it('should persist data across multiple operations', async () => {
@@ -540,32 +617,42 @@ describe('SQLiteConnectionPool', () => {
       const connection = pool.getConnection();
 
       // Insert a user
-      const insertResult = await connection.query('INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)',
-        ['persist-test', 'persist@example.com', 'Persist User', 'user'])();
+      const insertResult = await connection.query('INSERT INTO users (id, email, name, role) VALUES (?, ?, ?, ?)', [
+        'persist-test',
+        'persist@example.com',
+        'Persist User',
+        'user',
+      ])();
       expect(E.isRight(insertResult)).toBe(true);
 
       // Query the user
       const selectResult = await connection.query('SELECT * FROM users WHERE id = ?', ['persist-test'])();
-      expect(selectResult).toEqual(E.right([
-        expect.objectContaining({
-          id: 'persist-test',
-          email: 'persist@example.com',
-        }),
-      ]));
+      expect(selectResult).toEqual(
+        E.right([
+          expect.objectContaining({
+            id: 'persist-test',
+            email: 'persist@example.com',
+          }),
+        ]),
+      );
 
       // Update the user
-      const updateResult = await connection.query('UPDATE users SET name = ? WHERE id = ?',
-        ['Updated Persist User', 'persist-test'])();
+      const updateResult = await connection.query('UPDATE users SET name = ? WHERE id = ?', [
+        'Updated Persist User',
+        'persist-test',
+      ])();
       expect(E.isRight(updateResult)).toBe(true);
 
       // Verify the update
       const verifyResult = await connection.query('SELECT * FROM users WHERE id = ?', ['persist-test'])();
-      expect(verifyResult).toEqual(E.right([
-        expect.objectContaining({
-          id: 'persist-test',
-          name: 'Updated Persist User',
-        }),
-      ]));
+      expect(verifyResult).toEqual(
+        E.right([
+          expect.objectContaining({
+            id: 'persist-test',
+            name: 'Updated Persist User',
+          }),
+        ]),
+      );
     });
   });
 });

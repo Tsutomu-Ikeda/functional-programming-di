@@ -13,12 +13,14 @@ describe('userFactory', () => {
 
       const result = createUserEntity(input);
 
-      expect(result).toEqual(E.right({
-        email: input.email,
-        name: input.name,
-        role: 'user',
-        id: expect.any(String),
-      }));
+      expect(result).toEqual(
+        E.right({
+          email: input.email,
+          name: input.name,
+          role: 'user',
+          id: expect.any(String),
+        }),
+      );
     });
 
     it('should generate unique ids for different users', () => {
@@ -54,12 +56,14 @@ describe('userFactory', () => {
 
       const result = createUserEntity(input);
 
-      expect(result).toEqual(E.right({
-        email: expect.any(String),
-        name: expect.any(String),
-        role: 'user',
-        id: expect.any(String),
-      }));
+      expect(result).toEqual(
+        E.right({
+          email: expect.any(String),
+          name: expect.any(String),
+          role: 'user',
+          id: expect.any(String),
+        }),
+      );
     });
   });
 });

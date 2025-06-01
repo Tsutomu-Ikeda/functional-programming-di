@@ -98,34 +98,43 @@ describe('TRPC Router', () => {
       const caller = appRouter.createCaller(context);
 
       // Test invalid email
-      await expect(caller.user.create({
-        email: 'invalid-email',
-        name: 'Test User',
-        password: 'password123',
-      })).rejects.toThrow();
+      await expect(
+        caller.user.create({
+          email: 'invalid-email',
+          name: 'Test User',
+          password: 'password123',
+        }),
+      ).rejects.toThrow();
 
       // Test short name
-      await expect(caller.user.create({
-        email: 'test@example.com',
-        name: 'T',
-        password: 'password123',
-      })).rejects.toThrow();
+      await expect(
+        caller.user.create({
+          email: 'test@example.com',
+          name: 'T',
+          password: 'password123',
+        }),
+      ).rejects.toThrow();
 
       // Test short password
-      await expect(caller.user.create({
-        email: 'test@example.com',
-        name: 'Test User',
-        password: '123',
-      })).rejects.toThrow();
+      await expect(
+        caller.user.create({
+          email: 'test@example.com',
+          name: 'Test User',
+          password: '123',
+        }),
+      ).rejects.toThrow();
     });
 
     it('should handle validation errors from use case', async () => {
-      mockCreateUser.mockReturnValue(() => () => Promise.resolve(E.left({
-        _tag: 'ValidationError',
-        errors: [
-          { field: 'email', message: 'Email already exists' },
-        ],
-      })));
+      mockCreateUser.mockReturnValue(
+        () => () =>
+          Promise.resolve(
+            E.left({
+              _tag: 'ValidationError',
+              errors: [{ field: 'email', message: 'Email already exists' }],
+            }),
+          ),
+      );
 
       const caller = appRouter.createCaller(context);
 
@@ -152,9 +161,7 @@ describe('TRPC Router', () => {
     };
 
     it('should get user by ID successfully', async () => {
-      mockUserRepository.findById.mockReturnValue(
-        () => Promise.resolve(E.right(testUser)),
-      );
+      mockUserRepository.findById.mockReturnValue(() => Promise.resolve(E.right(testUser)));
 
       const caller = appRouter.createCaller(context);
       const result = await caller.user.getById({ id: 'user-123' });
@@ -177,11 +184,13 @@ describe('TRPC Router', () => {
     });
 
     it('should handle user not found', async () => {
-      mockUserRepository.findById.mockReturnValue(
-        () => Promise.resolve(E.left({
-          _tag: 'UserNotFound',
-          userId: 'user-123',
-        })),
+      mockUserRepository.findById.mockReturnValue(() =>
+        Promise.resolve(
+          E.left({
+            _tag: 'UserNotFound',
+            userId: 'user-123',
+          }),
+        ),
       );
 
       const caller = appRouter.createCaller(context);
@@ -205,10 +214,15 @@ describe('TRPC Router', () => {
 
   describe('Error mapping', () => {
     it('should map ValidationError to BAD_REQUEST', async () => {
-      mockCreateUser.mockReturnValue(() => () => Promise.resolve(E.left({
-        _tag: 'ValidationError',
-        errors: [{ field: 'email', message: 'Invalid email' }],
-      })));
+      mockCreateUser.mockReturnValue(
+        () => () =>
+          Promise.resolve(
+            E.left({
+              _tag: 'ValidationError',
+              errors: [{ field: 'email', message: 'Invalid email' }],
+            }),
+          ),
+      );
 
       const caller = appRouter.createCaller(context);
 
@@ -227,11 +241,13 @@ describe('TRPC Router', () => {
     });
 
     it('should map UserNotFound to NOT_FOUND', async () => {
-      mockUserRepository.findById.mockReturnValue(
-        () => Promise.resolve(E.left({
-          _tag: 'UserNotFound',
-          userId: 'user-123',
-        })),
+      mockUserRepository.findById.mockReturnValue(() =>
+        Promise.resolve(
+          E.left({
+            _tag: 'UserNotFound',
+            userId: 'user-123',
+          }),
+        ),
       );
 
       const caller = appRouter.createCaller(context);
@@ -247,11 +263,13 @@ describe('TRPC Router', () => {
     });
 
     it('should map DatabaseError to INTERNAL_SERVER_ERROR', async () => {
-      mockUserRepository.findById.mockReturnValue(
-        () => Promise.resolve(E.left({
-          _tag: 'DatabaseError',
-          message: 'Connection failed',
-        })),
+      mockUserRepository.findById.mockReturnValue(() =>
+        Promise.resolve(
+          E.left({
+            _tag: 'DatabaseError',
+            message: 'Connection failed',
+          }),
+        ),
       );
 
       const caller = appRouter.createCaller(context);

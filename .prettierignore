@@ -1,0 +1,22 @@
+# Dependencies
+node_modules/
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Build outputs
+dist/
+build/
+coverage/
+
+# Environment files
+.env*
+
+# Config files that should maintain their format
+*.config.js
+*.config.mjs
+jest.config.cjs
+
+# Generated files
+*.min.js
+*.min.css

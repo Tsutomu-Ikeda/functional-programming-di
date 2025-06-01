@@ -21,17 +21,13 @@ export function combineValidations<T>(
 export function required(field: string): (value: string) => E.Either<ValidationError[], string> {
   return (value: string) => {
     const isEmpty = !value || value.trim() === '';
-    return isEmpty
-      ? E.left([{ field, message: `${field} is required` }])
-      : E.right(value);
+    return isEmpty ? E.left([{ field, message: `${field} is required` }]) : E.right(value);
   };
 }
 
 export function minLength(field: string, min: number): (value: string) => E.Either<ValidationError[], string> {
   return (value: string) => {
     const isTooShort = value.length < min;
-    return isTooShort
-      ? E.left([{ field, message: `${field} must be at least ${min} characters` }])
-      : E.right(value);
+    return isTooShort ? E.left([{ field, message: `${field} must be at least ${min} characters` }]) : E.right(value);
   };
 }

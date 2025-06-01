@@ -23,21 +23,36 @@ describe('registry', () => {
 
       await registerServices(container, config);
 
-      expect(registerSpy).toHaveBeenCalledWith('databasePool', expect.objectContaining({
-        lifecycle: 'singleton',
-      }));
-      expect(registerSpy).toHaveBeenCalledWith('userRepository', expect.objectContaining({
-        lifecycle: 'scoped',
-      }));
-      expect(registerSpy).toHaveBeenCalledWith('emailService', expect.objectContaining({
-        lifecycle: 'singleton',
-      }));
-      expect(registerSpy).toHaveBeenCalledWith('appLogger', expect.objectContaining({
-        lifecycle: 'singleton',
-      }));
-      expect(registerSpy).toHaveBeenCalledWith('requestLogger', expect.objectContaining({
-        lifecycle: 'scoped',
-      }));
+      expect(registerSpy).toHaveBeenCalledWith(
+        'databasePool',
+        expect.objectContaining({
+          lifecycle: 'singleton',
+        }),
+      );
+      expect(registerSpy).toHaveBeenCalledWith(
+        'userRepository',
+        expect.objectContaining({
+          lifecycle: 'scoped',
+        }),
+      );
+      expect(registerSpy).toHaveBeenCalledWith(
+        'emailService',
+        expect.objectContaining({
+          lifecycle: 'singleton',
+        }),
+      );
+      expect(registerSpy).toHaveBeenCalledWith(
+        'appLogger',
+        expect.objectContaining({
+          lifecycle: 'singleton',
+        }),
+      );
+      expect(registerSpy).toHaveBeenCalledWith(
+        'requestLogger',
+        expect.objectContaining({
+          lifecycle: 'scoped',
+        }),
+      );
     });
 
     it('should register database pool as singleton', async () => {
@@ -45,7 +60,7 @@ describe('registry', () => {
 
       await registerServices(container, config);
 
-      const databasePoolCall = registerSpy.mock.calls.find(call => call[0] === 'databasePool');
+      const databasePoolCall = registerSpy.mock.calls.find((call) => call[0] === 'databasePool');
       expect(databasePoolCall).toBeDefined();
       expect(databasePoolCall![1].lifecycle).toBe('singleton');
     });
@@ -55,7 +70,7 @@ describe('registry', () => {
 
       await registerServices(container, config);
 
-      const userRepositoryCall = registerSpy.mock.calls.find(call => call[0] === 'userRepository');
+      const userRepositoryCall = registerSpy.mock.calls.find((call) => call[0] === 'userRepository');
       expect(userRepositoryCall).toBeDefined();
       expect(userRepositoryCall![1].lifecycle).toBe('scoped');
     });
@@ -65,7 +80,7 @@ describe('registry', () => {
 
       await registerServices(container, config);
 
-      const emailServiceCall = registerSpy.mock.calls.find(call => call[0] === 'emailService');
+      const emailServiceCall = registerSpy.mock.calls.find((call) => call[0] === 'emailService');
       expect(emailServiceCall).toBeDefined();
       expect(emailServiceCall![1].lifecycle).toBe('singleton');
     });
@@ -75,7 +90,7 @@ describe('registry', () => {
 
       await registerServices(container, config);
 
-      const appLoggerCall = registerSpy.mock.calls.find(call => call[0] === 'appLogger');
+      const appLoggerCall = registerSpy.mock.calls.find((call) => call[0] === 'appLogger');
       expect(appLoggerCall).toBeDefined();
       expect(appLoggerCall![1].lifecycle).toBe('singleton');
     });
@@ -85,12 +100,14 @@ describe('registry', () => {
 
       await registerServices(container, config);
 
-      const requestLoggerCall = registerSpy.mock.calls.find(call => call[0] === 'requestLogger');
+      const requestLoggerCall = registerSpy.mock.calls.find((call) => call[0] === 'requestLogger');
       expect(requestLoggerCall).toBeDefined();
       expect(requestLoggerCall![1].lifecycle).toBe('scoped');
 
       // Test that the factory throws an error as expected
-      await expect(requestLoggerCall![1].factory()).rejects.toThrow('Request logger should be created in scoped container');
+      await expect(requestLoggerCall![1].factory()).rejects.toThrow(
+        'Request logger should be created in scoped container',
+      );
     });
   });
 

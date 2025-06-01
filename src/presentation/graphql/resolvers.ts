@@ -79,10 +79,7 @@ export const resolvers = {
         };
 
         // Execute use case
-        const result = await pipe(
-          createUser(args.input),
-          (useCase) => useCase(deps),
-        )();
+        const result = await pipe(createUser(args.input), (useCase) => useCase(deps))();
 
         if (result._tag === 'Right') {
           return {
@@ -101,7 +98,7 @@ export const resolvers = {
               return {
                 success: false,
                 data: null,
-                error: `Validation failed: ${error.errors.map(e => e.message).join(', ')}`,
+                error: `Validation failed: ${error.errors.map((e) => e.message).join(', ')}`,
               };
             case 'UserNotFound':
               return {

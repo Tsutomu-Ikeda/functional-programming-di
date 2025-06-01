@@ -51,20 +51,20 @@ describe('createUser usecase', () => {
         role: 'user',
       };
 
-      mockUserRepository.findByEmail.mockReturnValue(
-        TE.left({ _tag: 'UserNotFound', userId: input.email }),
-      );
+      mockUserRepository.findByEmail.mockReturnValue(TE.left({ _tag: 'UserNotFound', userId: input.email }));
       mockUserRepository.save.mockReturnValue(TE.right(expectedUser));
       mockEmailService.sendWelcomeEmail.mockReturnValue(TE.right(undefined));
 
       const result = await createUser(input)(deps)();
 
-      expect(result).toEqual(E.right({
-        email: input.email,
-        name: input.name,
-        role: 'user',
-        id: expect.any(String),
-      }));
+      expect(result).toEqual(
+        E.right({
+          email: input.email,
+          name: input.name,
+          role: 'user',
+          id: expect.any(String),
+        }),
+      );
 
       expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(input.email);
       expect(mockUserRepository.save).toHaveBeenCalledWith(
@@ -95,9 +95,7 @@ describe('createUser usecase', () => {
         role: 'user',
       };
 
-      mockUserRepository.findByEmail.mockReturnValue(
-        TE.left({ _tag: 'UserNotFound', userId: input.email }),
-      );
+      mockUserRepository.findByEmail.mockReturnValue(TE.left({ _tag: 'UserNotFound', userId: input.email }));
       mockUserRepository.save.mockReturnValue(TE.right(expectedUser));
       mockEmailService.sendWelcomeEmail.mockReturnValue(
         TE.left({ _tag: 'Unauthorized', reason: 'Email service unavailable' }),
@@ -125,10 +123,12 @@ describe('createUser usecase', () => {
 
       const result = await createUser(input)(deps)();
 
-      expect(result).toEqual(E.left({
-        _tag: 'ValidationError',
-        errors: [{ field: 'email', message: 'Invalid email format' }],
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'ValidationError',
+          errors: [{ field: 'email', message: 'Invalid email format' }],
+        }),
+      );
 
       expect(mockUserRepository.findByEmail).not.toHaveBeenCalled();
       expect(mockUserRepository.save).not.toHaveBeenCalled();
@@ -144,10 +144,12 @@ describe('createUser usecase', () => {
 
       const result = await createUser(input)(deps)();
 
-      expect(result).toEqual(E.left({
-        _tag: 'ValidationError',
-        errors: [{ field: 'name', message: 'Name must be at least 2 characters' }],
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'ValidationError',
+          errors: [{ field: 'name', message: 'Name must be at least 2 characters' }],
+        }),
+      );
     });
 
     it('should return validation error for short password', async () => {
@@ -159,10 +161,17 @@ describe('createUser usecase', () => {
 
       const result = await createUser(input)(deps)();
 
-      expect(result).toEqual(E.left({
-        _tag: 'ValidationError',
-        errors: [{ field: 'password', message: 'Password must be at least 6 characters' }],
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'ValidationError',
+          errors: [
+            {
+              field: 'password',
+              message: 'Password must be at least 6 characters',
+            },
+          ],
+        }),
+      );
     });
 
     it('should accumulate multiple validation errors', async () => {
@@ -174,14 +183,19 @@ describe('createUser usecase', () => {
 
       const result = await createUser(input)(deps)();
 
-      expect(result).toEqual(E.left({
-        _tag: 'ValidationError',
-        errors: [
-          { field: 'email', message: 'Invalid email format' },
-          { field: 'name', message: 'Name must be at least 2 characters' },
-          { field: 'password', message: 'Password must be at least 6 characters' },
-        ],
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'ValidationError',
+          errors: [
+            { field: 'email', message: 'Invalid email format' },
+            { field: 'name', message: 'Name must be at least 2 characters' },
+            {
+              field: 'password',
+              message: 'Password must be at least 6 characters',
+            },
+          ],
+        }),
+      );
     });
   });
 
@@ -204,10 +218,12 @@ describe('createUser usecase', () => {
 
       const result = await createUser(input)(deps)();
 
-      expect(result).toEqual(E.left({
-        _tag: 'ValidationError',
-        errors: [{ field: 'email', message: 'Email already exists' }],
-      }));
+      expect(result).toEqual(
+        E.left({
+          _tag: 'ValidationError',
+          errors: [{ field: 'email', message: 'Email already exists' }],
+        }),
+      );
 
       expect(mockUserRepository.findByEmail).toHaveBeenCalledWith(input.email);
       expect(mockUserRepository.save).not.toHaveBeenCalled();
@@ -250,9 +266,7 @@ describe('createUser usecase', () => {
         reason: 'Save operation failed',
       };
 
-      mockUserRepository.findByEmail.mockReturnValue(
-        TE.left({ _tag: 'UserNotFound', userId: input.email }),
-      );
+      mockUserRepository.findByEmail.mockReturnValue(TE.left({ _tag: 'UserNotFound', userId: input.email }));
       mockUserRepository.save.mockReturnValue(TE.left(saveError));
 
       const result = await createUser(input)(deps)();
@@ -278,9 +292,7 @@ describe('createUser usecase', () => {
         role: 'user',
       };
 
-      mockUserRepository.findByEmail.mockReturnValue(
-        TE.left({ _tag: 'UserNotFound', userId: input.email }),
-      );
+      mockUserRepository.findByEmail.mockReturnValue(TE.left({ _tag: 'UserNotFound', userId: input.email }));
       mockUserRepository.save.mockReturnValue(TE.right(expectedUser));
       mockEmailService.sendWelcomeEmail.mockReturnValue(TE.right(undefined));
 
@@ -311,9 +323,7 @@ describe('createUser usecase', () => {
         reason: 'Email service down',
       };
 
-      mockUserRepository.findByEmail.mockReturnValue(
-        TE.left({ _tag: 'UserNotFound', userId: input.email }),
-      );
+      mockUserRepository.findByEmail.mockReturnValue(TE.left({ _tag: 'UserNotFound', userId: input.email }));
       mockUserRepository.save.mockReturnValue(TE.right(expectedUser));
       mockEmailService.sendWelcomeEmail.mockReturnValue(TE.left(emailError));
 

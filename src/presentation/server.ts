@@ -24,7 +24,11 @@ interface ServerState {
 type ServerError =
   | { readonly _tag: 'ContainerInitializationError'; readonly message: string }
   | { readonly _tag: 'MiddlewareSetupError'; readonly message: string }
-  | { readonly _tag: 'ServerStartError'; readonly message: string; readonly port: number };
+  | {
+      readonly _tag: 'ServerStartError';
+      readonly message: string;
+      readonly port: number;
+    };
 
 // Pure function to create Express app with basic middleware
 const createExpressApp = (): IO.IO<express.Application> => () => {
@@ -68,64 +72,72 @@ const initializeContainer = (): TE.TaskEither<ServerError, DIContainer> =>
   );
 
 // Setup health check endpoint
-const setupHealthEndpoint = (app: express.Application): IO.IO<void> => () => {
-  app.get('/health', (req, res) => {
-    res.json({
-      status: 'healthy',
-      timestamp: new Date().toISOString(),
-      services: {
-        rest: 'available at /api',
-        endpoints: {
-          'POST /api/users': 'Create a new user',
-          'GET /api/users/:id': 'Get user by ID',
+const setupHealthEndpoint =
+  (app: express.Application): IO.IO<void> =>
+  () => {
+    app.get('/health', (req, res) => {
+      res.json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        services: {
+          rest: 'available at /api',
+          endpoints: {
+            'POST /api/users': 'Create a new user',
+            'GET /api/users/:id': 'Get user by ID',
+          },
         },
-      },
+      });
     });
-  });
-};
+  };
 
 // Setup API documentation endpoint
-const setupApiDocsEndpoint = (app: express.Application): IO.IO<void> => () => {
-  app.get('/api', (req, res) => {
-    res.json({
-      name: 'Clean Architecture API',
-      version: '1.0.0',
-      description: 'API built with Clean Architecture principles and DI',
-      endpoints: {
-        'POST /api/users': {
-          description: 'Create a new user',
-          body: {
-            email: 'string (required)',
-            name: 'string (required)',
-            password: 'string (required, min 6 chars)',
+const setupApiDocsEndpoint =
+  (app: express.Application): IO.IO<void> =>
+  () => {
+    app.get('/api', (req, res) => {
+      res.json({
+        name: 'Clean Architecture API',
+        version: '1.0.0',
+        description: 'API built with Clean Architecture principles and DI',
+        endpoints: {
+          'POST /api/users': {
+            description: 'Create a new user',
+            body: {
+              email: 'string (required)',
+              name: 'string (required)',
+              password: 'string (required, min 6 chars)',
+            },
+          },
+          'GET /api/users/:id': {
+            description: 'Get user by ID',
+            params: {
+              id: 'string (required)',
+            },
           },
         },
-        'GET /api/users/:id': {
-          description: 'Get user by ID',
-          params: {
-            id: 'string (required)',
-          },
-        },
-      },
+      });
     });
-  });
-};
+  };
 
 // Setup error handling middleware
-const setupErrorHandling = (app: express.Application): IO.IO<void> => () => {
-  app.use((error: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
-
-    console.error('Unhandled error:', error);
-    res.status(500).json({
-      success: false,
-      error: 'Internal server error',
-      requestId: (req as express.Request & { context?: { requestId?: string } }).context?.requestId,
+const setupErrorHandling =
+  (app: express.Application): IO.IO<void> =>
+  () => {
+    app.use((error: Error, req: express.Request, res: express.Response, _next: express.NextFunction) => {
+      console.error('Unhandled error:', error);
+      res.status(500).json({
+        success: false,
+        error: 'Internal server error',
+        requestId: (req as express.Request & { context?: { requestId?: string } }).context?.requestId,
+      });
     });
-  });
-};
+  };
 
 // Setup all middleware and routes
-const setupMiddlewareAndRoutes = (app: express.Application, container: DIContainer): TE.TaskEither<ServerError, express.Application> =>
+const setupMiddlewareAndRoutes = (
+  app: express.Application,
+  container: DIContainer,
+): TE.TaskEither<ServerError, express.Application> =>
   pipe(
     TE.tryCatch(
       async () => {
@@ -155,10 +167,10 @@ const setupMiddlewareAndRoutes = (app: express.Application, container: DIContain
 const initializeServerState = (config: ServerConfig): TE.TaskEither<ServerError, ServerState> =>
   pipe(
     initializeContainer(),
-    TE.flatMap(container =>
+    TE.flatMap((container) =>
       pipe(
         setupMiddlewareAndRoutes(createExpressApp()(), container),
-        TE.map(app => ({
+        TE.map((app) => ({
           app,
           container,
           config,
@@ -171,23 +183,23 @@ const initializeServerState = (config: ServerConfig): TE.TaskEither<ServerError,
 const startServer = (state: ServerState): TE.TaskEither<ServerError, ServerState> =>
   pipe(
     TE.tryCatch(
-      () => new Promise<ServerState>((resolve, reject) => {
-        try {
-          state.app.listen(state.config.port, () => {
+      () =>
+        new Promise<ServerState>((resolve, reject) => {
+          try {
+            state.app.listen(state.config.port, () => {
+              console.log(`🚀 Server running on port ${state.config.port}`);
 
-            console.log(`🚀 Server running on port ${state.config.port}`);
+              console.log(`📡 REST API: http://localhost:${state.config.port}/api`);
 
-            console.log(`📡 REST API: http://localhost:${state.config.port}/api`);
+              console.log(`❤️ Health: http://localhost:${state.config.port}/health`);
 
-            console.log(`❤️ Health: http://localhost:${state.config.port}/health`);
-
-            console.log(`📚 API Docs: http://localhost:${state.config.port}/api`);
-            resolve(state);
-          });
-        } catch (error) {
-          reject(error);
-        }
-      }),
+              console.log(`📚 API Docs: http://localhost:${state.config.port}/api`);
+              resolve(state);
+            });
+          } catch (error) {
+            reject(error);
+          }
+        }),
       (error) => ({
         _tag: 'ServerStartError',
         message: error instanceof Error ? error.message : 'Unknown server start error',
@@ -222,7 +234,7 @@ export class ApplicationServer {
     const result = await pipe(
       initializeServerState(config),
       TE.flatMap(startServer),
-      TE.map(state => {
+      TE.map((state) => {
         this.state = state;
       }),
     )();
@@ -252,11 +264,12 @@ export const createServer = (): IO.IO<ApplicationServer> => () => new Applicatio
 export const createAndStartServer = (port: number = 3000): TE.TaskEither<ServerError, ApplicationServer> =>
   pipe(
     TE.of(createServer()()),
-    TE.tap(server =>
+    TE.tap((server) =>
       TE.tryCatch(
-        () => server.start(port).then(result =>
-          E.isLeft(result) ? Promise.reject(result.left) : Promise.resolve(undefined),
-        ),
+        () =>
+          server
+            .start(port)
+            .then((result) => (E.isLeft(result) ? Promise.reject(result.left) : Promise.resolve(undefined))),
         (error) => error as ServerError,
       ),
     ),
