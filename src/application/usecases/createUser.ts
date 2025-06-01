@@ -14,7 +14,7 @@ export type CreateUserDeps = {
   logger: Logger
 }
 
-const effects = createEffect<CreateUserDeps>();
+const effects = createEffect<CreateUserDeps, DomainError>();
 
 export const createUser = (input: CreateUserInput) =>
   pipe(
@@ -27,8 +27,8 @@ export const createUser = (input: CreateUserInput) =>
     RTE.tap(sendWelcomeEmail),
   );
 
-const checkEmailNotExists = effects.async<CreateUserInput, DomainError>(
-  ({ userRepository }, validInput,) =>
+const checkEmailNotExists = effects.async<CreateUserInput>(
+  ({ userRepository }, validInput) =>
     pipe(
       userRepository.findByEmail(validInput.email),
       TE.flatMap(() => TE.left<DomainError>({
@@ -39,10 +39,10 @@ const checkEmailNotExists = effects.async<CreateUserInput, DomainError>(
         error._tag === 'UserNotFound'
           ? TE.right(undefined)
           : TE.left(error)),
-    )
+    ),
 );
 
-const createAndSaveUser = effects.asyncTransform<CreateUserInput, User, DomainError>(
+const createAndSaveUser = effects.asyncTransform<CreateUserInput, User>(
   ({ userRepository, logger }, validInput) =>
     pipe(
       TE.fromEither(createUserEntity(validInput)),
@@ -51,7 +51,7 @@ const createAndSaveUser = effects.asyncTransform<CreateUserInput, User, DomainEr
     ),
 );
 
-const sendWelcomeEmail = effects.async<User, DomainError>(
+const sendWelcomeEmail = effects.async<User>(
   ({ emailService, logger }, user) =>
     pipe(
       emailService.sendWelcomeEmail(user),

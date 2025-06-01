@@ -6,30 +6,30 @@ import { pipe } from 'fp-ts/lib/function';
 /**
  * Interface for effect combinators
  */
-export interface EffectCombinators<R> {
+export interface EffectCombinators<R, Err> {
   /**
    * Create a synchronous effect using IO
    */
   sync: <T>(effectFn: (env: R, context: T) => IO.IO<void>) =>
-    (context: T) => RTE.ReaderTaskEither<R, never, T>;
+    (context: T) => RTE.ReaderTaskEither<R, Err, T>;
 
   /**
    * Create an asynchronous effect using TaskEither
    */
-  async: <T, E>(effectFn: (env: R, context: T) => TE.TaskEither<E, void>) =>
-    (context: T) => RTE.ReaderTaskEither<R, E, T>;
+  async: <T>(effectFn: (env: R, context: T) => TE.TaskEither<Err, void>) =>
+    (context: T) => RTE.ReaderTaskEither<R, Err, T>;
 
   /**
    * Create a synchronous transformation using IO
    */
   syncTransform: <TIn, TOut>(transformFn: (env: R, input: TIn) => IO.IO<TOut>) =>
-    (input: TIn) => RTE.ReaderTaskEither<R, never, TOut>;
+    (input: TIn) => RTE.ReaderTaskEither<R, Err, TOut>;
 
   /**
    * Create an asynchronous transformation using TaskEither
    */
-  asyncTransform: <TIn, TOut, E>(transformFn: (env: R, input: TIn) => TE.TaskEither<E, TOut>) =>
-    (input: TIn) => RTE.ReaderTaskEither<R, E, TOut>;
+  asyncTransform: <TIn, TOut>(transformFn: (env: R, input: TIn) => TE.TaskEither<Err, TOut>) =>
+    (input: TIn) => RTE.ReaderTaskEither<R, Err, TOut>;
 }
 
 /**
@@ -66,24 +66,24 @@ export const withAsyncEffect = <R, T, E>(
       ),
     );
 
-export const createEffect = <R>(): EffectCombinators<R> => ({
+export const createEffect = <R, Err>(): EffectCombinators<R, Err> => ({
   /**
    * Create a synchronous effect using IO
    */
   sync: <T>(effectFn: (env: R, context: T) => IO.IO<void>) =>
-    withEffect<R, T, never>(effectFn),
+    withEffect<R, T, Err>(effectFn),
 
   /**
    * Create an asynchronous effect using TaskEither
    */
-  async: <T, E>(effectFn: (env: R, context: T) => TE.TaskEither<E, void>) =>
-    withAsyncEffect<R, T, E>(effectFn),
+  async: <T>(effectFn: (env: R, context: T) => TE.TaskEither<Err, void>) =>
+    withAsyncEffect<R, T, Err>(effectFn),
 
   /**
    * Create a synchronous transformation using IO
    */
   syncTransform: <TIn, TOut>(transformFn: (env: R, input: TIn) => IO.IO<TOut>) =>
-    (input: TIn): RTE.ReaderTaskEither<R, never, TOut> =>
+    (input: TIn): RTE.ReaderTaskEither<R, Err, TOut> =>
       pipe(
         RTE.ask<R>(),
         RTE.flatMapTaskEither((env) =>
@@ -94,8 +94,8 @@ export const createEffect = <R>(): EffectCombinators<R> => ({
   /**
    * Create an asynchronous transformation using TaskEither
    */
-  asyncTransform: <TIn, TOut, E>(transformFn: (env: R, input: TIn) => TE.TaskEither<E, TOut>) =>
-    (input: TIn): RTE.ReaderTaskEither<R, E, TOut> =>
+  asyncTransform: <TIn, TOut>(transformFn: (env: R, input: TIn) => TE.TaskEither<Err, TOut>) =>
+    (input: TIn): RTE.ReaderTaskEither<R, Err, TOut> =>
       pipe(
         RTE.ask<R>(),
         RTE.flatMapTaskEither((env) => transformFn(env, input)),
