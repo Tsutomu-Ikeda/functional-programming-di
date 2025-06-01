@@ -1,19 +1,19 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { NextFunction, Request, Response } from 'express';
 import { Router } from 'express';
-import * as TE from 'fp-ts/lib/TaskEither';
 import * as E from 'fp-ts/lib/Either';
 import * as IO from 'fp-ts/lib/IO';
 import * as O from 'fp-ts/lib/Option';
 import * as R from 'fp-ts/lib/Record';
+import * as TE from 'fp-ts/lib/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
+import type { EmailService, UserRepository } from '../../../application/ports';
 import type { CreateUserDeps } from '../../../application/usecases/createUser';
 import { createUser } from '../../../application/usecases/createUser';
-import type { ScopedContainer, RequestContext } from '../../../infrastructure/di/types';
-import type { UserRepository, EmailService } from '../../../application/ports';
-import { RequestScopedLogger } from '../../../infrastructure/logging/logger';
-import type { CreateUserInput } from '../../../domain/userValidation';
 import type { DomainError } from '../../../domain/errors';
 import type { User } from '../../../domain/user';
+import type { CreateUserInput } from '../../../domain/userValidation';
+import type { RequestContext, ScopedContainer } from '../../../infrastructure/di/types';
+import { RequestScopedLogger } from '../../../infrastructure/logging/logger';
 
 export interface AuthenticatedRequest extends Request {
   container: ScopedContainer;

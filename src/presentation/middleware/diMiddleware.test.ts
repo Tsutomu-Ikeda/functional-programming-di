@@ -1,7 +1,7 @@
-import type { Request, Response, NextFunction } from 'express';
+import type { NextFunction, Request, Response } from 'express';
+import type { DIContainer, ScopedContainer } from '../../infrastructure/di/types';
 import type { AuthenticatedRequest } from './diMiddleware';
 import { createDIMiddleware, createDIMiddlewareFP, createMiddlewareConfig } from './diMiddleware';
-import type { DIContainer, ScopedContainer } from '../../infrastructure/di/types';
 
 // Mock uuid
 jest.mock('uuid', () => ({

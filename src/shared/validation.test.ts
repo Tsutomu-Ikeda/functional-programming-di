@@ -1,8 +1,8 @@
 import * as E from 'fp-ts/Either';
 import { pipe } from 'fp-ts/lib/function';
-import { combineValidations, required, minLength } from './validation';
 import type { CreateUserInput } from '../domain/userValidation';
 import { validateCreateUserInput } from '../domain/userValidation';
+import { combineValidations, minLength, required } from './validation';
 
 describe('validation', () => {
   describe('validateCreateUserInput', () => {

@@ -10,5 +10,9 @@
   "endOfLine": "lf",
   "quoteProps": "as-needed",
   "bracketSameLine": false,
-  "proseWrap": "preserve"
+  "proseWrap": "preserve",
+  "plugins": ["@trivago/prettier-plugin-sort-imports"],
+  "importOrder": ["^@?\\w", "^[./]"],
+  "importOrderSeparation": false,
+  "importOrderSortSpecifiers": true
 }

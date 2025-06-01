@@ -1,7 +1,7 @@
 import * as TE from 'fp-ts/lib/TaskEither';
-import type { User } from '../../domain/user';
-import type { DomainError } from '../../domain/errors';
 import type { EmailService } from '../../application/ports';
+import type { DomainError } from '../../domain/errors';
+import type { User } from '../../domain/user';
 
 export interface EmailConfig {
   smtpHost: string;

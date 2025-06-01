@@ -1,12 +1,12 @@
-import * as TE from 'fp-ts/TaskEither';
 import * as E from 'fp-ts/Either';
-import sqlite3 from 'sqlite3';
-import type { SQLiteConfig } from './sqliteConnection';
-import { SQLiteConnection, SQLiteConnectionPool } from './sqliteConnection';
+import * as TE from 'fp-ts/TaskEither';
 import { promises as fs } from 'fs';
 import path from 'path';
-import type { DatabaseConnection } from './connection';
+import sqlite3 from 'sqlite3';
 import type { DomainError } from '../../domain/errors';
+import type { DatabaseConnection } from './connection';
+import type { SQLiteConfig } from './sqliteConnection';
+import { SQLiteConnection, SQLiteConnectionPool } from './sqliteConnection';
 
 describe('SQLiteConnection', () => {
   let connection: SQLiteConnection;

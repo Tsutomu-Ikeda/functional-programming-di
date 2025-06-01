@@ -1,7 +1,7 @@
-import type * as TE from 'fp-ts/lib/TaskEither';
 import type * as IO from 'fp-ts/lib/IO';
-import type { User } from '../domain/user';
+import type * as TE from 'fp-ts/lib/TaskEither';
 import type { DomainError } from '../domain/errors';
+import type { User } from '../domain/user';
 
 export interface UserRepository {
   findById: (id: string) => TE.TaskEither<DomainError, User>;

@@ -1,6 +1,6 @@
-import * as TE from 'fp-ts/lib/TaskEither';
-import * as RTE from 'fp-ts/lib/ReaderTaskEither';
 import type * as IO from 'fp-ts/lib/IO';
+import * as RTE from 'fp-ts/lib/ReaderTaskEither';
+import * as TE from 'fp-ts/lib/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
 
 /**

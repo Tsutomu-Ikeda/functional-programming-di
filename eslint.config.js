@@ -90,6 +90,7 @@ export default [
       '*.mjs',
       '*.config.js',
       '*.config.mjs',
+      'package.json',
       'package-lock.json',
       'pnpm-lock.yaml',
       'yarn.lock',

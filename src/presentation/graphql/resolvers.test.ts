@@ -1,9 +1,9 @@
 import * as E from 'fp-ts/lib/Either';
+import type { EmailService, UserRepository } from '../../application/ports';
+import type { User } from '../../domain/user';
+import type { RequestContext, ScopedContainer } from '../../infrastructure/di/types';
 import type { GraphQLContext } from './resolvers';
 import { resolvers } from './resolvers';
-import type { User } from '../../domain/user';
-import type { ScopedContainer, RequestContext } from '../../infrastructure/di/types';
-import type { UserRepository, EmailService } from '../../application/ports';
 
 // Mock dependencies
 jest.mock('../../application/usecases/createUser');

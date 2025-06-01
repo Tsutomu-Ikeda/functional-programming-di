@@ -1,6 +1,6 @@
-import type { AppConfig } from './registry';
-import { registerServices, createDefaultConfig } from './registry';
 import { createContainer } from './container';
+import type { AppConfig } from './registry';
+import { createDefaultConfig, registerServices } from './registry';
 import type { DIContainer } from './types';
 
 // Mock the dependencies

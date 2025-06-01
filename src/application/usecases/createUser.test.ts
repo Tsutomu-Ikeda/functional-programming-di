@@ -1,10 +1,10 @@
-import * as TE from 'fp-ts/TaskEither';
 import * as E from 'fp-ts/Either';
 import * as IO from 'fp-ts/IO';
+import * as TE from 'fp-ts/TaskEither';
+import type { CreateUserInput, DomainError, User } from '../../index';
+import type { EmailService, Logger, UserRepository } from '../ports';
 import type { CreateUserDeps } from './createUser';
 import { createUser } from './createUser';
-import type { UserRepository, EmailService, Logger } from '../ports';
-import type { User, DomainError, CreateUserInput } from '../../index';
 
 describe('createUser usecase', () => {
   let mockUserRepository: jest.Mocked<UserRepository>;

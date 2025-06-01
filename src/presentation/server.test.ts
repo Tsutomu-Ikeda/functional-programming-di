@@ -1,4 +1,6 @@
-import * as E from 'fp-ts/lib/Either';
+import type express from 'express';
+import type * as E from 'fp-ts/lib/Either';
+import { ApplicationServer, createAndStartServer, createServer } from './server';
 
 // Mock express app
 const mockApp = {
@@ -8,7 +10,7 @@ const mockApp = {
 };
 
 // Mock express functions
-const mockExpress = jest.fn(() => mockApp) as unknown as jest.MockedFunction<typeof import('express')>;
+const mockExpress = jest.fn(() => mockApp) as unknown as jest.MockedFunction<typeof express>;
 mockExpress.json = jest.fn();
 mockExpress.urlencoded = jest.fn();
 
@@ -20,9 +22,6 @@ jest.mock('./rest/routes/userRoutes');
 
 // Mock express
 jest.mock('express', () => mockExpress);
-
-// Import after mocking
-import { ApplicationServer, createServer, createAndStartServer } from './server';
 
 describe('ApplicationServer', () => {
   let server: ApplicationServer;

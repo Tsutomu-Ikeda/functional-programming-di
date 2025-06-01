@@ -1,21 +1,21 @@
 import type { Response } from 'express';
-import * as TE from 'fp-ts/lib/TaskEither';
 import * as E from 'fp-ts/lib/Either';
 import * as IO from 'fp-ts/lib/IO';
-import type { AuthenticatedRequest } from './userRoutes';
-import { createUserRoutes, createUserRoutesFP, createRouteConfig } from './userRoutes';
-import type { ScopedContainer, RequestContext } from '../../../infrastructure/di/types';
-import type { UserRepository, EmailService } from '../../../application/ports';
-import { RequestScopedLogger } from '../../../infrastructure/logging/logger';
-import type { CreateUserInput } from '../../../domain/userValidation';
-import type { User } from '../../../domain/user';
-import type { DomainError } from '../../../domain/errors';
-import { SQLiteConnectionPool } from '../../../infrastructure/database/sqliteConnection';
-import { DatabaseUserRepository } from '../../../infrastructure/repositories/userRepository';
-import { depend } from '../../../infrastructure/di/types';
-import path from 'path';
+import * as TE from 'fp-ts/lib/TaskEither';
 import fs from 'fs';
+import path from 'path';
+import type { EmailService, UserRepository } from '../../../application/ports';
 import type { CreateUserDeps } from '../../../application/usecases/createUser';
+import type { DomainError } from '../../../domain/errors';
+import type { User } from '../../../domain/user';
+import type { CreateUserInput } from '../../../domain/userValidation';
+import { SQLiteConnectionPool } from '../../../infrastructure/database/sqliteConnection';
+import type { RequestContext, ScopedContainer } from '../../../infrastructure/di/types';
+import { depend } from '../../../infrastructure/di/types';
+import { RequestScopedLogger } from '../../../infrastructure/logging/logger';
+import { DatabaseUserRepository } from '../../../infrastructure/repositories/userRepository';
+import type { AuthenticatedRequest } from './userRoutes';
+import { createRouteConfig, createUserRoutes, createUserRoutesFP } from './userRoutes';
 
 // Test database setup
 const TEST_DB_PATH = path.join(__dirname, '../../../test.db');

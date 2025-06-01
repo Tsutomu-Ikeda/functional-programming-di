@@ -1,4 +1,4 @@
-import type { DIContainer, ScopedContainer, ServiceDefinition, RequestContext } from './types';
+import type { DIContainer, RequestContext, ScopedContainer, ServiceDefinition } from './types';
 
 export class Container implements DIContainer {
   private services = new Map<string, ServiceDefinition>();

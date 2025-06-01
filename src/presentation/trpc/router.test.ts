@@ -1,8 +1,11 @@
 import { TRPCError } from '@trpc/server';
 import * as E from 'fp-ts/lib/Either';
-import type { ScopedContainer, RequestContext } from '../../infrastructure/di/types';
-import type { UserRepository, EmailService } from '../../application/ports';
+import type { EmailService, UserRepository } from '../../application/ports';
 import type { User } from '../../domain/user';
+import type { RequestContext, ScopedContainer } from '../../infrastructure/di/types';
+// Import after mocking
+import type { TRPCContext } from './router';
+import { appRouter } from './router';
 
 // Mock the createUser use case
 const mockCreateUser = jest.fn();
@@ -19,10 +22,6 @@ jest.mock('../../infrastructure/logging/logger', () => ({
     debug: jest.fn(),
   })),
 }));
-
-// Import after mocking
-import type { TRPCContext } from './router';
-import { appRouter } from './router';
 
 describe('TRPC Router', () => {
   let mockContainer: jest.Mocked<ScopedContainer>;

@@ -1,7 +1,7 @@
 import * as E from 'fp-ts/lib/Either';
 import { pipe } from 'fp-ts/lib/function';
-import type { ValidationError, DomainError } from './errors';
 import { combineValidations } from '../shared/validation';
+import type { DomainError, ValidationError } from './errors';
 
 export interface CreateUserInput {
   email: string;

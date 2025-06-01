@@ -1,13 +1,13 @@
 import express from 'express';
-import * as TE from 'fp-ts/lib/TaskEither';
-import * as IO from 'fp-ts/lib/IO';
 import * as E from 'fp-ts/lib/Either';
+import * as IO from 'fp-ts/lib/IO';
+import * as TE from 'fp-ts/lib/TaskEither';
 import { pipe } from 'fp-ts/lib/function';
 import { createContainer } from '../infrastructure/di/container';
-import { registerServices, createDefaultConfig } from '../infrastructure/di/registry';
+import { createDefaultConfig, registerServices } from '../infrastructure/di/registry';
+import type { DIContainer } from '../infrastructure/di/types';
 import { createDIMiddleware } from './middleware/diMiddleware';
 import { createUserRoutes } from './rest/routes/userRoutes';
-import type { DIContainer } from '../infrastructure/di/types';
 
 // Types for server configuration and state
 interface ServerConfig {

@@ -1,7 +1,7 @@
-import * as TE from 'fp-ts/TaskEither';
 import * as E from 'fp-ts/Either';
 import * as IO from 'fp-ts/IO';
-import type { UserRepository, EmailService, Logger, User, DomainError, CreateUserInput, CreateUserDeps } from './index';
+import * as TE from 'fp-ts/TaskEither';
+import type { CreateUserDeps, CreateUserInput, DomainError, EmailService, Logger, User, UserRepository } from './index';
 import { createUser } from './index';
 
 describe('Integration Tests', () => {

@@ -1,6 +1,6 @@
-import type { GraphQLObjectType, GraphQLEnumType, GraphQLInputObjectType } from 'graphql';
-import { buildSchema, GraphQLSchema } from 'graphql';
-import { typeDefs, schema } from './schema';
+import type { GraphQLEnumType, GraphQLInputObjectType, GraphQLObjectType } from 'graphql';
+import { GraphQLSchema, buildSchema } from 'graphql';
+import { schema, typeDefs } from './schema';
 
 describe('GraphQL Schema', () => {
   describe('typeDefs', () => {

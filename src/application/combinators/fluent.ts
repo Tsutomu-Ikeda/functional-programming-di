@@ -1,5 +1,5 @@
-import * as TE from 'fp-ts/lib/TaskEither';
 import type * as RTE from 'fp-ts/lib/ReaderTaskEither';
+import * as TE from 'fp-ts/lib/TaskEither';
 import type { DomainError } from '../../domain/errors';
 
 export const fx = {

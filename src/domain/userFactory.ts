@@ -1,6 +1,6 @@
 import * as E from 'fp-ts/lib/Either';
-import type { User } from './user';
 import type { DomainError } from './errors';
+import type { User } from './user';
 import type { CreateUserInput } from './userValidation';
 
 export function createUserEntity(input: CreateUserInput): E.Either<DomainError, User> {

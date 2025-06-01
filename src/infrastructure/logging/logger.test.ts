@@ -1,6 +1,6 @@
-import type { LoggerConfig, LogEntry } from './logger';
-import { RequestScopedLogger, SingletonLogger } from './logger';
 import type { RequestContext } from '../di/types';
+import type { LogEntry, LoggerConfig } from './logger';
+import { RequestScopedLogger, SingletonLogger } from './logger';
 
 describe('Logger', () => {
   let consoleSpy: jest.SpyInstance;
