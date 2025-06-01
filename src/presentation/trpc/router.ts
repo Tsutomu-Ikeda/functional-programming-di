@@ -3,7 +3,7 @@ import { z } from 'zod';
 import * as TE from 'fp-ts/lib/TaskEither';
 import * as IO from 'fp-ts/lib/IO';
 import { pipe } from 'fp-ts/lib/function';
-import { createUser } from '../../application/usecases/createUser';
+import { createUser, CreateUserDeps } from '../../application/usecases/createUser';
 import { ScopedContainer, RequestContext } from '../../infrastructure/di/types';
 import { UserRepository, EmailService } from '../../application/ports';
 import { RequestScopedLogger } from '../../infrastructure/logging/logger';
@@ -41,15 +41,7 @@ const createRequestLogger =
     new RequestScopedLogger(requestContext);
 
 // Pure function to resolve dependencies from container
-const resolveDependencies = (
-  container: ScopedContainer,
-): TE.TaskEither<
-  TRPCError,
-  {
-    userRepository: UserRepository;
-    emailService: EmailService;
-  }
-> =>
+const resolveDependencies = (container: ScopedContainer): TE.TaskEither<TRPCError, Partial<CreateUserDeps>> =>
   pipe(
     TE.tryCatch(
       async () => {
@@ -131,11 +123,7 @@ const handleTaskEitherResult = <T>(
 // Pure function to execute create user use case
 const executeCreateUser = (
   input: z.infer<typeof createUserInputSchema>,
-  deps: {
-    userRepository: UserRepository;
-    emailService: EmailService;
-    logger: RequestScopedLogger;
-  },
+  deps: CreateUserDeps,
 ): TE.TaskEither<DomainError, User> => createUser(input)(deps);
 
 // Pure function to execute get user by ID

@@ -14,6 +14,7 @@ import { DatabaseUserRepository } from '../../../infrastructure/repositories/use
 import { depend } from '../../../infrastructure/di/types';
 import path from 'path';
 import fs from 'fs';
+import { CreateUserDeps } from '../../../application/usecases/createUser';
 
 // Test database setup
 const TEST_DB_PATH = path.join(__dirname, '../../../test.db');
@@ -673,14 +674,7 @@ describe('userRoutes', () => {
           emailService,
           logger,
         },
-        async (
-          deps: {
-            userRepository: UserRepository;
-            emailService: EmailService;
-            logger: RequestScopedLogger;
-          },
-          input: CreateUserInput,
-        ) => {
+        async (deps: CreateUserDeps, input: CreateUserInput) => {
           // This simulates how the actual route handler would work
           const result = await deps.userRepository.findByEmail(input.email)();
           if (E.isRight(result)) {
@@ -738,14 +732,7 @@ describe('userRoutes', () => {
           emailService,
           logger,
         },
-        async (
-          deps: {
-            userRepository: UserRepository;
-            emailService: EmailService;
-            logger: RequestScopedLogger;
-          },
-          input: CreateUserInput,
-        ) => {
+        async (deps: CreateUserDeps, input: CreateUserInput) => {
           const newUser: User = {
             id: 'test-id',
             email: input.email,

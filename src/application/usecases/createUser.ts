@@ -8,6 +8,8 @@ import { validateCreateUserInput, CreateUserInput } from '../../domain/userValid
 import { createUserEntity } from '../../domain/userFactory';
 import { fx } from '../combinators';
 
+export type CreateUserDeps = Parameters<ReturnType<typeof createUser>>[0];
+
 export const createUser = (input: CreateUserInput) =>
   pipe(
     RTE.fromEither(validateCreateUserInput(input)),

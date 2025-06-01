@@ -5,7 +5,7 @@ import * as IO from 'fp-ts/lib/IO';
 import * as O from 'fp-ts/lib/Option';
 import * as R from 'fp-ts/lib/Record';
 import { pipe } from 'fp-ts/lib/function';
-import { createUser } from '../../../application/usecases/createUser';
+import { createUser, CreateUserDeps } from '../../../application/usecases/createUser';
 import { ScopedContainer, RequestContext } from '../../../infrastructure/di/types';
 import { UserRepository, EmailService } from '../../../application/ports';
 import { RequestScopedLogger } from '../../../infrastructure/logging/logger';
@@ -51,16 +51,7 @@ const createRouteContext =
   });
 
 // Resolve dependencies for create user use case
-const resolveDependencies = (
-  context: RouteContext,
-): TE.TaskEither<
-  RouteError,
-  {
-    userRepository: UserRepository;
-    emailService: EmailService;
-    logger: RequestScopedLogger;
-  }
-> =>
+const resolveDependencies = (context: RouteContext): TE.TaskEither<RouteError, CreateUserDeps> =>
   pipe(
     TE.tryCatch(
       async () => {
@@ -80,14 +71,7 @@ const resolveDependencies = (
   );
 
 // Execute create user use case
-const executeCreateUser = (
-  input: CreateUserInput,
-  deps: {
-    userRepository: UserRepository;
-    emailService: EmailService;
-    logger: RequestScopedLogger;
-  },
-): TE.TaskEither<RouteError, User> =>
+const executeCreateUser = (input: CreateUserInput, deps: CreateUserDeps): TE.TaskEither<RouteError, User> =>
   pipe(
     TE.tryCatch(
       createUser(input)(deps),
